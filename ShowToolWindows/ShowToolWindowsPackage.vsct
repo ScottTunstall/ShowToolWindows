@@ -60,7 +60,7 @@
         </Strings>
       </Button>
     </Buttons>
-
+    
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
     <Bitmaps>
       <!--  The bitmap id is defined in a way that is a little bit different from the others:
@@ -71,6 +71,14 @@
       <Bitmap guid="guidImages" href="Resources\ShowSolutionExplorerCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough"/>
     </Bitmaps>
   </Commands>
+
+  <KeyBindings>
+    <KeyBinding guid="guidShowToolWindowsPackageCmdSet"
+                id="ShowSolutionExplorerCommandId"
+                editor="guidVSStd97"
+                key1="S" mod1="Alt"
+                key2="W"/>
+  </KeyBindings>
 
   <Symbols>
     <!-- This is the package guid. -->
