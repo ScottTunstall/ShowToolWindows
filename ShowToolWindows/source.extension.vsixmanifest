@@ -3,11 +3,13 @@
     <Metadata>
         <Identity Id="ShowToolWindows.aa7eea29-c26b-493f-8bff-84df7d1490c2" Version="2.0" Language="en-US" Publisher="Scott Tunstall" />
         <DisplayName>ShowToolWindows</DisplayName>
-        <Description xml:space="preserve">Commands that handle Tool Windows that have got out of control.
+        <Description xml:space="preserve">Commands to handle Tool Windows that have got out of control. 
+
 Can Show a Solution Explorer that has gone off screen or obscured by other windows
 Can Hide all but the Solution Explorer (something we all need to do when in Tool Window Hell)
 Can Hide all Tool Windows including Solution Explorer (when you've just had enough of it all)Commands that handle Will position </Description>
         <MoreInfo>https://github.com/ScottTunstall/ShowToolWindows</MoreInfo>
+        <ReleaseNotes>Version 2.0 </ReleaseNotes>
         <Tags>Tool, Windows, Solution, Explorer</Tags>
     </Metadata>
     <Installation>
