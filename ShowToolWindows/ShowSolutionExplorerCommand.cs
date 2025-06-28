@@ -107,12 +107,6 @@ namespace ShowToolWindows
 
                 // Get the IDE window bounds
                 var visualStudioWindow = dte.MainWindow;
-                int mainLeft = visualStudioWindow.Left;
-                int mainTop = visualStudioWindow.Top;
-                int mainWidth = visualStudioWindow.Width;
-                int mainHeight = visualStudioWindow.Height;
-                int mainRight = mainLeft + mainWidth;
-
 
                 // Show the Solution Explorer window
                 var solutionWindow = dte.Windows.Item(EnvDTE.Constants.vsWindowKindSolutionExplorer);
@@ -126,9 +120,6 @@ namespace ShowToolWindows
                 solutionWindow.Visible = true;
                 solutionWindow.Activate();
 
-                // Get the virtual screen bounds
-                Rectangle screen = SystemInformation.VirtualScreen;
-                                                
                 RepositionIfOffscreen(visualStudioWindow, solutionWindow, SystemInformation.VirtualScreen);
             }
             catch (Exception ex)
@@ -150,62 +141,48 @@ namespace ShowToolWindows
             int winBottom = winTop + winHeight;
 
             // If Visual Studio's bottom edge is off screen, position solution explorer at the top of the screen
-            int y;
-            if (visualStudioWindow.Top + visualStudioWindow.Height > screen.Bottom)
-            {
-                y = screen.Top; 
-            }
-            else
-            {
-                y = visualStudioWindow.Top; // Otherwise, position at Visual Studio's top
-            }
-            
+            // Otherwise, position at Visual Studio's top
+            var y = (visualStudioWindow.Top + visualStudioWindow.Height) > screen.Bottom ? screen.Top : visualStudioWindow.Top; 
+
+            // Any part of the solution explorer off left edge of screen?
             if (winLeft < screen.Left)
             {
                 // Float and move to left edge
-                FloatWindowAt(windowToRepos, screen.Left, y, winWidth, winHeight);
+                FloatWindowAt(windowToRepos, screen.Left, y, winWidth, winHeight, screen);
                 Debug.WriteLine("Solution Explorer floated and positioned at left edge of screen");
                 return;
             }
 
+            // Any part of the solution explorer off right edge of screen?
             if (winRight > screen.Right)
             {
                 // Float and move to right edge
-                FloatWindowAt(windowToRepos, screen.Right - winWidth, y, winWidth, winHeight);
+                FloatWindowAt(windowToRepos, screen.Right - winWidth, y, winWidth, winHeight, screen);
                 Debug.WriteLine("Solution Explorer floated and positioned at right edge of screen");
                 return;
             }
 
-            // Any part off bottom
+            // Any part of the solution explorer off bottom edge of screen?  
             if (winBottom > screen.Bottom)
             {
                 // Float and move to top edge
-                FloatWindowAt(windowToRepos, winLeft, y, winWidth, winHeight);
+                FloatWindowAt(windowToRepos, winLeft, y, winWidth, winHeight, screen);
                 Debug.WriteLine("Solution Explorer floated and positioned at top of screen");
                 return;
             }
         }
 
         // Helper to float and position the window
-        private void FloatWindowAt(Window window, int left, int top, int width, int height)
+        private void FloatWindowAt(Window window, int left, int top, int width, int height, Rectangle screen)
         {
             window.IsFloating = true;
             // Clamp width/height to screen
-            int screenWidth = System.Windows.Forms.SystemInformation.VirtualScreen.Width;
-            int screenHeight = System.Windows.Forms.SystemInformation.VirtualScreen.Height;
+            int screenHeight = screen.Height;
             window.Width = Math.Min(width, 400); // reasonable default width
             window.Height = Math.Min(height, screenHeight);
             window.Left = left;
             window.Top = top;
             window.Activate();
-        }
-
-        private void DockWindow(Window window)
-        {
-            if (window.IsFloating)
-            {
-                window.IsFloating = false;
-            }
         }
     }
 }
