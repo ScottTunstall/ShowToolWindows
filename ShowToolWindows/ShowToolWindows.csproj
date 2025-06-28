@@ -45,11 +45,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CloseAllToolWindowsCommand.cs" />
+    <Compile Include="CloseAllToolWindowsExceptSolutionExplorerCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShowSolutionExplorerCommand.cs" />
     <Compile Include="ShowToolWindowsPackage.cs" />
+    <Compile Include="WindowKindConsts.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -73,6 +77,8 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\CloseAllToolWindowsCommand.png" />
+    <Content Include="Resources\CloseAllToolWindowsExceptSolutionExplorerCommand.png" />
     <Content Include="Resources\ShowSolutionExplorerCommand.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

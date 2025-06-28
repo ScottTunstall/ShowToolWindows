@@ -48,6 +48,8 @@ namespace ShowToolWindows
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             await ShowSolutionExplorerCommand.InitializeAsync(this);
+            await CloseAllToolWindowsExceptSolutionExplorerCommand.InitializeAsync(this);
+            await CloseAllToolWindowsCommand.InitializeAsync(this);
         }
 
         #endregion

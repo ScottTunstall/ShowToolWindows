@@ -15,10 +15,10 @@
         defining some of the constants that we will use inside the file. -->
 
   <!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
-  <Extern href="stdidcmd.h"/>
+  <Extern href="stdidcmd.h" />
 
   <!--This header contains the command ids for the menus provided by the shell. -->
-  <Extern href="vsshlids.h"/>
+  <Extern href="vsshlids.h" />
 
   <!--The Commands section is where commands, menus, and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
@@ -37,7 +37,7 @@
          must be a menu. -->
     <Groups>
       <Group guid="guidShowToolWindowsPackageCmdSet" id="MyMenuGroup" priority="0x0600">
-        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
       </Group>
     </Groups>
 
@@ -54,9 +54,23 @@
           If you do not want an image next to your command, remove the Icon node /> -->
       <Button guid="guidShowToolWindowsPackageCmdSet" id="ShowSolutionExplorerCommandId" priority="0x0100" type="Button">
         <Parent guid="guidShowToolWindowsPackageCmdSet" id="MyMenuGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
+        <Icon guid="guidImages" id="solutionExplorerIcon" />
         <Strings>
           <ButtonText>Show Solution Explorer</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidShowToolWindowsPackageCmdSet" id="CloseAllToolWindowsExceptSolutionExplorerCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidShowToolWindowsPackageCmdSet" id="MyMenuGroup" />
+        <Icon guid="guidImages1" id="solutionExplorerIconWithCross" />
+        <Strings>
+          <ButtonText>Close all Tool Windows except Solution Explorer</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidShowToolWindowsPackageCmdSet" id="CloseAllToolWindowsCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidShowToolWindowsPackageCmdSet" id="MyMenuGroup" />
+        <Icon guid="guidImages2" id="nuclearOption" />
+        <Strings>
+          <ButtonText>Close all Tool Windows</ButtonText>
         </Strings>
       </Button>
     </Buttons>
@@ -68,16 +82,16 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used
             inside a button definition. An important aspect of this declaration is that the element id
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="Resources\ShowSolutionExplorerCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough"/>
+      <Bitmap guid="guidImages" href="Resources\ShowSolutionExplorerCommand.png" usedList="solutionExplorerIcon"  />
+      <Bitmap guid="guidImages1" href="Resources\CloseAllToolWindowsExceptSolutionExplorerCommand.png" usedList="solutionExplorerIconWithCross" />
+      <Bitmap guid="guidImages2" href="Resources\CloseAllToolWindowsCommand.png" usedList="nuclearOption" />
     </Bitmaps>
   </Commands>
 
   <KeyBindings>
-    <KeyBinding guid="guidShowToolWindowsPackageCmdSet"
-                id="ShowSolutionExplorerCommandId"
-                editor="guidVSStd97"
-                key1="S" mod1="Alt"
-                key2="W"/>
+    <KeyBinding guid="guidShowToolWindowsPackageCmdSet" id="ShowSolutionExplorerCommandId" editor="guidVSStd97" key1="S" mod1="Alt" key2="W" />
+    <KeyBinding guid="guidShowToolWindowsPackageCmdSet" id="CloseAllToolWindowsExceptSolutionExplorerCommandId" editor="guidVSStd97" key1="S" mod1="Alt" key2="X" />
+    <KeyBinding guid="guidShowToolWindowsPackageCmdSet" id="CloseAllToolWindowsCommandId" editor="guidVSStd97" key1="S" mod1="Alt" key2="A" />
   </KeyBindings>
 
   <Symbols>
@@ -88,15 +102,23 @@
     <GuidSymbol name="guidShowToolWindowsPackageCmdSet" value="{a2a7f2af-5e8b-4a37-a078-5a8dbe625606}">
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="ShowSolutionExplorerCommandId" value="0x0100" />
+      <IDSymbol name="CloseAllToolWindowsExceptSolutionExplorerCommandId" value="4129" />
+      <IDSymbol name="CloseAllToolWindowsCommandId" value="4130" />
     </GuidSymbol>
 
-    <GuidSymbol name="guidImages" value="{7c6779de-492e-46fb-829a-ec2bb5f47cd4}" >
-      <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
+    <GuidSymbol name="guidImages" value="{7c6779de-492e-46fb-829a-ec2bb5f47cd4}">
+      <IDSymbol name="solutionExplorerIcon" value="1" />
+      <IDSymbol name="zilch" value="2" />
+    </GuidSymbol>
+  
+    <GuidSymbol value="{c68a072d-fca2-4ce1-bd33-02f013130b11}" name="guidImages1">
+      <IDSymbol name="solutionExplorerIconWithCross" value="1" />
+      <IDSymbol name="zilch" value="2" />
+    </GuidSymbol>
+  
+    <GuidSymbol value="{d60ad988-107a-4c42-8fc8-85eb9916e3df}" name="guidImages2">
+      <IDSymbol name="nuclearOption" value="1" />
+      <IDSymbol name="zilch" value="2" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>
