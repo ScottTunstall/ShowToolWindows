@@ -1,4 +1,4 @@
-# ToolWindowExtensions
+# Show Tool Window Extension
 
 ## About
 
