@@ -1,29 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
-    <Metadata>
-        <Identity Id="ShowToolWindows.aa7eea29-c26b-493f-8bff-84df7d1490c2" Version="2.0" Language="en-US" Publisher="Scott Tunstall" />
-        <DisplayName>ShowToolWindows</DisplayName>
-        <Description xml:space="preserve">Commands to handle Tool Windows that have got out of control. 
-
-Can Show a Solution Explorer that has gone off screen or obscured by other windows
-Can Hide all but the Solution Explorer (something we all need to do when in Tool Window Hell)
-Can Hide all Tool Windows including Solution Explorer (when you've just had enough of it all)</Description>
-        <MoreInfo>https://github.com/ScottTunstall/ShowToolWindows</MoreInfo>
-        <ReleaseNotes>Version 2.0 </ReleaseNotes>
-        <Tags>Tool, Windows, Solution, Explorer</Tags>
-    </Metadata>
-    <Installation>
-        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
-            <ProductArchitecture>amd64</ProductArchitecture>
-        </InstallationTarget>
-    </Installation>
-    <Dependencies>
-        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
-    </Dependencies>
-    <Prerequisites>
-        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
-    </Prerequisites>
-    <Assets>
-        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
-    </Assets>
+  <Metadata>
+    <Identity Id="ShowToolWindows.aa7eea29-c26b-493f-8bff-84df7d1490c2" Version="2.1" Language="en-US" Publisher="Scott Tunstall" />
+    <DisplayName>ShowToolWindows</DisplayName>
+    <Description xml:space="preserve">
+  Commands to handle Tool Windows that have got out of control.
+</Description>
+    <MoreInfo>https://github.com/ScottTunstall/ShowToolWindows</MoreInfo>
+    <ReleaseNotes>Version 2.1</ReleaseNotes>
+    <Tags>Tool, Windows, Close, Show, Solution, Explorer</Tags>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+  </Dependencies>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
+  </Prerequisites>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+  </Assets>
 </PackageManifest>
