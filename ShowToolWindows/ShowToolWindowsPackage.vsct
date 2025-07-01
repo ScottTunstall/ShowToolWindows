@@ -89,9 +89,9 @@
   </Commands>
 
   <KeyBindings>
-    <KeyBinding guid="guidShowToolWindowsPackageCmdSet" id="ShowSolutionExplorerCommandId" editor="guidVSStd97" key1="S" mod1="Alt" key2="W" />
-    <KeyBinding guid="guidShowToolWindowsPackageCmdSet" id="CloseAllToolWindowsExceptSolutionExplorerCommandId" editor="guidVSStd97" key1="S" mod1="Alt" key2="X" />
-    <KeyBinding guid="guidShowToolWindowsPackageCmdSet" id="CloseAllToolWindowsCommandId" editor="guidVSStd97" key1="S" mod1="Alt" key2="A" />
+    <KeyBinding guid="guidShowToolWindowsPackageCmdSet" id="ShowSolutionExplorerCommandId" editor="guidVSStd97" key1="S" mod1="Control Shift" key2="W" />
+    <KeyBinding guid="guidShowToolWindowsPackageCmdSet" id="CloseAllToolWindowsExceptSolutionExplorerCommandId" editor="guidVSStd97" key1="S" mod1="Control Shift" key2="X" />
+    <KeyBinding guid="guidShowToolWindowsPackageCmdSet" id="CloseAllToolWindowsCommandId" editor="guidVSStd97" key1="S" mod1="Control Shift" key2="A" />
   </KeyBindings>
 
   <Symbols>
