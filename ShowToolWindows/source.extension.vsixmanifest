@@ -7,7 +7,7 @@
 
 Can Show a Solution Explorer that has gone off screen or obscured by other windows
 Can Hide all but the Solution Explorer (something we all need to do when in Tool Window Hell)
-Can Hide all Tool Windows including Solution Explorer (when you've just had enough of it all)Commands that handle Will position </Description>
+Can Hide all Tool Windows including Solution Explorer (when you've just had enough of it all)</Description>
         <MoreInfo>https://github.com/ScottTunstall/ShowToolWindows</MoreInfo>
         <ReleaseNotes>Version 2.0 </ReleaseNotes>
         <Tags>Tool, Windows, Solution, Explorer</Tags>
