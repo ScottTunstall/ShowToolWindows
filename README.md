@@ -1,4 +1,4 @@
-# Show Tool Window Extension
+# Show Tool Window Extension for Visual Studio 2019 and 2022.
 
 ## About
 
