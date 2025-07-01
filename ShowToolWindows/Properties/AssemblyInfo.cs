@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("ShowToolWindows")]
-[assembly: AssemblyDescription("Shows or hides tool windows")]
+[assembly: AssemblyDescription("Shows or hides tool windows in Visual Studio.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Scott Tunstall (scott.tunstall@ntlworld.com)")]
 [assembly: AssemblyProduct("ShowToolWindows")]
-[assembly: AssemblyCopyright("Copyright 2025 Scott Tunstall.")]
+[assembly: AssemblyCopyright("Developed June 2025 by Scott Tunstall. Forking of this product is allowed, but creating a derivative for sale is strictly forbidden.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -29,4 +29,4 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("2.0.*")]
-[assembly: AssemblyFileVersion("2.0.*")]
+[assembly: AssemblyFileVersion("2.0.0.1")]
