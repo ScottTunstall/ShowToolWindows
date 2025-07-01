@@ -22,7 +22,7 @@ After installing the extension, you should see three new commands (circled in im
 * The third command, **Close all Tool Windows** is the nuclear option and does as you expect. Every tool window goes, but your code windows will be left untouched. 
 
 
-## Keyboard Shortcuts
+## Assigning Keyboard Shortcuts (recommended)
 
 I recommend you assign keyboard shortcuts to these commands. To do this, click **Tools | Options** then open **Environment | Keyboard**, like so:
 
