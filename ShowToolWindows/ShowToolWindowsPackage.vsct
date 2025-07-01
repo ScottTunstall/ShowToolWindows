@@ -57,6 +57,7 @@
         <Icon guid="guidImages" id="solutionExplorerIcon" />
         <Strings>
           <ButtonText>Show Solution Explorer</ButtonText>
+          <LocCanonicalName>ScottTunstall.ShowToolWindows.ShowSolutionExplorer</LocCanonicalName>
         </Strings>
       </Button>
       <Button guid="guidShowToolWindowsPackageCmdSet" id="CloseAllToolWindowsExceptSolutionExplorerCommandId" priority="0x0100" type="Button">
@@ -64,13 +65,15 @@
         <Icon guid="guidImages1" id="solutionExplorerIconWithCross" />
         <Strings>
           <ButtonText>Close all Tool Windows except Solution Explorer</ButtonText>
+          <LocCanonicalName>ScottTunstall.ShowToolWindows.CloseAllToolWindowsExceptSolutionExplorer</LocCanonicalName>
         </Strings>
       </Button>
-      <Button guid="guidShowToolWindowsPackageCmdSet" id="CloseAllToolWindowsCommandId" priority="0x0100" type="Button">
+      <Button guid="guidShowToolWindowsPackageCmdSet" id="CloseAllToolWindowsCommandId"  priority="0x0100" type="Button">
         <Parent guid="guidShowToolWindowsPackageCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages2" id="nuclearOption" />
         <Strings>
           <ButtonText>Close all Tool Windows</ButtonText>
+          <LocCanonicalName>ScottTunstall.ShowToolWindows.CloseAllToolWindows</LocCanonicalName>
         </Strings>
       </Button>
     </Buttons>
@@ -87,12 +90,6 @@
       <Bitmap guid="guidImages2" href="Resources\CloseAllToolWindowsCommand.png" usedList="nuclearOption" />
     </Bitmaps>
   </Commands>
-
-  <KeyBindings>
-    <KeyBinding guid="guidShowToolWindowsPackageCmdSet" id="ShowSolutionExplorerCommandId" editor="guidVSStd97" key1="S" mod1="Control Shift" key2="W" />
-    <KeyBinding guid="guidShowToolWindowsPackageCmdSet" id="CloseAllToolWindowsExceptSolutionExplorerCommandId" editor="guidVSStd97" key1="S" mod1="Control Shift" key2="X" />
-    <KeyBinding guid="guidShowToolWindowsPackageCmdSet" id="CloseAllToolWindowsCommandId" editor="guidVSStd97" key1="S" mod1="Control Shift" key2="A" />
-  </KeyBindings>
 
   <Symbols>
     <!-- This is the package guid. -->
