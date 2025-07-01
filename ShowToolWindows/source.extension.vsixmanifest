@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="ShowToolWindows.aa7eea29-c26b-493f-8bff-84df7d1490c2" Version="2.2" Language="en-US" Publisher="Scott Tunstall" />
+    <Identity Id="ShowToolWindows.aa7eea29-c26b-493f-8bff-84df7d1490c2" Version="2.3" Language="en-US" Publisher="Scott Tunstall" />
     <DisplayName>ShowToolWindows</DisplayName>
     <Description xml:space="preserve">
   Commands to handle Tool Windows that have got out of control.
 </Description>
     <MoreInfo>https://github.com/ScottTunstall/ShowToolWindows</MoreInfo>
-    <ReleaseNotes>Version 2.2</ReleaseNotes>
+    <ReleaseNotes>Version 2.3</ReleaseNotes>
     <Tags>Tool, Windows, Close, Show, Solution, Explorer</Tags>
   </Metadata>
   <Installation>
