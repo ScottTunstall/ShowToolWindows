@@ -77,6 +77,14 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="renegade_realistic.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="target_renegade.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\CloseAllToolWindowsCommand.png" />
     <Content Include="Resources\CloseAllToolWindowsExceptSolutionExplorerCommand.png" />
     <Content Include="Resources\ShowSolutionExplorerCommand.png" />
