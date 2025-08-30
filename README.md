@@ -1,6 +1,7 @@
 # Show Tool Window Extension for Visual Studio 2019 and 2022
 
-<img width="1540" height="1144" alt="renegade_realistic" src="https://github.com/user-attachments/assets/d864c819-92fe-4bd2-84a9-20c7d7837437" />
+<img width="1024" height="1024" alt="renegade_realistic_2" src="https://github.com/user-attachments/assets/d6565409-cf80-4197-a34b-218650c20354" />
+
 
 ## About
 
