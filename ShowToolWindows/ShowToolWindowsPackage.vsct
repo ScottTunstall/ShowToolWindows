@@ -76,6 +76,13 @@
           <LocCanonicalName>ScottTunstall.ShowToolWindows.CloseAllToolWindows</LocCanonicalName>
         </Strings>
       </Button>
+      <Button guid="guidShowToolWindowsPackageCmdSet" id="CloseSpecificToolWindowsCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidShowToolWindowsPackageCmdSet" id="MyMenuGroup" />
+        <Strings>
+          <ButtonText>Show/Hide specific tool windows</ButtonText>
+          <LocCanonicalName>ScottTunstall.ShowToolWindows.ShowHideSpecificToolWindows</LocCanonicalName>
+        </Strings>
+      </Button>
     </Buttons>
     
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -101,6 +108,7 @@
       <IDSymbol name="ShowSolutionExplorerCommandId" value="0x0100" />
       <IDSymbol name="CloseAllToolWindowsExceptSolutionExplorerCommandId" value="4129" />
       <IDSymbol name="CloseAllToolWindowsCommandId" value="4130" />
+      <IDSymbol name="CloseSpecificToolWindowsCommandId" value="4131" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{7c6779de-492e-46fb-829a-ec2bb5f47cd4}">

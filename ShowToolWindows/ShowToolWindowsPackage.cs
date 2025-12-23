@@ -1,4 +1,7 @@
 ﻿using Microsoft.VisualStudio.Shell;
+using ShowToolWindows.Commands;
+using ShowToolWindows.UI;
+using ShowToolWindows.UI.ToolWindows;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -26,6 +29,7 @@ namespace ShowToolWindows
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(ShowToolWindowsPackage.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideToolWindow(typeof(CloseToolWindowsToolWindow))]
     public sealed class ShowToolWindowsPackage : AsyncPackage
     {
         /// <summary>
@@ -50,6 +54,7 @@ namespace ShowToolWindows
             await ShowSolutionExplorerCommand.InitializeAsync(this);
             await CloseAllToolWindowsExceptSolutionExplorerCommand.InitializeAsync(this);
             await CloseAllToolWindowsCommand.InitializeAsync(this);
+            await CloseSpecificToolWindowsCommand.InitializeAsync(this);
         }
 
         #endregion
