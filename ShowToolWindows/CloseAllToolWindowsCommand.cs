@@ -1,7 +1,9 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using EnvDTE;
+using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Linq;
 using Task = System.Threading.Tasks.Task;
 
 namespace ShowToolWindows
@@ -89,28 +91,20 @@ namespace ShowToolWindows
 
             try
             {
-                var dte = Package.GetGlobalService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
-                if (dte == null)
+                if (!(Package.GetGlobalService(typeof(EnvDTE.DTE)) is DTE dte))
                 {
                     Debug.WriteLine("ERROR: Could not get DTE service");
                     return;
                 }
 
-                // Iterate all windows and close all tool windows 
-                foreach (EnvDTE.Window window in dte.Windows)
-                {
-                    try
-                    {
-                        if (window.Kind == WindowKindConsts.ToolWindowKind && window.ObjectKind != EnvDTE.Constants.vsWindowKindMainWindow)
-                        {
-                            window.Close();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"Could not close window: {window.Caption}, {ex.Message}");
-                    }
-                }
+#pragma warning disable VSTHRD010
+                var windowsToClose = dte.Windows
+                    .Cast<EnvDTE.Window>()
+                    .Where(w => w.Kind == WindowKindConsts.ToolWindowKind && w.ObjectKind != EnvDTE.Constants.vsWindowKindMainWindow)
+                    .ToList();
+#pragma warning restore VSTHRD010
+
+                WindowHelper.CloseWindows(windowsToClose);
             }
             catch (Exception ex)
             {
