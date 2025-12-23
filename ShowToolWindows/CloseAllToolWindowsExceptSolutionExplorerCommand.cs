@@ -30,7 +30,7 @@ namespace ShowToolWindows
         /// <summary>
         /// VS Package that provides this command, not null.
         /// </summary>
-        private readonly AsyncPackage package;
+        private readonly AsyncPackage _package;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CloseAllToolWindowsExceptSolutionExplorerCommand"/> class.
@@ -40,11 +40,11 @@ namespace ShowToolWindows
         /// <param name="commandService">Command service to add command to, not null.</param>
         private CloseAllToolWindowsExceptSolutionExplorerCommand(AsyncPackage package, OleMenuCommandService commandService)
         {
-            this.package = package ?? throw new ArgumentNullException(nameof(package));
+            this._package = package ?? throw new ArgumentNullException(nameof(package));
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
-            var menuCommandID = new CommandID(CommandSet, CommandId);
-            var menuItem = new MenuCommand(this.Execute, menuCommandID);
+            var menuCommandId = new CommandID(CommandSet, CommandId);
+            var menuItem = new MenuCommand(this.Execute, menuCommandId);
             commandService.AddCommand(menuItem);
         }
 
@@ -64,7 +64,7 @@ namespace ShowToolWindows
         {
             get
             {
-                return this.package;
+                return this._package;
             }
         }
 
