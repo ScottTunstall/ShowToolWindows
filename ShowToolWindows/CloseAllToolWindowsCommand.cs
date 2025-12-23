@@ -40,11 +40,11 @@ namespace ShowToolWindows
         /// <param name="commandService">Command service to add command to, not null.</param>
         private CloseAllToolWindowsCommand(AsyncPackage package, OleMenuCommandService commandService)
         {
-            this._package = package ?? throw new ArgumentNullException(nameof(package));
+            _package = package ?? throw new ArgumentNullException(nameof(package));
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
             var menuCommandId = new CommandID(CommandSet, CommandId);
-            var menuItem = new MenuCommand(this.Execute, menuCommandId);
+            var menuItem = new MenuCommand(Execute, menuCommandId);
             commandService.AddCommand(menuItem);
         }
 
@@ -60,11 +60,11 @@ namespace ShowToolWindows
         /// <summary>
         /// Gets the service provider from the owner package.
         /// </summary>
-        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider
+        private IAsyncServiceProvider ServiceProvider
         {
             get
             {
-                return this._package;
+                return _package;
             }
         }
 
@@ -95,7 +95,7 @@ namespace ShowToolWindows
 
             try
             {
-                if (!(Package.GetGlobalService(typeof(EnvDTE.DTE)) is DTE dte))
+                if (!(Package.GetGlobalService(typeof(DTE)) is DTE dte))
                 {
                     Debug.WriteLine("ERROR: Could not get DTE service");
                     StatusBarHelper.ShowStatusBarNotification("Error: Could not access Visual Studio services");
@@ -104,10 +104,10 @@ namespace ShowToolWindows
 
 #pragma warning disable VSTHRD010
                 var windowsToClose = dte.Windows
-                    .Cast<EnvDTE.Window>()
+                    .Cast<Window>()
                     .Where(w=> w.Visible)
                     .Where(w => w.Kind == WindowKindConsts.ToolWindowKind)
-                    .Where(w=> w.ObjectKind != EnvDTE.Constants.vsWindowKindMainWindow)
+                    .Where(w=> w.ObjectKind != Constants.vsWindowKindMainWindow)
                     .ToList();
 #pragma warning restore VSTHRD010
 
