@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="ShowToolWindows.aa7eea29-c26b-493f-8bff-84df7d1490c2" Version="2.4" Language="en-US" Publisher="Scott Tunstall" />
+        <Identity Id="ShowToolWindows.aa7eea29-c26b-493f-8bff-84df7d1490c2" Version="2.5" Language="en-US" Publisher="Scott Tunstall" />
         <DisplayName>ShowToolWindows</DisplayName>
-        <Description xml:space="preserve">Commands to handle Tool Windows that have got out of control. Via the Tools menu, you now can close all tool windows except solution explorer or close all tool windows completely.
+        <Description xml:space="preserve">Commands to handle Tool Windows that have got out of control. Via the Tools menu, you can now show solution explorer, close all tool windows except solution explorer, or close all tool windows completely.
 </Description>
         <MoreInfo>https://github.com/ScottTunstall/ShowToolWindows</MoreInfo>
-        <ReleaseNotes>Version 2.4</ReleaseNotes>
+        <ReleaseNotes>Version 2.5</ReleaseNotes>
         <Icon>renegade_realistic_2.png</Icon>
         <PreviewImage>renegade_realistic_2.png</PreviewImage>
         <Tags>Tool, Windows, Close, Show, Solution, Explorer</Tags>
@@ -44,12 +44,34 @@
         <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[17.0,18.0)">
             <ProductArchitecture>arm64</ProductArchitecture>
         </InstallationTarget>
+
+        <!-- VS 2026 (amd64) -->
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[18.0,19.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Id="Microsoft.VisualStudio.Professional" Version="[18.0,19.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[18.0,19.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+
+        <!-- VS 2026 (arm64) -->
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[18.0,19.0)">
+            <ProductArchitecture>arm64</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Id="Microsoft.VisualStudio.Professional" Version="[18.0,19.0)">
+            <ProductArchitecture>arm64</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[18.0,19.0)">
+            <ProductArchitecture>arm64</ProductArchitecture>
+        </InstallationTarget>
     </Installation>
     <Dependencies>
         <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
     </Dependencies>
     <Prerequisites>
-        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[16.0,18.0)" DisplayName="Visual Studio core editor" />
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[16.0,19.0)" DisplayName="Visual Studio core editor" />
     </Prerequisites>
     <Assets>
         <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
