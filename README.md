@@ -1,8 +1,8 @@
-# Show Tool Window Extension for Visual Studio 2019 and 2022
+# Show Tool Window Extension for Visual Studio 2019, 2022 and 2026.
 
 ## About
 
-Are you using Visual Studio 2019 or 2022?
+Are you using Visual Studio 2019+ ?
 
 Does your Solution Explorer end up wandering off screen or get stuck under a pile of windows and you have a torrid time trying to find it?
 Or do you end up with a load of Tool Windows open and you don't want to reset window layout but would like to close them all?
