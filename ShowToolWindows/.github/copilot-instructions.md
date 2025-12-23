@@ -14,6 +14,7 @@
 ## General Coding Practices
 
 - Use C# compatible with .NET Framework 4.7.2
+- OBEY .editorconfig settings.
 - Follow .NET naming conventions (PascalCase for types, camelCase for locals).
 - Keep methods short and focused.
 - Avoid static mutable state.
