@@ -157,7 +157,6 @@ namespace ShowToolWindows
             {
                 // Float and move to right edge
                 FloatWindowAt(windowToRepos, screen.Right - winWidth, y, winWidth, winHeight, screen);
-
                 return;
             }
 
