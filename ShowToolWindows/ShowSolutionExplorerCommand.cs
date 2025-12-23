@@ -10,10 +10,13 @@ using Task = System.Threading.Tasks.Task;
 namespace ShowToolWindows
 {
     /// <summary>
-    /// Command handler
+    /// Command handler that shows and activates the Solution Explorer tool window.
     /// </summary>
-
-    #pragma warning disable VSTHRD010 // Invoke single-threaded types on Main thread
+    /// <remarks>
+    /// This command makes the Solution Explorer visible and brings it to the foreground.
+    /// If the Solution Explorer is positioned off-screen, the command automatically repositions 
+    /// it to be visible within the current screen bounds.
+    /// </remarks>
     internal sealed class ShowSolutionExplorerCommand
     {
         /// <summary>
@@ -39,11 +42,11 @@ namespace ShowToolWindows
         /// <param name="commandService">Command service to add command to, not null.</param>
         private ShowSolutionExplorerCommand(AsyncPackage package, OleMenuCommandService commandService)
         {
-            this._package = package ?? throw new ArgumentNullException(nameof(package));
+            _package = package ?? throw new ArgumentNullException(nameof(package));
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
             var menuCommandId = new CommandID(CommandSet, CommandId);
-            var menuItem = new MenuCommand(this.Execute, menuCommandId);
+            var menuItem = new MenuCommand(Execute, menuCommandId);
             commandService.AddCommand(menuItem);
         }
 
@@ -59,11 +62,11 @@ namespace ShowToolWindows
         /// <summary>
         /// Gets the service provider from the owner package.
         /// </summary>
-        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider
+        private IAsyncServiceProvider ServiceProvider
         {
             get
             {
-                return this._package;
+                return _package;
             }
         }
 
@@ -91,32 +94,27 @@ namespace ShowToolWindows
         private void Execute(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            Debug.WriteLine("ShowSolutionExplorerCommand.Execute called");
 
             try
             {
                 // Get the Solution Explorer tool window
-                var dte = Package.GetGlobalService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
-                if (dte == null)
+                if (!(Package.GetGlobalService(typeof(DTE)) is DTE dte))
                 {
                     Debug.WriteLine("ERROR: Could not get DTE service");
                     return;
                 }
 
-                Debug.WriteLine("Got DTE service successfully");
-
                 // Get the IDE window bounds
                 var visualStudioWindow = dte.MainWindow;
 
                 // Show the Solution Explorer window
-                var solutionWindow = dte.Windows.Item(EnvDTE.Constants.vsWindowKindSolutionExplorer);
+                var solutionWindow = dte.Windows.Item(Constants.vsWindowKindSolutionExplorer);
                 if (solutionWindow == null)
                 {
                     Debug.WriteLine("ERROR: Solution Explorer window not found");
                     return;
                 }
-
-                Debug.WriteLine("Found Solution Explorer window");
+                
                 solutionWindow.Visible = true;
                 solutionWindow.Activate();
 
@@ -130,9 +128,9 @@ namespace ShowToolWindows
             }
         }
 
+#pragma warning disable VSTHRD010
         private void RepositionIfOffscreen(Window visualStudioWindow, Window windowToRepos, Rectangle screen)
         {
-
             int winLeft = windowToRepos.Left;
             int winTop = windowToRepos.Top;
             int winWidth = windowToRepos.Width;
@@ -140,16 +138,17 @@ namespace ShowToolWindows
             int winRight = winLeft + winWidth;
             int winBottom = winTop + winHeight;
 
-            // If Visual Studio's bottom edge is off screen, position solution explorer at the top of the screen
+            // If Visual Studio's bottom edge is off-screen, position solution explorer at the top of the screen
             // Otherwise, position at Visual Studio's top
-            var y = (visualStudioWindow.Top + visualStudioWindow.Height) > screen.Bottom ? screen.Top : visualStudioWindow.Top; 
+            var y = (visualStudioWindow.Top + visualStudioWindow.Height) > screen.Bottom
+                ? screen.Top
+                : visualStudioWindow.Top;
 
             // Any part of the solution explorer off left edge of screen?
             if (winLeft < screen.Left)
             {
                 // Float and move to left edge
                 FloatWindowAt(windowToRepos, screen.Left, y, winWidth, winHeight, screen);
-                Debug.WriteLine("Solution Explorer floated and positioned at left edge of screen");
                 return;
             }
 
@@ -158,7 +157,7 @@ namespace ShowToolWindows
             {
                 // Float and move to right edge
                 FloatWindowAt(windowToRepos, screen.Right - winWidth, y, winWidth, winHeight, screen);
-                Debug.WriteLine("Solution Explorer floated and positioned at right edge of screen");
+
                 return;
             }
 
@@ -167,7 +166,6 @@ namespace ShowToolWindows
             {
                 // Float and move to top edge
                 FloatWindowAt(windowToRepos, winLeft, y, winWidth, winHeight, screen);
-                Debug.WriteLine("Solution Explorer floated and positioned at top of screen");
                 return;
             }
         }
@@ -184,5 +182,7 @@ namespace ShowToolWindows
             window.Top = top;
             window.Activate();
         }
+
+#pragma warning restore VSTHRD010
     }
 }
