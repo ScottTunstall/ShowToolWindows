@@ -9,8 +9,12 @@ using Task = System.Threading.Tasks.Task;
 namespace ShowToolWindows
 {
     /// <summary>
-    /// Command handler
+    /// Command handler that closes all visible tool windows in Visual Studio.
     /// </summary>
+    /// <remarks>
+    /// This command closes all tool windows except the main window, providing a way to quickly 
+    /// clean up the Visual Studio workspace by hiding all visible tool windows at once.
+    /// </remarks>
     internal sealed class CloseAllToolWindowsCommand
     {
         /// <summary>
@@ -94,23 +98,32 @@ namespace ShowToolWindows
                 if (!(Package.GetGlobalService(typeof(EnvDTE.DTE)) is DTE dte))
                 {
                     Debug.WriteLine("ERROR: Could not get DTE service");
+                    StatusBarHelper.ShowStatusBarNotification("Error: Could not access Visual Studio services");
                     return;
                 }
 
 #pragma warning disable VSTHRD010
                 var windowsToClose = dte.Windows
                     .Cast<EnvDTE.Window>()
-                    .Where(w => w.Kind == WindowKindConsts.ToolWindowKind && w.ObjectKind != EnvDTE.Constants.vsWindowKindMainWindow)
+                    .Where(w=> w.Visible)
+                    .Where(w => w.Kind == WindowKindConsts.ToolWindowKind)
+                    .Where(w=> w.ObjectKind != EnvDTE.Constants.vsWindowKindMainWindow)
                     .ToList();
 #pragma warning restore VSTHRD010
 
-                WindowHelper.CloseWindows(windowsToClose);
+                int closedCount = WindowHelper.CloseWindows(windowsToClose);
+                
+                string message = closedCount == 1 
+                    ? "Closed 1 tool window." 
+                    : $"Closed {closedCount} tool windows.";
+                StatusBarHelper.ShowStatusBarNotification(message);
             }
             catch (Exception ex)
             {
                 // Log the error or show a message
                 Debug.WriteLine($"ERROR closing tool windows: {ex.Message}");
                 Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                StatusBarHelper.ShowStatusBarNotification($"Error closing tool windows: {ex.Message}");
             }
         }
     }

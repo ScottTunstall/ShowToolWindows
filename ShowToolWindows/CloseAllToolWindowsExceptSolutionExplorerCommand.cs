@@ -9,8 +9,12 @@ using Task = System.Threading.Tasks.Task;
 namespace ShowToolWindows
 {
     /// <summary>
-    /// Command handler
+    /// Command handler that closes all visible tool windows in Visual Studio except Solution Explorer.
     /// </summary>
+    /// <remarks>
+    /// This command closes all tool windows except the main window and Solution Explorer, providing a way to 
+    /// quickly clean up the Visual Studio workspace while preserving access to the solution structure.
+    /// </remarks>
     internal sealed class CloseAllToolWindowsExceptSolutionExplorerCommand
     {
         /// <summary>
@@ -95,24 +99,33 @@ namespace ShowToolWindows
                 if (!(Package.GetGlobalService(typeof(EnvDTE.DTE)) is DTE dte))
                 {
                     Debug.WriteLine("ERROR: Could not get DTE service");
+                    StatusBarHelper.ShowStatusBarNotification("Error: Could not access Visual Studio services");
                     return;
                 }
 
-                // Iterate all windows and close all tool windows except Solution Explorer
 #pragma warning disable VSTHRD010
                 var windowsToClose = dte.Windows
                     .Cast<EnvDTE.Window>()
-                    .Where(x=>x.Kind == WindowKindConsts.ToolWindowKind && x.ObjectKind != EnvDTE.Constants.vsWindowKindMainWindow && x.ObjectKind != EnvDTE.Constants.vsWindowKindSolutionExplorer)
+                    .Where(w=>w.Visible)
+                    .Where(w=>w.Kind == WindowKindConsts.ToolWindowKind)
+                    .Where(w=>w.ObjectKind != EnvDTE.Constants.vsWindowKindMainWindow)
+                    .Where(w=> w.ObjectKind != EnvDTE.Constants.vsWindowKindSolutionExplorer)
                     .ToList();
 #pragma warning restore VSTHRD010
 
-                WindowHelper.CloseWindows(windowsToClose);
+                int closedCount = WindowHelper.CloseWindows(windowsToClose);
+                
+                string message = closedCount == 1 
+                    ? "Closed 1 tool window." 
+                    : $"Closed {closedCount} tool windows.";
+                StatusBarHelper.ShowStatusBarNotification(message);
             }
             catch (Exception ex)
             {
                 // Log the error or show a message
                 Debug.WriteLine($"ERROR closing tool windows: {ex.Message}");
                 Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                StatusBarHelper.ShowStatusBarNotification($"Error closing tool windows: {ex.Message}");
             }
         }
     }
