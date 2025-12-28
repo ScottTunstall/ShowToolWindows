@@ -10,7 +10,7 @@ namespace ShowToolWindows.Commands
     /// <summary>
     /// Command handler that shows the Show/Hide specific tool windows tool window.
     /// </summary>
-    internal sealed class CloseSpecificToolWindowsCommand
+    internal sealed class ToggleToolWindowsCommand
     {
         /// <summary>
         /// Command ID.
@@ -24,7 +24,7 @@ namespace ShowToolWindows.Commands
 
         private readonly AsyncPackage _package;
 
-        private CloseSpecificToolWindowsCommand(AsyncPackage package, OleMenuCommandService commandService)
+        private ToggleToolWindowsCommand(AsyncPackage package, OleMenuCommandService commandService)
         {
             _package = package ?? throw new ArgumentNullException(nameof(package));
             if (commandService == null)
@@ -40,7 +40,7 @@ namespace ShowToolWindows.Commands
         /// <summary>
         /// Gets the singleton instance of the command.
         /// </summary>
-        public static CloseSpecificToolWindowsCommand Instance
+        public static ToggleToolWindowsCommand Instance
         {
             get;
             private set;
@@ -55,7 +55,7 @@ namespace ShowToolWindows.Commands
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
 
             OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
-            Instance = new CloseSpecificToolWindowsCommand(package, commandService);
+            Instance = new ToggleToolWindowsCommand(package, commandService);
         }
 
         private void Execute(object sender, EventArgs e)
@@ -66,13 +66,13 @@ namespace ShowToolWindows.Commands
                 {
                     await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(_package.DisposalToken);
 
-                    ToolWindowPane window = await _package.ShowToolWindowAsync(typeof(CloseToolWindowsToolWindow), 0, true, _package.DisposalToken);
+                    ToolWindowPane window = await _package.ShowToolWindowAsync(typeof(ToggleToolWindowsToolWindow), 0, true, _package.DisposalToken);
                     if (window?.Frame == null)
                     {
                         throw new NotSupportedException("Cannot create Show/Hide specific tool windows tool window.");
                     }
 
-                    CloseToolWindowsToolWindow pane = (CloseToolWindowsToolWindow)window;
+                    ToggleToolWindowsToolWindow pane = (ToggleToolWindowsToolWindow)window;
                     await pane.InitializeAsync(_package);
 
                     IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
