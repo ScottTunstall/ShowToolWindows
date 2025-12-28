@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Window = EnvDTE.Window;
 
 namespace ShowToolWindows.UI.ToolWindows
@@ -13,19 +14,26 @@ namespace ShowToolWindows.UI.ToolWindows
     /// <summary>
     /// Interaction logic for CloseToolWindowsControl.
     /// </summary>
-    public partial class CloseToolWindowsControl : UserControl
+    public partial class ToggleToolWindowsControl : UserControl
     {
         private AsyncPackage _package;
         private DTE _dte;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CloseToolWindowsControl"/> class.
+        /// Initializes a new instance of the <see cref="ToggleToolWindowsControl"/> class.
         /// </summary>
-        public CloseToolWindowsControl()
+        public ToggleToolWindowsControl()
         {
             InitializeComponent();
             DataContext = this;
+
+            RefreshCommand = new RelayCommand(ExecuteRefresh);
         }
+
+        /// <summary>
+        /// Gets the command for refreshing the tool windows list (F5).
+        /// </summary>
+        public ICommand RefreshCommand { get; }
 
         /// <summary>
         /// Gets the collection of tool windows displayed in the UI.
@@ -103,6 +111,12 @@ namespace ShowToolWindows.UI.ToolWindows
             SetAllWindowsVisibility(false);
         }
 
+
+        private void ExecuteRefresh(object parameter)
+        {
+            RefreshToolWindows();
+        }
+
         private void RefreshToolWindows()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -126,6 +140,18 @@ namespace ShowToolWindows.UI.ToolWindows
             }
         }
 
+        private void SelectAllToolWindows()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            foreach (ToolWindowEntry entry in ToolWindows)
+            {
+                entry.IsVisible = true;
+                entry.SetVisibility(true);
+                entry.Synchronize();
+            }
+        }
+
         private static bool IsSupportedToolWindow(Window window)
         {
             if (window == null)
@@ -145,14 +171,14 @@ namespace ShowToolWindows.UI.ToolWindows
 
             // Exclude our own tool window by GUID
             string objectKindNormalized = window.ObjectKind.Trim('{', '}');
-            if (string.Equals(objectKindNormalized, CloseToolWindowsToolWindow.ToolWindowGuidString,
+            if (string.Equals(objectKindNormalized, ToggleToolWindowsToolWindow.ToolWindowGuidString,
                     StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
 
             // Also exclude by caption as a fallback
-            if (string.Equals(window.Caption, CloseToolWindowsToolWindow.ToolWindowTitle, StringComparison.Ordinal))
+            if (string.Equals(window.Caption, ToggleToolWindowsToolWindow.ToolWindowTitle, StringComparison.Ordinal))
             {
                 return false;
             }

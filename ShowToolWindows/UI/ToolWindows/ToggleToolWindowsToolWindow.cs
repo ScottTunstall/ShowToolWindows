@@ -9,7 +9,7 @@ namespace ShowToolWindows.UI.ToolWindows
     /// Tool window that hosts the UI for showing and hiding tool windows.
     /// </summary>
     [Guid(ToolWindowGuidString)]
-    public sealed class CloseToolWindowsToolWindow : ToolWindowPane
+    public sealed class ToggleToolWindowsToolWindow : ToolWindowPane
     {
         /// <summary>
         /// Tool window GUID.
@@ -19,13 +19,13 @@ namespace ShowToolWindows.UI.ToolWindows
         internal const string ToolWindowTitle = "Show/Hide specific tool windows";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CloseToolWindowsToolWindow"/> class.
+        /// Initializes a new instance of the <see cref="ToggleToolWindowsToolWindow"/> class.
         /// </summary>
-        public CloseToolWindowsToolWindow()
+        public ToggleToolWindowsToolWindow()
             : base(null)
         {
             Caption = ToolWindowTitle;
-            Content = new CloseToolWindowsControl();
+            Content = new ToggleToolWindowsControl();
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace ShowToolWindows.UI.ToolWindows
                 throw new ArgumentNullException(nameof(package));
             }
 
-            CloseToolWindowsControl control = (CloseToolWindowsControl)Content;
+            ToggleToolWindowsControl control = (ToggleToolWindowsControl)Content;
             await control.InitializeAsync(package);
         }
     }
