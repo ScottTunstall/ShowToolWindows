@@ -47,18 +47,19 @@
   <ItemGroup>
     <Compile Include="Commands\CloseAllToolWindowsCommand.cs" />
     <Compile Include="Commands\CloseAllToolWindowsExceptSolutionExplorerCommand.cs" />
-    <Compile Include="Commands\CloseSpecificToolWindowsCommand.cs" />
-    <Compile Include="UI\ToolWindows\CloseToolWindowsControl.xaml.cs">
-      <DependentUpon>CloseToolWindowsControl.xaml</DependentUpon>
+    <Compile Include="Commands\ToggleToolWindowsCommand.cs" />
+    <Compile Include="UI\RelayCommand.cs" />
+    <Compile Include="UI\ToolWindows\ToggleToolWindowsControl.xaml.cs">
+      <DependentUpon>ToggleToolWindowsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ToolWindows\CloseToolWindowsToolWindow.cs" />
+    <Compile Include="UI\ToolWindows\ToggleToolWindowsToolWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Commands\ShowSolutionExplorerCommand.cs" />
     <Compile Include="ShowToolWindowsPackage.cs" />
     <Compile Include="UI\StatusBarHelper.cs" />
     <Compile Include="UI\ToolWindowEntry.cs" />
     <Compile Include="UI\WindowHelper.cs" />
-    <Compile Include="WindowKindConsts.cs" />
+    <Compile Include="UI\WindowKindConsts.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -98,7 +99,7 @@
     <Content Include="Resources\ShowSolutionExplorerCommand.png" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="UI\ToolWindows\CloseToolWindowsControl.xaml">
+    <Page Include="UI\ToolWindows\ToggleToolWindowsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -29,7 +29,7 @@ namespace ShowToolWindows
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(ShowToolWindowsPackage.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(CloseToolWindowsToolWindow))]
+    [ProvideToolWindow(typeof(ToggleToolWindowsToolWindow))]
     public sealed class ShowToolWindowsPackage : AsyncPackage
     {
         /// <summary>
@@ -54,7 +54,7 @@ namespace ShowToolWindows
             await ShowSolutionExplorerCommand.InitializeAsync(this);
             await CloseAllToolWindowsExceptSolutionExplorerCommand.InitializeAsync(this);
             await CloseAllToolWindowsCommand.InitializeAsync(this);
-            await CloseSpecificToolWindowsCommand.InitializeAsync(this);
+            await ToggleToolWindowsCommand.InitializeAsync(this);
         }
 
         #endregion
