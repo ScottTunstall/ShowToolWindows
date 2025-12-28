@@ -2,7 +2,7 @@
 
 ## About
 
-Are you using Visual Studio 2019+ ?
+Are you using Visual Studio 2019, 2022 or 2026?
 
 Does your Solution Explorer end up wandering off screen or get stuck under a pile of windows and you have a torrid time trying to find it?
 Or do you end up with a load of Tool Windows open and you don't want to reset window layout but would like to close them all?
