@@ -12,7 +12,7 @@ namespace ShowToolWindows.UI
     internal static class WindowHelper
     {
         /// <summary>
-        /// Closes the specified collection of Visual Studio tool windows.
+        /// Closes the specified collection of Visual Studio windows.
         /// </summary>
         /// <param name="windowsToClose">The collection of windows to close.</param>
         /// <returns>The number of windows that were successfully closed.</returns>
