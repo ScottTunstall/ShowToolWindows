@@ -2,7 +2,6 @@ using EnvDTE;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using ShowToolWindows.Models;
 using ShowToolWindows.Services;
 using System;
 using System.Collections.Generic;
