@@ -17,6 +17,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="8" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" 
@@ -52,5 +54,46 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+
+        <!-- Stashes UI section -->
+        <Expander Grid.Row="6"
+                  Header="Stashes"
+                  IsExpanded="True"
+                  Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}">
+            <Grid Margin="0,8,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="150" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <Button Content="Stash"
+                            Width="80"
+                            Click="StashButton_Click" />
+                    <Button Content="Pop"
+                            Width="80"
+                            Margin="8,0,0,0"
+                            Click="PopButton_Click" />
+                </StackPanel>
+
+                <ListBox Grid.Row="2"
+                         x:Name="StashListBox"
+                         ItemsSource="{Binding Stashes}"
+                         BorderThickness="1"
+                         BorderBrush="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBorderBrushKey}}"
+                         MouseDoubleClick="StashListBox_MouseDoubleClick"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" 
+                                       Margin="2"
+                                       TextTrimming="CharacterEllipsis"
+                                       ToolTip="{Binding}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Expander>
     </Grid>
 </UserControl>
