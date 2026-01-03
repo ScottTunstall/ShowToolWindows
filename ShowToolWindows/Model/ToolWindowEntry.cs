@@ -4,7 +4,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 
-namespace ShowToolWindows.UI
+namespace ShowToolWindows.Model
 {
     /// <summary>
     /// Represents a Visual Studio tool window entry that can be shown or hidden.
