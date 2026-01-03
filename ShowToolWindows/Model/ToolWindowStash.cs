@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace ShowToolWindows.Model
 {
@@ -7,10 +8,20 @@ namespace ShowToolWindows.Model
     /// </summary>
     public class ToolWindowStash
     {
+        private string[] _windowCaptions;
+        private string _description;
+
         /// <summary>
         /// Gets or sets the captions of the visible tool windows.
         /// </summary>
-        public string[] WindowCaptions { get; set; }
+        public string[] WindowCaptions
+        {
+            get => _windowCaptions;
+            set {
+                _windowCaptions = value.Where(caption => !string.IsNullOrWhiteSpace(caption)).ToArray();
+                _description = string.Join(", ", _windowCaptions);
+            }
+        }
 
         /// <summary>
         /// Gets or sets the DTE object kinds of the visible tool windows.
@@ -20,6 +31,11 @@ namespace ShowToolWindows.Model
         /// <summary>
         /// Gets or sets the timestamp when this stash was created.
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+
+        public override string ToString()
+        {
+            return _description;
+        }
     }
 }
