@@ -7,10 +7,13 @@ namespace ShowToolWindows.Model
     /// </summary>
     public class ToolWindowStash
     {
+        /// <summary>
+        /// Gets or sets the captions of the visible tool windows.
+        /// </summary>
         public string[] WindowCaptions { get; set; }
 
         /// <summary>
-        /// Gets or sets the pipe-separated list of window ObjectKind GUIDs.
+        /// Gets or sets the DTE object kinds of the visible tool windows.
         /// </summary>
         public string[] WindowObjectKinds { get; set; }
 
