@@ -2,6 +2,7 @@ using EnvDTE;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using ShowToolWindows.Model;
 using ShowToolWindows.Services;
 using System;
 using System.Collections.Generic;
@@ -80,7 +81,7 @@ namespace ShowToolWindows.UI.ToolWindows
             _dte = dteService as DTE;
 
             _stashService = new StashSettingsService(_package);
-            LoadStashes();
+            LoadToolWindowStashes();
 
             RefreshToolWindows();
         }
@@ -153,7 +154,7 @@ namespace ShowToolWindows.UI.ToolWindows
 
             if (StashListBox.SelectedItem is ToolWindowStash stash)
             {
-                RestoreStash(stash);
+                RestoreToolWindowStash(stash);
             }
         }
 
@@ -294,12 +295,12 @@ namespace ShowToolWindows.UI.ToolWindows
             }
 
             var stash = Stashes[0];
-            RestoreStash(stash);
+            RestoreToolWindowStash(stash);
             Stashes.RemoveAt(0);
             SaveToolWindowStashes();
         }
 
-        private void LoadStashes()
+        private void LoadToolWindowStashes()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -330,7 +331,7 @@ namespace ShowToolWindows.UI.ToolWindows
             _stashService.SaveStashes(stashList);
         }
 
-        private void RestoreStash(ToolWindowStash stash)
+        private void RestoreToolWindowStash(ToolWindowStash stash)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -420,8 +421,7 @@ namespace ShowToolWindows.UI.ToolWindows
                     }
 
                     Guid toolWindowGuid = new Guid(objectKind);
-                    IVsWindowFrame frame;
-                    int hr = uiShell.FindToolWindow((uint)__VSFINDTOOLWIN.FTW_fForceCreate, ref toolWindowGuid, out frame);
+                    int hr = uiShell.FindToolWindow((uint)__VSFINDTOOLWIN.FTW_fForceCreate, ref toolWindowGuid, out IVsWindowFrame frame);
                     if (ErrorHandler.Succeeded(hr) && frame != null)
                     {
                         frame.Show();
