@@ -1,5 +1,7 @@
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Threading;
+using ShowToolWindows.UI;
 using ShowToolWindows.UI.ToolWindows;
 using System;
 using System.ComponentModel.Design;
@@ -33,7 +35,7 @@ namespace ShowToolWindows.Commands
             }
 
             var menuCommandId = new CommandID(CommandSet, CommandId);
-            var menuItem = new MenuCommand(Execute, menuCommandId);
+            var menuItem = new MenuCommand((s,e)=> ExecuteAsync().Forget(), menuCommandId);
             commandService.AddCommand(menuItem);
         }
 
@@ -58,31 +60,21 @@ namespace ShowToolWindows.Commands
             Instance = new ToggleToolWindowsCommand(package, commandService);
         }
 
-        private void Execute(object sender, EventArgs e)
+        private async Task ExecuteAsync()
         {
-            ThreadHelper.JoinableTaskFactory.Run(async () =>
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(_package.DisposalToken);
+
+            ToolWindowPane window = await _package.ShowToolWindowAsync(typeof(ToggleToolWindowsToolWindow), 0, true, _package.DisposalToken);
+            if (window?.Frame == null)
             {
-                try
-                {
-                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(_package.DisposalToken);
+                throw new NotSupportedException("Cannot create Show/Hide specific tool windows tool window.");
+            }
 
-                    ToolWindowPane window = await _package.ShowToolWindowAsync(typeof(ToggleToolWindowsToolWindow), 0, true, _package.DisposalToken);
-                    if (window?.Frame == null)
-                    {
-                        throw new NotSupportedException("Cannot create Show/Hide specific tool windows tool window.");
-                    }
+            ToggleToolWindowsToolWindow pane = (ToggleToolWindowsToolWindow)window;
+            await pane.InitializeAsync(_package);
 
-                    ToggleToolWindowsToolWindow pane = (ToggleToolWindowsToolWindow)window;
-                    await pane.InitializeAsync(_package);
-
-                    IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
-                    Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"ERROR opening Show/Hide specific tool windows tool window: {ex.Message}");
-                }
-            });
+            IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
     }
 }
