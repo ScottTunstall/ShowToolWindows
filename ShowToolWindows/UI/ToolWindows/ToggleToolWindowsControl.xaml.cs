@@ -1,5 +1,4 @@
 using EnvDTE;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using ShowToolWindows.Model;
@@ -7,6 +6,8 @@ using ShowToolWindows.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -19,11 +20,13 @@ namespace ShowToolWindows.UI.ToolWindows
     /// <summary>
     /// Interaction logic for CloseToolWindowsControl.
     /// </summary>
-    public partial class ToggleToolWindowsControl : UserControl
+    public partial class ToggleToolWindowsControl : UserControl, INotifyPropertyChanged
     {
         private AsyncPackage _package;
         private DTE _dte;
+        private IVsUIShell _uiShell;
         private StashSettingsService _stashService;
+        private ToolWindowHelper _toolWindowHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ToggleToolWindowsControl"/> class.
@@ -34,12 +37,17 @@ namespace ShowToolWindows.UI.ToolWindows
             DataContext = this;
 
             RefreshCommand = new RelayCommand(ExecuteRefresh);
+
+            Loaded += ToggleToolWindowsControl_Loaded;
+            Unloaded += ToggleToolWindowsControl_Unloaded;
         }
+
 
         /// <summary>
         /// Gets the command for refreshing the tool windows list (F5).
         /// </summary>
         public ICommand RefreshCommand { get; }
+
 
         /// <summary>
         /// Gets the collection of tool windows displayed in the UI.
@@ -50,12 +58,24 @@ namespace ShowToolWindows.UI.ToolWindows
         } = new ObservableCollection<ToolWindowEntry>();
 
         /// <summary>
+        /// Gets the header text for the stashes expander, including the count.
+        /// </summary>
+        public string StashesHeader => $"Stashes ({Stashes.Count})";
+
+        /// <summary>
         /// Gets the collection of stashed tool window snapshots.
         /// </summary>
         public ObservableCollection<ToolWindowStash> Stashes
         {
             get;
         } = new ObservableCollection<ToolWindowStash>();
+
+
+        /// <summary>
+        /// Occurs when a property value changes.
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+
 
         /// <summary>
         /// Initializes the control with Visual Studio services.
@@ -79,14 +99,36 @@ namespace ShowToolWindows.UI.ToolWindows
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
             object dteService = await package.GetServiceAsync(typeof(DTE));
             _dte = dteService as DTE;
+            _uiShell = await _package.GetServiceAsync(typeof(SVsUIShell)) as IVsUIShell;
 
             _stashService = new StashSettingsService(_package);
+            _toolWindowHelper = new ToolWindowHelper(_dte, _uiShell);
             LoadToolWindowStashes();
 
             RefreshToolWindows();
         }
 
 #pragma warning disable VSTHRD010
+
+        private void ToggleToolWindowsControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            Stashes.CollectionChanged += Stashes_CollectionChanged;
+        }
+
+        private void ToggleToolWindowsControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Stashes.CollectionChanged -= Stashes_CollectionChanged;
+        }
+
+        private void Stashes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(StashesHeader));
+        }
+
+        private void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         /// <summary>
         /// Handles the Checked event to show a tool window.
@@ -174,7 +216,9 @@ namespace ShowToolWindows.UI.ToolWindows
                 return;
             }
 
-            var allWindows = _dte.Windows.Cast<Window>().ToList();
+            var allWindows = _dte.Windows
+                .Cast<Window>()
+                .ToList();
             
             System.Diagnostics.Debug.WriteLine($"=== Total Windows Found: {allWindows.Count} ===");
             foreach (var w in allWindows)
@@ -193,69 +237,12 @@ namespace ShowToolWindows.UI.ToolWindows
             }
         }
 
-        private static bool IsSupportedToolWindow(Window window)
-        {
-            if (window == null)
-            {
-                return false;
-            }
-
-            if (!string.Equals(window.Kind, WindowKindConsts.ToolWindowKind, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-            if (string.Equals(window.ObjectKind, EnvDTE.Constants.vsWindowKindMainWindow, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-            string objectKindNormalized = window.ObjectKind.Trim('{', '}');
-            if (string.Equals(objectKindNormalized, ToggleToolWindowsToolWindow.ToolWindowGuidString,
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-            if (string.Equals(window.Caption, ToggleToolWindowsToolWindow.ToolWindowTitle, StringComparison.Ordinal))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private void SetToolWindowVisibility(object sender, bool isVisible)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            FrameworkElement frameworkElement = sender as FrameworkElement;
-            if (!(frameworkElement?.DataContext is ToolWindowEntry entry))
-            {
-                return;
-            }
-
-            entry.SetVisibility(isVisible);
-            entry.Synchronize();
-        }
-
-        private void SetAllToolWindowsVisibility(bool isVisible)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            foreach (ToolWindowEntry entry in ToolWindows)
-            {
-                entry.SetVisibility(isVisible);
-                entry.Synchronize();
-            }
-        }
-
         private void StashOpenToolWindows()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            var visibleWindows = _dte.Windows.Cast<Window>()
-                .Where(w => w.Visible)
+            var visibleWindows = _dte.Windows
+                .Cast<Window>()
                 .Where(IsSupportedToolWindow)
                 .OrderBy(w => w.Caption, StringComparer.CurrentCultureIgnoreCase)
                 .ToList();
@@ -278,7 +265,7 @@ namespace ShowToolWindows.UI.ToolWindows
             {
                 WindowCaptions = captions.ToArray(),
                 WindowObjectKinds = objectKinds.ToArray(),
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTimeOffset.UtcNow
             };
 
             Stashes.Insert(0, stash);
@@ -339,104 +326,72 @@ namespace ShowToolWindows.UI.ToolWindows
 
             var objectKinds = stash.WindowObjectKinds;
 
-            var objectKindsAsHashSet = new HashSet<string>(objectKinds);
-
-            var allWindows = _dte.Windows.Cast<Window>()
-                .Where(IsSupportedToolWindow)
-                .ToList();
-
-            foreach (var window in allWindows)
-            {
-                var shouldBeVisible = objectKindsAsHashSet.Contains(window.ObjectKind);
-
-                try
-                {
-                    if (shouldBeVisible && !window.Visible)
-                    {
-                        window.Visible = true;
-                        window.Activate();
-                    }
-                    else if (!shouldBeVisible && window.Visible)
-                    {
-                        window.Visible = false;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Could not set visibility for window '{window.Caption}': {ex.Message}");
-                }
-            }
-
             for (int i = 0; i < objectKinds.Length; i++)
             {
                 var objectKind = objectKinds[i];
                 var caption = i < captions.Length ? captions[i] : "Unknown";
 
-                if (string.IsNullOrWhiteSpace(objectKind))
-                {
-                    continue;
-                }
-
-                var windowExists = allWindows.Any(w => 
-                    string.Equals(w.ObjectKind, objectKind, StringComparison.OrdinalIgnoreCase));
-
-                if (!windowExists)
-                {
-                    TryOpenWindowByObjectKind(objectKind, caption);
-                }
+                _toolWindowHelper.TryOpenToolWindowByObjectKind(objectKind);
             }
 
             RefreshToolWindows();
         }
 
-        private void TryOpenWindowByObjectKind(string objectKind, string caption)
+
+        private static bool IsSupportedToolWindow(Window window)
+        {
+            if (window == null)
+            {
+                return false;
+            }
+
+            if (!string.Equals(window.Kind, WindowKindConsts.ToolWindowKind, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            if (string.Equals(window.ObjectKind, EnvDTE.Constants.vsWindowKindMainWindow, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            string objectKindNormalized = window.ObjectKind.Trim('{', '}');
+            if (string.Equals(objectKindNormalized, ToggleToolWindowsToolWindow.ToolWindowGuidString, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            if (string.Equals(window.Caption, ToggleToolWindowsToolWindow.ToolWindowTitle, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private void SetToolWindowVisibility(object sender, bool isVisible)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            try
+            FrameworkElement frameworkElement = sender as FrameworkElement;
+            if (!(frameworkElement?.DataContext is ToolWindowEntry entry))
             {
-                var window = _dte.Windows.Item(objectKind);
-                if (window != null)
-                {
-                    window.Visible = true;
-                    window.Activate();
-                    System.Diagnostics.Debug.WriteLine($"Opened window '{caption}' using ObjectKind '{objectKind}'");
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Window '{caption}' not in collection, will try to create it: {ex.Message}");
+                return;
             }
 
-            ThreadHelper.JoinableTaskFactory.Run(async delegate
-            {
-                try
-                {
-                    IVsUIShell uiShell = await _package.GetServiceAsync(typeof(SVsUIShell)) as IVsUIShell;
-                    if (uiShell == null)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Could not get IVsUIShell to open window '{caption}'");
-                        return;
-                    }
+            entry.SetVisibility(isVisible);
+            entry.Synchronize();
+        }
 
-                    Guid toolWindowGuid = new Guid(objectKind);
-                    int hr = uiShell.FindToolWindow((uint)__VSFINDTOOLWIN.FTW_fForceCreate, ref toolWindowGuid, out IVsWindowFrame frame);
-                    if (ErrorHandler.Succeeded(hr) && frame != null)
-                    {
-                        frame.Show();
-                        System.Diagnostics.Debug.WriteLine($"Opened window '{caption}' using IVsUIShell and ObjectKind '{objectKind}'");
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine($"FindToolWindow failed for '{caption}' (ObjectKind '{objectKind}'), hr={hr}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Could not open window '{caption}' by ObjectKind '{objectKind}' via IVsUIShell: {ex.Message}");
-                }
-            });
+        private void SetAllToolWindowsVisibility(bool isVisible)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            foreach (ToolWindowEntry entry in ToolWindows)
+            {
+                entry.SetVisibility(isVisible);
+                entry.Synchronize();
+            }
         }
 
 #pragma warning restore VSTHRD010

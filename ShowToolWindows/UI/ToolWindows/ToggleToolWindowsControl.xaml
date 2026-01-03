@@ -57,7 +57,7 @@
 
         <!-- Stashes UI section -->
         <Expander Grid.Row="6"
-                  Header="Stashes"
+                  Header="{Binding StashesHeader}"
                   IsExpanded="True"
                   Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}">
             <Grid Margin="0,8,0,0">
