@@ -1,6 +1,6 @@
 using System;
 
-namespace ShowToolWindows.Models
+namespace ShowToolWindows.UI
 {
     /// <summary>
     /// Represents a saved snapshot of visible tool windows.
