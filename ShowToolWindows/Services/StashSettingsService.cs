@@ -2,7 +2,7 @@ using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Settings;
 using Newtonsoft.Json;
-using ShowToolWindows.Models;
+using ShowToolWindows.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
