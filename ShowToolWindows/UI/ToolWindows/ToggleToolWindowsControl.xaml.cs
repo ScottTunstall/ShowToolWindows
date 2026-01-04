@@ -197,7 +197,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            RefreshToolWindows();
+            ExecuteRefreshToolWindows();
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void StashButton_Click(object sender, RoutedEventArgs e)
         {
-            StashOpenToolWindows();
+            ExecuteStashToolWindows();
         }
 
         /// <summary>
@@ -237,7 +237,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void PopButton_Click(object sender, RoutedEventArgs e)
         {
-            PopToolWindowsFromStash();
+            ExecutePopToolWindowsFromStash();
         }
 
         /// <summary>
@@ -247,7 +247,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void DropAllButton_Click(object sender, RoutedEventArgs e)
         {
-            DropAllStashes();
+            ExecuteDropAllStashes();
         }
 
 
@@ -274,6 +274,36 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             RefreshToolWindows();
         }
+
+
+        private void ExecuteRefreshToolWindows()
+        {
+            RefreshToolWindows();
+
+            StatusBarHelper.ShowStatusBarNotification("Tool windows refreshed.");
+        }
+
+        private void ExecuteStashToolWindows()
+        {
+            StashOpenToolWindows();
+
+            StatusBarHelper.ShowStatusBarNotification("Tool windows stashed.");
+        }
+
+        private void ExecutePopToolWindowsFromStash()
+        {
+            PopToolWindowsFromStash();
+
+            StatusBarHelper.ShowStatusBarNotification("Tool windows popped from stash stack.");
+        }
+
+        private void ExecuteDropAllStashes()
+        {
+            DropAllStashes();
+
+            StatusBarHelper.ShowStatusBarNotification("All tool window stashes dropped.");
+        }
+
 
         private void RefreshToolWindows()
         {
@@ -366,6 +396,45 @@ namespace ShowToolWindows.UI.ToolWindows
             SaveToolWindowStashes();
         }
 
+        private void DropAllStashes()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!IsInitialised)
+            {
+                return;
+            }
+
+            if (Stashes.Count == 0)
+            {
+                return;
+            }
+
+            Guid clsid = Guid.Empty;
+            _uiShell.ShowMessageBox(
+                0,
+                ref clsid,
+                "Drop All Stashes",
+                "Are you sure you wish to drop all stashes?",
+                null,
+                0,
+                OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
+                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_SECOND,
+                OLEMSGICON.OLEMSGICON_QUERY,
+                0,
+                out int result);
+
+            if (result != (int)VSConstants.MessageBoxResult.IDYES)
+            {
+                return;
+            }
+
+            Stashes.Clear();
+            SaveToolWindowStashes();
+
+            StatusBarHelper.ShowStatusBarNotification("All tool window stashes dropped.");
+        }
+
         private void LoadToolWindowStashes()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -413,40 +482,6 @@ namespace ShowToolWindows.UI.ToolWindows
             RefreshToolWindows();
         }
 
-        private void DropAllStashes()
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!IsInitialised)
-            {
-                return;
-            }
-
-            if (Stashes.Count == 0)
-            {
-                return;
-            }
-
-            Guid clsid = Guid.Empty;
-            _uiShell.ShowMessageBox(
-                0,
-                ref clsid,
-                "Drop All Stashes",
-                "Are you sure you wish to drop all stashes?",
-                null,
-                0,
-                OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_SECOND,
-                OLEMSGICON.OLEMSGICON_QUERY,
-                0,
-                out int result);
-
-            if (result == (int)VSConstants.MessageBoxResult.IDYES)
-            {
-                Stashes.Clear();
-                SaveToolWindowStashes();
-            }
-        }
 
         private static bool IsSupportedToolWindow(Window window)
         {
