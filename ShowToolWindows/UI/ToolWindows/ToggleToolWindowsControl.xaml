@@ -29,23 +29,28 @@
         <StackPanel Grid.Row="2" Orientation="Horizontal">
             <Button Content="Refresh (F5)"
                     Width="90"
+                    IsEnabled="{Binding IsInitialized}"
                     Click="RefreshButton_Click" />
             <Button Content="Show All"
                     Width="80"
                     Margin="8,0,0,0"
+                    IsEnabled="{Binding IsInitialized}"
                     Click="ShowAllButton_Click" />
             <Button Content="Hide All"
                     Width="80"
                     Margin="8,0,0,0"
+                    IsEnabled="{Binding IsInitialized}"
                     Click="HideAllButton_Click" />
             <Button Content="Stash Selected"
                     Padding="8,2"
                     Margin="8,0,0,0"
+                    IsEnabled="{Binding IsInitialized}"
                     Click="StashButton_Click" />
         </StackPanel>
 
         <ListBox Grid.Row="4"
                  ItemsSource="{Binding ToolWindows}"
+                 IsEnabled="{Binding IsInitialized}"
                  BorderThickness="0"
                  ScrollViewer.VerticalScrollBarVisibility="Auto">
             <ListBox.ItemTemplate>
@@ -74,12 +79,19 @@
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
                     <Button Content="Pop"
                             Width="80"
+                            IsEnabled="{Binding IsInitialized}"
                             Click="PopButton_Click" />
+                    <Button Content="Drop All"
+                            Width="80"
+                            Margin="8,0,0,0"
+                            IsEnabled="{Binding IsInitialized}"
+                            Click="DropAllButton_Click" />
                 </StackPanel>
 
                 <ListBox Grid.Row="2"
                          x:Name="StashListBox"
                          ItemsSource="{Binding Stashes}"
+                         IsEnabled="{Binding IsInitialized}"
                          BorderThickness="1"
                          BorderBrush="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBorderBrushKey}}"
                          MouseDoubleClick="StashListBox_MouseDoubleClick"

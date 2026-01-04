@@ -1,4 +1,5 @@
 using EnvDTE;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using ShowToolWindows.Model;
@@ -27,6 +28,7 @@ namespace ShowToolWindows.UI.ToolWindows
         private IVsUIShell _uiShell;
         private StashSettingsService _stashService;
         private ToolWindowHelper _toolWindowHelper;
+        private bool _isInitialized;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ToggleToolWindowsControl"/> class.
@@ -70,6 +72,21 @@ namespace ShowToolWindows.UI.ToolWindows
             get;
         } = new ObservableCollection<ToolWindowStash>();
 
+        /// <summary>
+        /// Gets a value indicating whether the control has been initialized with VS services.
+        /// </summary>
+        public bool IsInitialized
+        {
+            get => _isInitialized;
+            private set
+            {
+                if (_isInitialized != value)
+                {
+                    _isInitialized = value;
+                    OnPropertyChanged(nameof(IsInitialized));
+                }
+            }
+        }
 
         /// <summary>
         /// Occurs when a property value changes.
@@ -105,6 +122,7 @@ namespace ShowToolWindows.UI.ToolWindows
             _toolWindowHelper = new ToolWindowHelper(_dte, _uiShell);
             LoadToolWindowStashes();
 
+            IsInitialized = true;
             RefreshToolWindows();
         }
 
@@ -186,6 +204,14 @@ namespace ShowToolWindows.UI.ToolWindows
             PopToolWindowsFromStash();
         }
 
+        /// <summary>
+        /// Handles the Drop All button click to clear all stashes after confirmation.
+        /// </summary>
+        private void DropAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            DropAllStashes();
+        }
+
 
         /// <summary>
         /// Handles double-click on a stash to restore those tool windows.
@@ -208,6 +234,11 @@ namespace ShowToolWindows.UI.ToolWindows
         private void RefreshToolWindows()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!IsInitialized)
+            {
+                return;
+            }
 
             ToolWindows.Clear();
 
@@ -235,6 +266,11 @@ namespace ShowToolWindows.UI.ToolWindows
         private void StashOpenToolWindows()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!IsInitialized)
+            {
+                return;
+            }
 
             var selectedWindows = ToolWindows
                 .Where(entry => entry.IsVisible)
@@ -269,6 +305,11 @@ namespace ShowToolWindows.UI.ToolWindows
         private void PopToolWindowsFromStash()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!IsInitialized)
+            {
+                return;
+            }
 
             if (Stashes.Count == 0)
             {
@@ -316,6 +357,11 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
+            if (!IsInitialized)
+            {
+                return;
+            }
+
             var captions = stash.WindowCaptions;
 
             var objectKinds = stash.WindowObjectKinds;
@@ -331,6 +377,40 @@ namespace ShowToolWindows.UI.ToolWindows
             RefreshToolWindows();
         }
 
+        private void DropAllStashes()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!IsInitialized)
+            {
+                return;
+            }
+
+            if (Stashes.Count == 0)
+            {
+                return;
+            }
+
+            Guid clsid = Guid.Empty;
+            _uiShell.ShowMessageBox(
+                0,
+                ref clsid,
+                "Drop All Stashes",
+                "Are you sure you wish to drop all stashes?",
+                null,
+                0,
+                OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
+                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_SECOND,
+                OLEMSGICON.OLEMSGICON_QUERY,
+                0,
+                out int result);
+
+            if (result == (int)VSConstants.MessageBoxResult.IDYES)
+            {
+                Stashes.Clear();
+                SaveToolWindowStashes();
+            }
+        }
 
         private static bool IsSupportedToolWindow(Window window)
         {
@@ -367,6 +447,11 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
+            if (!IsInitialized)
+            {
+                return;
+            }
+
             FrameworkElement frameworkElement = sender as FrameworkElement;
             if (!(frameworkElement?.DataContext is ToolWindowEntry entry))
             {
@@ -380,8 +465,14 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
+            if (!IsInitialized)
+            {
+                return;
+            }
+
             _toolWindowHelper.SetToolWindowsVisibility(ToolWindows, isVisible);
         }
+
 
 #pragma warning restore VSTHRD010
     }
