@@ -24,6 +24,7 @@ namespace ShowToolWindows.Model
 
             _window = window ?? throw new ArgumentNullException(nameof(window));
             Caption = window.Caption;
+            ObjectKind = window.ObjectKind;
             _isVisible = window.Visible;
         }
 
@@ -31,6 +32,14 @@ namespace ShowToolWindows.Model
         /// Gets the display caption for the tool window.
         /// </summary>
         public string Caption
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets the object kind GUID for the tool window.
+        /// </summary>
+        public string ObjectKind
         {
             get;
         }
