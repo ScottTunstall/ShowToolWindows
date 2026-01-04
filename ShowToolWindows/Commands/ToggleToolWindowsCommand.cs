@@ -1,7 +1,6 @@
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
-using ShowToolWindows.UI;
 using ShowToolWindows.UI.ToolWindows;
 using System;
 using System.ComponentModel.Design;
