@@ -1,6 +1,5 @@
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Threading;
 using ShowToolWindows.UI.ToolWindows;
 using System;
 using System.ComponentModel.Design;
@@ -34,7 +33,7 @@ namespace ShowToolWindows.Commands
             }
 
             var menuCommandId = new CommandID(CommandSet, CommandId);
-            var menuItem = new MenuCommand((s,e)=> ExecuteAsync().Forget(), menuCommandId);
+            var menuItem = new MenuCommand((s, e) => ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync()), menuCommandId);
             commandService.AddCommand(menuItem);
         }
 
