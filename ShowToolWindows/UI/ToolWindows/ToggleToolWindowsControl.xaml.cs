@@ -51,7 +51,6 @@ namespace ShowToolWindows.UI.ToolWindows
         /// </summary>
         public ICommand RefreshCommand { get; }
 
-
         /// <summary>
         /// Gets the collection of tool windows displayed in the UI.
         /// </summary>
@@ -64,6 +63,16 @@ namespace ShowToolWindows.UI.ToolWindows
         /// Gets the header text for the stashes expander, including the count.
         /// </summary>
         public string StashesHeader => $"Stashes ({Stashes.Count})";
+
+        /// <summary>
+        /// Gets a value indicating whether there are any stashes available.
+        /// </summary>
+        public bool HasStashes => Stashes.Count > 0;
+
+        /// <summary>
+        /// Gets a value indicating whether stash operations can be performed.
+        /// </summary>
+        public bool CanMutateStash => IsInitialised && HasStashes;
 
         /// <summary>
         /// Gets the collection of stashed tool window snapshots.
@@ -85,6 +94,7 @@ namespace ShowToolWindows.UI.ToolWindows
                 {
                     _isInitialised = value;
                     OnPropertyChanged(nameof(IsInitialised));
+                    OnPropertyChanged(nameof(CanMutateStash));
                 }
             }
         }
@@ -115,10 +125,10 @@ namespace ShowToolWindows.UI.ToolWindows
             _package = package;
 
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
-            
+
             object dteService = await package.GetServiceAsync(typeof(DTE));
             _dte = dteService as DTE ?? throw new InvalidOperationException("Failed to get DTE service.");
-            
+
             _uiShell = await _package.GetServiceAsync(typeof(SVsUIShell)) as IVsUIShell ?? throw new InvalidOperationException("Failed to get IVsUIShell service.");
 
             _stashService = new StashSettingsService(_package);
@@ -159,6 +169,8 @@ namespace ShowToolWindows.UI.ToolWindows
         private void Stashes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(nameof(StashesHeader));
+            OnPropertyChanged(nameof(HasStashes));
+            OnPropertyChanged(nameof(CanMutateStash));
         }
 
         /// <summary>
@@ -177,7 +189,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void WindowCheckbox_Checked(object sender, RoutedEventArgs e)
         {
-            SetToolWindowVisibility(sender, true);
+            SelectCheckBoxItem(sender as FrameworkElement);
         }
 
         /// <summary>
@@ -187,7 +199,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void WindowCheckbox_Unchecked(object sender, RoutedEventArgs e)
         {
-            SetToolWindowVisibility(sender, false);
+            DeselectCheckBoxItem(sender as FrameworkElement);
         }
 
         /// <summary>
@@ -210,7 +222,6 @@ namespace ShowToolWindows.UI.ToolWindows
             ExecuteShowAllAvailableToolWindows();
         }
 
-
         /// <summary>
         /// Handles the Hide All button click to hide all tool windows.
         /// </summary>
@@ -228,7 +239,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void StashButton_Click(object sender, RoutedEventArgs e)
         {
-            ExecuteStashVisibleToolWindows();
+            ExecuteStashSelectedToolWindows();
         }
 
         /// <summary>
@@ -298,12 +309,24 @@ namespace ShowToolWindows.UI.ToolWindows
             StatusBarHelper.ShowStatusBarNotification("All available tool windows hidden.");
         }
 
-
-        private void ExecuteStashVisibleToolWindows()
+        private void ExecuteStashSelectedToolWindows()
         {
-            StashVisibleToolWindows();
+            if (!IsInitialised)
+            {
+                return;
+            }
 
-            StatusBarHelper.ShowStatusBarNotification("Tool windows stashed.");
+            int selectedCount = ToolWindowsListBox.SelectedItems.Count;
+
+            if (selectedCount == 0)
+            {
+                StatusBarHelper.ShowStatusBarNotification("No tool windows selected to stash. Select items in the list first.");
+                return;
+            }
+
+            StashSelectedToolWindows();
+
+            StatusBarHelper.ShowStatusBarNotification($"{selectedCount} selected tool window(s) stashed.");
         }
 
         private void ExecutePopToolWindowsFromStash()
@@ -326,39 +349,37 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
 
-        private void RefreshToolWindows()
+        private void SelectCheckBoxItem(FrameworkElement sender)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!IsInitialised)
+            if (!(sender.DataContext is ToolWindowEntry entry))
             {
-                return;
+                throw new InvalidOperationException();
             }
 
-            ToolWindows.Clear();
+            _toolWindowHelper.SetToolWindowVisibility(entry, true);
 
-            var allWindows = _dte.Windows
-                .Cast<Window>()
-                .ToList();
-            
-            System.Diagnostics.Debug.WriteLine($"=== Total Windows Found: {allWindows.Count} ===");
-            foreach (var w in allWindows)
+            if (!ToolWindowsListBox.SelectedItems.Contains(entry))
             {
-                System.Diagnostics.Debug.WriteLine($"Caption: '{w.Caption}', Kind: '{w.Kind}', ObjectKind: '{w.ObjectKind}'");
-            }
-
-            var windows = allWindows
-                .Where(IsSupportedToolWindow)
-                .OrderBy(w => w.Caption, StringComparer.CurrentCultureIgnoreCase)
-                .ToList();
-
-            foreach (Window window in windows)
-            {
-                ToolWindows.Add(new ToolWindowEntry(window));
+                ToolWindowsListBox.SelectedItems.Add(entry);
             }
         }
 
-        private void StashVisibleToolWindows()
+        private void DeselectCheckBoxItem(FrameworkElement sender)
+        {
+            if (!(sender.DataContext is ToolWindowEntry entry))
+            {
+                return;
+            }
+
+            _toolWindowHelper.SetToolWindowVisibility(entry, false);
+
+            if (ToolWindowsListBox.SelectedItems.Contains(entry))
+            {
+                ToolWindowsListBox.SelectedItems.Remove(entry);
+            }
+        }
+
+        private void SetAllToolWindowsVisibility(bool isVisible)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -367,20 +388,32 @@ namespace ShowToolWindows.UI.ToolWindows
                 return;
             }
 
-            var selectedWindows = ToolWindows
-                .Where(entry => entry.IsVisible)
-                .OrderBy(entry => entry.Caption, StringComparer.CurrentCultureIgnoreCase)
-                .ToList();
+            _toolWindowHelper.SetToolWindowsVisibility(ToolWindows, isVisible);
+        }
 
-            if (selectedWindows.Count == 0)
+        private void StashSelectedToolWindows()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!IsInitialised)
             {
                 return;
             }
+
+            if (ToolWindowsListBox.SelectedItems.Count == 0)
+            {
+                return;
+            }
+
+            var windowsToStash = ToolWindowsListBox.SelectedItems
+                .Cast<ToolWindowEntry>()
+                .OrderBy(entry => entry.Caption, StringComparer.CurrentCultureIgnoreCase)
+                .ToList();
 
             var captions = new List<string>();
             var objectKinds = new List<string>();
 
-            foreach (var entry in selectedWindows)
+            foreach (var entry in windowsToStash)
             {
                 captions.Add(entry.Caption);
                 objectKinds.Add(entry.ObjectKind);
@@ -389,7 +422,7 @@ namespace ShowToolWindows.UI.ToolWindows
             var stash = new ToolWindowStash
             {
                 WindowCaptions = captions.ToArray(),
-                WindowObjectKinds = objectKinds.ToArray(),
+                WindowObjectKinds = objectKinds.ToArray(), 
                 CreatedAt = DateTimeOffset.UtcNow
             };
 
@@ -460,7 +493,7 @@ namespace ShowToolWindows.UI.ToolWindows
 
             Stashes.Clear();
             var loadedStashes = _stashService.LoadStashes();
-           
+
             foreach (var stash in loadedStashes)
             {
                 Stashes.Add(stash);
@@ -502,6 +535,45 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
 
+        private void RefreshToolWindows()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!IsInitialised)
+            {
+                return;
+            }
+
+            ToolWindows.Clear();
+
+            var allWindows = _dte.Windows
+                .Cast<Window>()
+                .ToList();
+
+            System.Diagnostics.Debug.WriteLine($"=== Total Windows Found: {allWindows.Count} ===");
+            foreach (var w in allWindows)
+            {
+                System.Diagnostics.Debug.WriteLine($"Caption: '{w.Caption}', Kind: '{w.Kind}', ObjectKind: '{w.ObjectKind}'");
+            }
+
+            var windows = allWindows
+                .Where(IsSupportedToolWindow)
+                .OrderBy(w => w.Caption, StringComparer.CurrentCultureIgnoreCase)
+                .ToList();
+
+            foreach (Window window in windows)
+            {
+                var entry = new ToolWindowEntry(window);
+                ToolWindows.Add(entry);
+
+                // If the tool window is visible, select it in the list
+                if (entry.IsVisible)
+                {
+                    ToolWindowsListBox.SelectedItems.Add(entry);
+                }
+            }
+        }
+
         private static bool IsSupportedToolWindow(Window window)
         {
             if (window == null)
@@ -532,37 +604,6 @@ namespace ShowToolWindows.UI.ToolWindows
 
             return true;
         }
-
-        private void SetToolWindowVisibility(object sender, bool isVisible)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!IsInitialised)
-            {
-                return;
-            }
-
-            FrameworkElement frameworkElement = sender as FrameworkElement;
-            if (!(frameworkElement?.DataContext is ToolWindowEntry entry))
-            {
-                return;
-            }
-
-            _toolWindowHelper.SetToolWindowVisibility(entry, isVisible);
-        }
-
-        private void SetAllToolWindowsVisibility(bool isVisible)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!IsInitialised)
-            {
-                return;
-            }
-
-            _toolWindowHelper.SetToolWindowsVisibility(ToolWindows, isVisible);
-        }
-
 
 #pragma warning restore VSTHRD010
     }

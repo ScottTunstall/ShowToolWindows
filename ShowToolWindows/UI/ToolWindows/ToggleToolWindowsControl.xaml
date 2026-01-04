@@ -49,8 +49,10 @@
         </StackPanel>
 
         <ListBox Grid.Row="4"
+                 x:Name="ToolWindowsListBox"
                  ItemsSource="{Binding ToolWindows}"
                  IsEnabled="{Binding IsInitialised}"
+                 SelectionMode="Extended"
                  BorderThickness="0"
                  ScrollViewer.VerticalScrollBarVisibility="Auto">
             <ListBox.ItemTemplate>
@@ -79,12 +81,12 @@
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
                     <Button Content="Pop"
                             Width="80"
-                            IsEnabled="{Binding IsInitialised}"
+                            IsEnabled="{Binding CanMutateStash}"
                             Click="PopButton_Click" />
                     <Button Content="Drop All"
                             Width="80"
                             Margin="8,0,0,0"
-                            IsEnabled="{Binding IsInitialised}"
+                            IsEnabled="{Binding CanMutateStash}"
                             Click="DropAllButton_Click" />
                 </StackPanel>
 
