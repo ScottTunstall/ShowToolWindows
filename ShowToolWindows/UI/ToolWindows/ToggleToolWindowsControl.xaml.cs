@@ -211,11 +211,6 @@ namespace ShowToolWindows.UI.ToolWindows
 
             ToolWindows.Clear();
 
-            if (_dte == null)
-            {
-                return;
-            }
-
             var allWindows = _dte.Windows
                 .Cast<Window>()
                 .ToList();
