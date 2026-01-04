@@ -51,6 +51,7 @@
     <Compile Include="Model\ToolWindowStash.cs" />
     <Compile Include="Services\StashSettingsService.cs" />
     <Compile Include="UI\RelayCommand.cs" />
+    <Compile Include="UI\ToolWindowHelper.cs" />
     <Compile Include="UI\ToolWindows\ToggleToolWindowsControl.xaml.cs">
       <DependentUpon>ToggleToolWindowsControl.xaml</DependentUpon>
     </Compile>
