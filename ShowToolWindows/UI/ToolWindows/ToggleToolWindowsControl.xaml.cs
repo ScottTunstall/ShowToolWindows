@@ -207,8 +207,9 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void ShowAllButton_Click(object sender, RoutedEventArgs e)
         {
-            SetAllToolWindowsVisibility(true);
+            ExecuteShowAllAvailableToolWindows();
         }
+
 
         /// <summary>
         /// Handles the Hide All button click to hide all tool windows.
@@ -217,7 +218,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void HideAllButton_Click(object sender, RoutedEventArgs e)
         {
-            SetAllToolWindowsVisibility(false);
+            ExecuteHideAllAvailableToolWindows();
         }
 
         /// <summary>
@@ -227,7 +228,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void StashButton_Click(object sender, RoutedEventArgs e)
         {
-            ExecuteStashToolWindows();
+            ExecuteStashVisibleToolWindows();
         }
 
         /// <summary>
@@ -283,18 +284,38 @@ namespace ShowToolWindows.UI.ToolWindows
             StatusBarHelper.ShowStatusBarNotification("Tool windows refreshed.");
         }
 
-        private void ExecuteStashToolWindows()
+        private void ExecuteShowAllAvailableToolWindows()
         {
-            StashOpenToolWindows();
+            SetAllToolWindowsVisibility(true);
+
+            StatusBarHelper.ShowStatusBarNotification("All available tool windows shown.");
+        }
+
+        private void ExecuteHideAllAvailableToolWindows()
+        {
+            SetAllToolWindowsVisibility(false);
+
+            StatusBarHelper.ShowStatusBarNotification("All available tool windows hidden.");
+        }
+
+
+        private void ExecuteStashVisibleToolWindows()
+        {
+            StashVisibleToolWindows();
 
             StatusBarHelper.ShowStatusBarNotification("Tool windows stashed.");
         }
 
         private void ExecutePopToolWindowsFromStash()
         {
+            if (Stashes.Count == 0)
+            {
+                return;
+            }
+
             PopToolWindowsFromStash();
 
-            StatusBarHelper.ShowStatusBarNotification("Tool windows popped from stash stack.");
+            StatusBarHelper.ShowStatusBarNotification("Tool windows popped from stash.");
         }
 
         private void ExecuteDropAllStashes()
@@ -337,7 +358,7 @@ namespace ShowToolWindows.UI.ToolWindows
             }
         }
 
-        private void StashOpenToolWindows()
+        private void StashVisibleToolWindows()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -431,8 +452,6 @@ namespace ShowToolWindows.UI.ToolWindows
 
             Stashes.Clear();
             SaveToolWindowStashes();
-
-            StatusBarHelper.ShowStatusBarNotification("All tool window stashes dropped.");
         }
 
         private void LoadToolWindowStashes()
