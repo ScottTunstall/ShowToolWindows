@@ -35,6 +35,8 @@ namespace ShowToolWindows.UI
         /// <param name="isVisible">Whether the tool window should be visible.</param>
         public void SetToolWindowVisibility(ToolWindowEntry entry, bool isVisible)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             entry.SetVisibility(isVisible);
             entry.Synchronize();
         }
@@ -46,6 +48,8 @@ namespace ShowToolWindows.UI
         /// <param name="isVisible">Whether the tool windows should be visible.</param>
         public void SetToolWindowsVisibility(IEnumerable<ToolWindowEntry> toolWindows, bool isVisible)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             foreach (ToolWindowEntry entry in toolWindows)
             {
                 entry.SetVisibility(isVisible);
