@@ -2,12 +2,14 @@
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using ShowToolWindows.Model;
 using System;
+using System.Collections.Generic;
 
 namespace ShowToolWindows.UI
 {
     /// <summary>
-    /// Provides helper methods for opening Visual Studio tool windows.
+    /// Provides helper methods for opening and managing Visual Studio tool windows.
     /// </summary>
     internal class ToolWindowHelper
     {
@@ -26,11 +28,39 @@ namespace ShowToolWindows.UI
             _uiShell = vsUiShell ?? throw new ArgumentNullException(nameof(vsUiShell));
         }
 
+        /// <summary>
+        /// Sets the visibility state of a single tool window.
+        /// </summary>
+        /// <param name="entry">The tool window entry to modify.</param>
+        /// <param name="isVisible">Whether the tool window should be visible.</param>
+        public void SetToolWindowVisibility(ToolWindowEntry entry, bool isVisible)
+        {
+            entry.SetVisibility(isVisible);
+            entry.Synchronize();
+        }
 
         /// <summary>
-        /// Attempts to open a tool window by its object kind.
+        /// Sets the visibility state of multiple tool windows.
         /// </summary>
-        /// <param name="objectKind">The tool window object kind GUID.</param>
+        /// <param name="toolWindows">The collection of tool window entries to modify.</param>
+        /// <param name="isVisible">Whether the tool windows should be visible.</param>
+        public void SetToolWindowsVisibility(IEnumerable<ToolWindowEntry> toolWindows, bool isVisible)
+        {
+            foreach (ToolWindowEntry entry in toolWindows)
+            {
+                entry.SetVisibility(isVisible);
+                entry.Synchronize();
+            }
+        }
+
+        /// <summary>
+        /// Attempts to open a tool window by its object kind GUID.
+        /// </summary>
+        /// <remarks>
+        /// This method first attempts to find the window in the existing windows collection.
+        /// If not found, it uses the UI shell service to force-create and display the window.
+        /// </remarks>
+        /// <param name="objectKind">The tool window object kind GUID in string format.</param>
         /// <returns><c>true</c> if the window is opened or already available; otherwise, <c>false</c>.</returns>
         public bool TryOpenToolWindowByObjectKind(string objectKind)
         {
@@ -73,7 +103,5 @@ namespace ShowToolWindows.UI
 
             return false;
         }
-
-
     }
 }
