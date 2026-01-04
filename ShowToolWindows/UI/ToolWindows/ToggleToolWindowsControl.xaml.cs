@@ -241,13 +241,12 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            var visibleWindows = _dte.Windows
-                .Cast<Window>()
-                .Where(IsSupportedToolWindow)
-                .OrderBy(w => w.Caption, StringComparer.CurrentCultureIgnoreCase)
+            var selectedWindows = ToolWindows
+                .Where(entry => entry.IsVisible)
+                .OrderBy(entry => entry.Caption, StringComparer.CurrentCultureIgnoreCase)
                 .ToList();
 
-            if (visibleWindows.Count == 0)
+            if (selectedWindows.Count == 0)
             {
                 return;
             }
@@ -255,10 +254,10 @@ namespace ShowToolWindows.UI.ToolWindows
             var captions = new List<string>();
             var objectKinds = new List<string>();
 
-            foreach (var window in visibleWindows)
+            foreach (var entry in selectedWindows)
             {
-                captions.Add(window.Caption);
-                objectKinds.Add(window.ObjectKind);
+                captions.Add(entry.Caption);
+                objectKinds.Add(entry.ObjectKind);
             }
 
             var stash = new ToolWindowStash
@@ -379,19 +378,14 @@ namespace ShowToolWindows.UI.ToolWindows
                 return;
             }
 
-            entry.SetVisibility(isVisible);
-            entry.Synchronize();
+            _toolWindowHelper.SetToolWindowVisibility(entry, isVisible);
         }
 
         private void SetAllToolWindowsVisibility(bool isVisible)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            foreach (ToolWindowEntry entry in ToolWindows)
-            {
-                entry.SetVisibility(isVisible);
-                entry.Synchronize();
-            }
+            _toolWindowHelper.SetToolWindowsVisibility(ToolWindows, isVisible);
         }
 
 #pragma warning restore VSTHRD010

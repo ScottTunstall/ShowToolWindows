@@ -38,6 +38,10 @@
                     Width="80"
                     Margin="8,0,0,0"
                     Click="HideAllButton_Click" />
+            <Button Content="Stash Selected"
+                    Padding="8,2"
+                    Margin="8,0,0,0"
+                    Click="StashButton_Click" />
         </StackPanel>
 
         <ListBox Grid.Row="4"
@@ -68,12 +72,8 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <Button Content="Stash"
-                            Width="80"
-                            Click="StashButton_Click" />
                     <Button Content="Pop"
                             Width="80"
-                            Margin="8,0,0,0"
                             Click="PopButton_Click" />
                 </StackPanel>
 
