@@ -46,7 +46,8 @@ namespace ShowToolWindows.UI.ToolWindows
 
 
         /// <summary>
-        /// Gets the command for refreshing the tool windows list (F5).
+        /// Used by the F5 keybinding to refresh the tool windows list.
+        /// Gets the command for refreshing the tool windows list.
         /// </summary>
         public ICommand RefreshCommand { get; }
 
@@ -114,9 +115,11 @@ namespace ShowToolWindows.UI.ToolWindows
             _package = package;
 
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
+            
             object dteService = await package.GetServiceAsync(typeof(DTE));
-            _dte = dteService as DTE;
-            _uiShell = await _package.GetServiceAsync(typeof(SVsUIShell)) as IVsUIShell;
+            _dte = dteService as DTE ?? throw new InvalidOperationException("Failed to get DTE service.");
+            
+            _uiShell = await _package.GetServiceAsync(typeof(SVsUIShell)) as IVsUIShell ?? throw new InvalidOperationException("Failed to get IVsUIShell service.");
 
             _stashService = new StashSettingsService(_package);
             _toolWindowHelper = new ToolWindowHelper(_dte, _uiShell);
@@ -128,21 +131,40 @@ namespace ShowToolWindows.UI.ToolWindows
 
 #pragma warning disable VSTHRD010
 
+        /// <summary>
+        /// Handles the Loaded event of the control to wire up event subscriptions.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void ToggleToolWindowsControl_Loaded(object sender, RoutedEventArgs e)
         {
             Stashes.CollectionChanged += Stashes_CollectionChanged;
         }
 
+        /// <summary>
+        /// Handles the Unloaded event of the control to remove event subscriptions.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void ToggleToolWindowsControl_Unloaded(object sender, RoutedEventArgs e)
         {
             Stashes.CollectionChanged -= Stashes_CollectionChanged;
         }
 
+        /// <summary>
+        /// Handles the CollectionChanged event of the Stashes collection to update the stashes header text.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/> instance containing the event data.</param>
         private void Stashes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(nameof(StashesHeader));
         }
 
+        /// <summary>
+        /// Raises the PropertyChanged event for the specified property name.
+        /// </summary>
+        /// <param name="propertyName">Name of the property that changed.</param>
         private void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -151,6 +173,8 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <summary>
         /// Handles the Checked event to show a tool window.
         /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void WindowCheckbox_Checked(object sender, RoutedEventArgs e)
         {
             SetToolWindowVisibility(sender, true);
@@ -159,6 +183,8 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <summary>
         /// Handles the Unchecked event to hide a tool window.
         /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void WindowCheckbox_Unchecked(object sender, RoutedEventArgs e)
         {
             SetToolWindowVisibility(sender, false);
@@ -167,6 +193,8 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <summary>
         /// Handles the Refresh button click to reload the tool windows list.
         /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
             RefreshToolWindows();
@@ -175,6 +203,8 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <summary>
         /// Handles the Show All button click to display all tool windows.
         /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void ShowAllButton_Click(object sender, RoutedEventArgs e)
         {
             SetAllToolWindowsVisibility(true);
@@ -183,6 +213,8 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <summary>
         /// Handles the Hide All button click to hide all tool windows.
         /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void HideAllButton_Click(object sender, RoutedEventArgs e)
         {
             SetAllToolWindowsVisibility(false);
@@ -191,6 +223,8 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <summary>
         /// Handles the Stash button click to save current visible tool windows.
         /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void StashButton_Click(object sender, RoutedEventArgs e)
         {
             StashOpenToolWindows();
@@ -199,6 +233,8 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <summary>
         /// Handles the Pop button click to restore and remove the top stashed item.
         /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void PopButton_Click(object sender, RoutedEventArgs e)
         {
             PopToolWindowsFromStash();
@@ -207,6 +243,8 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <summary>
         /// Handles the Drop All button click to clear all stashes after confirmation.
         /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void DropAllButton_Click(object sender, RoutedEventArgs e)
         {
             DropAllStashes();
@@ -216,6 +254,8 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <summary>
         /// Handles double-click on a stash to restore those tool windows.
         /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
         private void StashListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -226,6 +266,10 @@ namespace ShowToolWindows.UI.ToolWindows
             }
         }
 
+        /// <summary>
+        /// Executes the refresh command to reload the tool windows list.
+        /// </summary>
+        /// <param name="parameter">The command parameter.</param>
         private void ExecuteRefresh(object parameter)
         {
             RefreshToolWindows();
@@ -326,11 +370,6 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (_stashService == null)
-            {
-                return;
-            }
-
             Stashes.Clear();
             var loadedStashes = _stashService.LoadStashes();
            
@@ -344,7 +383,7 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (_stashService == null)
+            if (!IsInitialised)
             {
                 return;
             }
