@@ -28,7 +28,7 @@ namespace ShowToolWindows.UI.ToolWindows
         private IVsUIShell _uiShell;
         private StashSettingsService _stashService;
         private ToolWindowHelper _toolWindowHelper;
-        private bool _isInitialized;
+        private bool _isInitialised;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ToggleToolWindowsControl"/> class.
@@ -73,17 +73,17 @@ namespace ShowToolWindows.UI.ToolWindows
         } = new ObservableCollection<ToolWindowStash>();
 
         /// <summary>
-        /// Gets a value indicating whether the control has been initialized with VS services.
+        /// Gets a value indicating whether the control has been initialised with VS services.
         /// </summary>
-        public bool IsInitialized
+        public bool IsInitialised
         {
-            get => _isInitialized;
+            get => _isInitialised;
             private set
             {
-                if (_isInitialized != value)
+                if (_isInitialised != value)
                 {
-                    _isInitialized = value;
-                    OnPropertyChanged(nameof(IsInitialized));
+                    _isInitialised = value;
+                    OnPropertyChanged(nameof(IsInitialised));
                 }
             }
         }
@@ -122,7 +122,7 @@ namespace ShowToolWindows.UI.ToolWindows
             _toolWindowHelper = new ToolWindowHelper(_dte, _uiShell);
             LoadToolWindowStashes();
 
-            IsInitialized = true;
+            IsInitialised = true;
             RefreshToolWindows();
         }
 
@@ -235,7 +235,7 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!IsInitialized)
+            if (!IsInitialised)
             {
                 return;
             }
@@ -267,7 +267,7 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!IsInitialized)
+            if (!IsInitialised)
             {
                 return;
             }
@@ -306,7 +306,7 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!IsInitialized)
+            if (!IsInitialised)
             {
                 return;
             }
@@ -357,19 +357,16 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!IsInitialized)
+            if (!IsInitialised)
             {
                 return;
             }
-
-            var captions = stash.WindowCaptions;
 
             var objectKinds = stash.WindowObjectKinds;
 
             for (int i = 0; i < objectKinds.Length; i++)
             {
                 var objectKind = objectKinds[i];
-                var caption = i < captions.Length ? captions[i] : "Unknown";
 
                 _toolWindowHelper.TryOpenToolWindowByObjectKind(objectKind);
             }
@@ -381,7 +378,7 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!IsInitialized)
+            if (!IsInitialised)
             {
                 return;
             }
@@ -447,7 +444,7 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!IsInitialized)
+            if (!IsInitialised)
             {
                 return;
             }
@@ -465,7 +462,7 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!IsInitialized)
+            if (!IsInitialised)
             {
                 return;
             }
