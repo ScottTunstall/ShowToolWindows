@@ -1,10 +1,12 @@
 ﻿using EnvDTE;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using ShowToolWindows.Model;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ShowToolWindows.UI
 {
@@ -28,32 +30,63 @@ namespace ShowToolWindows.UI
             _uiShell = vsUiShell ?? throw new ArgumentNullException(nameof(vsUiShell));
         }
 
-        /// <summary>
-        /// Sets the visibility state of a single tool window.
-        /// </summary>
-        /// <param name="entry">The tool window entry to modify.</param>
-        /// <param name="isVisible">Whether the tool window should be visible.</param>
-        public void SetToolWindowVisibility(ToolWindowEntry entry, bool isVisible)
+        public IEnumerable<Window> GetAllToolWindows()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            entry.SetVisibility(isVisible);
-            entry.Synchronize();
+#pragma warning disable VSTHRD010
+            var allWindows = _dte.Windows
+                .Cast<Window>()
+                .Where(window => string.Equals(window.Kind, WindowKindConsts.ToolWindowKind, StringComparison.OrdinalIgnoreCase))
+                .Where(window => !string.Equals(window.ObjectKind, EnvDTE.Constants.vsWindowKindMainWindow, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+#pragma warning restore VSTHRD010
+
+            System.Diagnostics.Debug.WriteLine($"=== Total Windows Found: {allWindows.Count} ===");
+            foreach (var w in allWindows)
+            {
+                System.Diagnostics.Debug.WriteLine($"Caption: '{w.Caption}', Kind: '{w.Kind}', ObjectKind: '{w.ObjectKind}'");
+            }
+
+            return allWindows
+                .ToList();
         }
 
-        /// <summary>
-        /// Sets the visibility state of multiple tool windows.
-        /// </summary>
-        /// <param name="toolWindows">The collection of tool window entries to modify.</param>
-        /// <param name="isVisible">Whether the tool windows should be visible.</param>
-        public void SetToolWindowsVisibility(IEnumerable<ToolWindowEntry> toolWindows, bool isVisible)
+        public IEnumerable<ToolWindowEntry> GetAllToolWindowEntries()
+        {
+            var toolWindows = GetAllToolWindows();
+            return toolWindows.Select(window => new ToolWindowEntry(window)).ToList();
+        }
+
+
+        public void RestoreToolWindowsFromStash(ToolWindowStash stash)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            foreach (ToolWindowEntry entry in toolWindows)
+            var objectKinds = stash.WindowObjectKinds;
+
+            for (int i = 0; i < objectKinds.Length; i++)
             {
-                entry.SetVisibility(isVisible);
-                entry.Synchronize();
+                var objectKind = objectKinds[i];
+
+                TryOpenToolWindowByObjectKind(objectKind);
+            }
+        }
+
+
+        public void CloseToolWindowsNotInStash(IEnumerable<ToolWindowEntry> toolWindows, ToolWindowStash stash)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            var stashObjectKinds = new HashSet<string>(stash.WindowObjectKinds, StringComparer.OrdinalIgnoreCase);
+
+            var windowsToClose = toolWindows
+                .Where(entry => entry.IsVisible && !stashObjectKinds.Contains(entry.ObjectKind))
+                .ToList();
+
+            foreach (var entry in windowsToClose)
+            {
+                SetToolWindowVisibility(entry, false);
             }
         }
 
@@ -107,5 +140,35 @@ namespace ShowToolWindows.UI
 
             return false;
         }
+
+        /// <summary>
+        /// Sets the visibility state of a single tool window.
+        /// </summary>
+        /// <param name="entry">The tool window entry to modify.</param>
+        /// <param name="isVisible">Whether the tool window should be visible.</param>
+        public void SetToolWindowVisibility(ToolWindowEntry entry, bool isVisible)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            entry.SetVisibility(isVisible);
+            entry.Synchronize();
+        }
+
+        /// <summary>
+        /// Sets the visibility state of multiple tool windows.
+        /// </summary>
+        /// <param name="toolWindows">The collection of tool window entries to modify.</param>
+        /// <param name="isVisible">Whether the tool windows should be visible.</param>
+        public void SetToolWindowsVisibility(IEnumerable<ToolWindowEntry> toolWindows, bool isVisible)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            foreach (ToolWindowEntry entry in toolWindows)
+            {
+                entry.SetVisibility(isVisible);
+                entry.Synchronize();
+            }
+        }
+
     }
 }
