@@ -152,25 +152,20 @@ namespace ShowToolWindows.UI
                 System.Diagnostics.Debug.WriteLine($"Window '{objectKind}' not in collection, will try to create it: {ex.Message}");
             }
 
-            ThreadHelper.JoinableTaskFactory.Run(async delegate
+            try
             {
-                try
+                Guid toolWindowGuid = new Guid(objectKind);
+                int hr = _uiShell.FindToolWindow((uint)__VSFINDTOOLWIN.FTW_fForceCreate, ref toolWindowGuid, out IVsWindowFrame frame);
+                if (ErrorHandler.Succeeded(hr) && frame != null)
                 {
-                    Guid toolWindowGuid = new Guid(objectKind);
-                    int hr = _uiShell.FindToolWindow((uint)__VSFINDTOOLWIN.FTW_fForceCreate, ref toolWindowGuid, out IVsWindowFrame frame);
-                    if (ErrorHandler.Succeeded(hr) && frame != null)
-                    {
-                        frame.Show();
-                        return true;
-                    }
+                    frame.Show();
+                    return true;
                 }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Could not open window ObjectKind '{objectKind}' via IVsUIShell: {ex.Message}");
-                }
-
-                return false;
-            });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Could not open window ObjectKind '{objectKind}' via IVsUIShell: {ex.Message}");
+            }
 
             return false;
         }
