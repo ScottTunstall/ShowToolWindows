@@ -29,6 +29,7 @@ namespace ShowToolWindows.UI.ToolWindows
         private StashSettingsService _stashService;
         private ToolWindowHelper _toolWindowHelper;
         private bool _isInitialised;
+        private bool _hasSelectedItems;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ToggleToolWindowsControl"/> class.
@@ -75,6 +76,28 @@ namespace ShowToolWindows.UI.ToolWindows
         public bool CanMutateStash => IsInitialised && HasStashes;
 
         /// <summary>
+        /// Gets a value indicating whether the stash button should be enabled.
+        /// </summary>
+        public bool CanStashSelected => IsInitialised && HasSelectedItems;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether any items are selected in the list box.
+        /// </summary>
+        public bool HasSelectedItems
+        {
+            get => _hasSelectedItems;
+            private set
+            {
+                if (_hasSelectedItems != value)
+                {
+                    _hasSelectedItems = value;
+                    OnPropertyChanged(nameof(HasSelectedItems));
+                    OnPropertyChanged(nameof(CanStashSelected));
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the collection of stashed tool window snapshots.
         /// </summary>
         public ObservableCollection<ToolWindowStash> Stashes
@@ -95,6 +118,7 @@ namespace ShowToolWindows.UI.ToolWindows
                     _isInitialised = value;
                     OnPropertyChanged(nameof(IsInitialised));
                     OnPropertyChanged(nameof(CanMutateStash));
+                    OnPropertyChanged(nameof(CanStashSelected));
                 }
             }
         }
@@ -149,6 +173,7 @@ namespace ShowToolWindows.UI.ToolWindows
         private void ToggleToolWindowsControl_Loaded(object sender, RoutedEventArgs e)
         {
             Stashes.CollectionChanged += Stashes_CollectionChanged;
+            ToolWindowsListBox.SelectionChanged += ToolWindowsListBox_SelectionChanged;
         }
 
         /// <summary>
@@ -159,6 +184,7 @@ namespace ShowToolWindows.UI.ToolWindows
         private void ToggleToolWindowsControl_Unloaded(object sender, RoutedEventArgs e)
         {
             Stashes.CollectionChanged -= Stashes_CollectionChanged;
+            ToolWindowsListBox.SelectionChanged -= ToolWindowsListBox_SelectionChanged;
         }
 
         /// <summary>
@@ -171,6 +197,16 @@ namespace ShowToolWindows.UI.ToolWindows
             OnPropertyChanged(nameof(StashesHeader));
             OnPropertyChanged(nameof(HasStashes));
             OnPropertyChanged(nameof(CanMutateStash));
+        }
+
+        /// <summary>
+        /// Handles the SelectionChanged event of the ToolWindowsListBox to update the HasSelectedItems property.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="SelectionChangedEventArgs"/> instance containing the event data.</param>
+        private void ToolWindowsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            HasSelectedItems = ToolWindowsListBox.SelectedItems.Count > 0;
         }
 
         /// <summary>
