@@ -14,12 +14,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Window = EnvDTE.Window;
 
 namespace ShowToolWindows.UI.ToolWindows
 {
     /// <summary>
-    /// Interaction logic for CloseToolWindowsControl.
+    /// User control that provides an interface for managing Visual Studio tool windows.
+    /// Supports showing, hiding, and stashing tool window configurations.
     /// </summary>
     public partial class ToggleToolWindowsControl : UserControl, INotifyPropertyChanged
     {
@@ -47,8 +47,8 @@ namespace ShowToolWindows.UI.ToolWindows
 
 
         /// <summary>
-        /// Used by the F5 keybinding to refresh the tool windows list.
         /// Gets the command for refreshing the tool windows list.
+        /// Bound to the F5 keybinding for user convenience.
         /// </summary>
         public ICommand RefreshCommand { get; }
 
@@ -61,7 +61,7 @@ namespace ShowToolWindows.UI.ToolWindows
         } = new ObservableCollection<ToolWindowEntry>();
 
         /// <summary>
-        /// Gets the header text for the stashes expander, including the count.
+        /// Gets the header text for the stashes expander, displaying the count of available stashes.
         /// </summary>
         public string StashesHeader => $"Stashes ({Stashes.Count})";
 
@@ -71,17 +71,19 @@ namespace ShowToolWindows.UI.ToolWindows
         public bool HasStashes => Stashes.Count > 0;
 
         /// <summary>
-        /// Gets a value indicating whether stash operations can be performed.
+        /// Gets a value indicating whether stash modification operations (pop, drop) can be performed.
+        /// Requires both initialization and at least one stash to be available.
         /// </summary>
         public bool CanMutateStash => IsInitialised && HasStashes;
 
         /// <summary>
         /// Gets a value indicating whether the stash button should be enabled.
+        /// Requires both initialization and at least one selected tool window.
         /// </summary>
         public bool CanStashSelected => IsInitialised && HasSelectedItems;
 
         /// <summary>
-        /// Gets or sets a value indicating whether any items are selected in the list box.
+        /// Gets or sets a value indicating whether any items are selected in the tool windows list box.
         /// </summary>
         public bool HasSelectedItems
         {
@@ -106,7 +108,7 @@ namespace ShowToolWindows.UI.ToolWindows
         } = new ObservableCollection<ToolWindowStash>();
 
         /// <summary>
-        /// Gets a value indicating whether the control has been initialised with VS services.
+        /// Gets a value indicating whether the control has been initialized with Visual Studio services.
         /// </summary>
         public bool IsInitialised
         {
@@ -130,9 +132,11 @@ namespace ShowToolWindows.UI.ToolWindows
 
 
         /// <summary>
-        /// Initializes the control with Visual Studio services.
+        /// Initializes the control with Visual Studio services asynchronously.
         /// </summary>
         /// <param name="package">The owning package.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="package"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when required Visual Studio services cannot be obtained.</exception>
         public async Task InitializeAsync(AsyncPackage package)
         {
             if (package == null)
@@ -166,7 +170,7 @@ namespace ShowToolWindows.UI.ToolWindows
 #pragma warning disable VSTHRD010
 
         /// <summary>
-        /// Handles the Loaded event of the control to wire up event subscriptions.
+        /// Handles the Loaded event of the control to subscribe to collection and selection change events.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
@@ -177,7 +181,7 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
-        /// Handles the Unloaded event of the control to remove event subscriptions.
+        /// Handles the Unloaded event of the control to unsubscribe from collection and selection change events.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
@@ -188,7 +192,7 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
-        /// Handles the CollectionChanged event of the Stashes collection to update the stashes header text.
+        /// Handles the CollectionChanged event of the Stashes collection to update related UI properties.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/> instance containing the event data.</param>
@@ -219,7 +223,7 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
-        /// Handles the Checked event to show a tool window.
+        /// Handles the Checked event of a tool window checkbox to show the corresponding tool window.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
@@ -229,7 +233,7 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
-        /// Handles the Unchecked event to hide a tool window.
+        /// Handles the Unchecked event of a tool window checkbox to hide the corresponding tool window.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
@@ -249,7 +253,7 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
-        /// Handles the Show All button click to display all tool windows.
+        /// Handles the Show All button click to display all available tool windows.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
@@ -259,7 +263,7 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
-        /// Handles the Hide All button click to hide all tool windows.
+        /// Handles the Hide All button click to hide all available tool windows.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
@@ -269,7 +273,7 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
-        /// Handles the Stash button click to save current visible tool windows.
+        /// Handles the Stash button click to save the currently selected tool windows to a new stash.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
@@ -278,6 +282,11 @@ namespace ShowToolWindows.UI.ToolWindows
             ExecuteStashSelectedToolWindows();
         }
 
+        /// <summary>
+        /// Handles the Pop/Merge button click to restore tool windows from the top stash while keeping current windows open.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void PopMergeButton_Click(object sender, RoutedEventArgs e)
         {
             ExecutePopAndMergeToolWindowsFromStash();
@@ -285,7 +294,8 @@ namespace ShowToolWindows.UI.ToolWindows
 
 
         /// <summary>
-        /// Handles the Pop (Abs) button click to restore and remove the top stashed item in absolute mode.
+        /// Handles the Pop (Abs) button click to restore tool windows from the top stash in absolute mode.
+        /// Closes all windows not in the stash before restoring.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
@@ -295,7 +305,7 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
-        /// Handles the Drop All button click to clear all stashes after confirmation.
+        /// Handles the Drop All button click to clear all stashes after user confirmation.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
@@ -303,10 +313,9 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ExecuteDropAllStashes();
         }
-
-
+        
         /// <summary>
-        /// Handles double-click on a stash to restore those tool windows.
+        /// Handles double-click on a stash item to restore the tool windows from that stash.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
@@ -323,13 +332,15 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <summary>
         /// Executes the refresh command to reload the tool windows list.
         /// </summary>
-        /// <param name="parameter">The command parameter.</param>
+        /// <param name="parameter">The command parameter (unused).</param>
         private void ExecuteRefresh(object parameter)
         {
             RefreshToolWindows();
         }
 
-
+        /// <summary>
+        /// Executes the refresh operation and displays a status bar notification.
+        /// </summary>
         private void ExecuteRefreshToolWindows()
         {
             RefreshToolWindows();
@@ -337,6 +348,9 @@ namespace ShowToolWindows.UI.ToolWindows
             StatusBarHelper.ShowStatusBarNotification("Tool windows refreshed.");
         }
 
+        /// <summary>
+        /// Shows all available tool windows and displays a status bar notification.
+        /// </summary>
         private void ExecuteShowAllAvailableToolWindows()
         {
             SetAllToolWindowsVisibility(true);
@@ -344,6 +358,9 @@ namespace ShowToolWindows.UI.ToolWindows
             StatusBarHelper.ShowStatusBarNotification("All available tool windows shown.");
         }
 
+        /// <summary>
+        /// Hides all available tool windows and displays a status bar notification.
+        /// </summary>
         private void ExecuteHideAllAvailableToolWindows()
         {
             SetAllToolWindowsVisibility(false);
@@ -351,6 +368,9 @@ namespace ShowToolWindows.UI.ToolWindows
             StatusBarHelper.ShowStatusBarNotification("All available tool windows hidden.");
         }
 
+        /// <summary>
+        /// Creates a new stash from the currently selected tool windows and displays a status bar notification.
+        /// </summary>
         private void ExecuteStashSelectedToolWindows()
         {
             if (!IsInitialised)
@@ -371,6 +391,9 @@ namespace ShowToolWindows.UI.ToolWindows
             StatusBarHelper.ShowStatusBarNotification($"{selectedCount} selected tool window(s) stashed.");
         }
 
+        /// <summary>
+        /// Restores tool windows from the top stash in merge mode (keeps existing windows open) and displays a status bar notification.
+        /// </summary>
         private void ExecutePopAndMergeToolWindowsFromStash()
         {
             if (Stashes.Count == 0)
@@ -383,6 +406,9 @@ namespace ShowToolWindows.UI.ToolWindows
             StatusBarHelper.ShowStatusBarNotification("Tool windows merged from stash.");
         }
 
+        /// <summary>
+        /// Restores tool windows from the top stash in absolute mode (closes windows not in the stash) and displays a status bar notification.
+        /// </summary>
         private void ExecutePopAbsToolWindowsFromStash()
         {
             if (Stashes.Count == 0)
@@ -395,6 +421,9 @@ namespace ShowToolWindows.UI.ToolWindows
             StatusBarHelper.ShowStatusBarNotification("Tool windows replaced by stash.");
         }
 
+        /// <summary>
+        /// Clears all stashes after user confirmation and displays a status bar notification.
+        /// </summary>
         private void ExecuteDropAllStashes()
         {
             DropAllStashes();
@@ -402,7 +431,11 @@ namespace ShowToolWindows.UI.ToolWindows
             StatusBarHelper.ShowStatusBarNotification("All tool window stashes dropped.");
         }
 
-
+        /// <summary>
+        /// Shows a tool window and adds it to the list box selection.
+        /// </summary>
+        /// <param name="sender">The framework element that triggered the event.</param>
+        /// <exception cref="InvalidOperationException">Thrown when the sender's DataContext is not a ToolWindowEntry.</exception>
         private void SelectCheckBoxItem(FrameworkElement sender)
         {
             if (!(sender.DataContext is ToolWindowEntry entry))
@@ -418,6 +451,10 @@ namespace ShowToolWindows.UI.ToolWindows
             }
         }
 
+        /// <summary>
+        /// Hides a tool window and removes it from the list box selection.
+        /// </summary>
+        /// <param name="sender">The framework element that triggered the event.</param>
         private void DeselectCheckBoxItem(FrameworkElement sender)
         {
             if (!(sender.DataContext is ToolWindowEntry entry))
@@ -433,6 +470,10 @@ namespace ShowToolWindows.UI.ToolWindows
             }
         }
 
+        /// <summary>
+        /// Sets the visibility of all tool windows in the collection.
+        /// </summary>
+        /// <param name="isVisible">True to show all windows; false to hide all windows.</param>
         private void SetAllToolWindowsVisibility(bool isVisible)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -445,6 +486,10 @@ namespace ShowToolWindows.UI.ToolWindows
             _toolWindowHelper.SetToolWindowsVisibility(ToolWindows, isVisible);
         }
 
+        /// <summary>
+        /// Creates a new stash from the currently selected tool windows.
+        /// The stash is added to the top of the stash collection and persisted to settings.
+        /// </summary>
         private void StashSelectedToolWindows()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -473,17 +518,16 @@ namespace ShowToolWindows.UI.ToolWindows
                 objectKinds.Add(entry.ObjectKind);
             }
 
-            var stash = new ToolWindowStash
-            {
-                WindowCaptions = captions.ToArray(),
-                WindowObjectKinds = objectKinds.ToArray(), 
-                CreatedAt = DateTimeOffset.UtcNow
-            };
+            var stash = new ToolWindowStash { WindowCaptions = captions.ToArray(), WindowObjectKinds = objectKinds.ToArray(), CreatedAt = DateTimeOffset.UtcNow };
 
             Stashes.Insert(0, stash);
             SaveAllToolWindowStashes();
         }
 
+        /// <summary>
+        /// Restores tool windows from the top stash in merge mode and removes the stash.
+        /// Does not close windows that are not in the stash.
+        /// </summary>
         private void PopToolWindowsFromStash()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -504,6 +548,10 @@ namespace ShowToolWindows.UI.ToolWindows
             SaveAllToolWindowStashes();
         }
 
+        /// <summary>
+        /// Restores tool windows from the top stash in absolute mode and removes the stash.
+        /// Closes all windows not in the stash before restoring.
+        /// </summary>
         private void PopAbsToolWindowsFromStash()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -526,6 +574,9 @@ namespace ShowToolWindows.UI.ToolWindows
             SaveAllToolWindowStashes();
         }
 
+        /// <summary>
+        /// Clears all stashes after prompting the user for confirmation.
+        /// </summary>
         private void DropAllStashes()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -563,6 +614,9 @@ namespace ShowToolWindows.UI.ToolWindows
             SaveAllToolWindowStashes();
         }
 
+        /// <summary>
+        /// Loads all saved tool window stashes from persistent settings.
+        /// </summary>
         private void LoadAllToolWindowStashes()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -576,6 +630,9 @@ namespace ShowToolWindows.UI.ToolWindows
             }
         }
 
+        /// <summary>
+        /// Saves all current tool window stashes to persistent settings.
+        /// </summary>
         private void SaveAllToolWindowStashes()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -589,6 +646,10 @@ namespace ShowToolWindows.UI.ToolWindows
             _stashService.SaveStashes(stashList);
         }
 
+        /// <summary>
+        /// Restores (shows) the tool windows specified in the given stash and refreshes the tool windows list.
+        /// </summary>
+        /// <param name="stash">The stash containing the tool windows to restore.</param>
         private void RestoreToolWindowsFromStash(ToolWindowStash stash)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -603,6 +664,10 @@ namespace ShowToolWindows.UI.ToolWindows
             RefreshToolWindows();
         }
 
+        /// <summary>
+        /// Closes all tool windows that are not present in the specified stash.
+        /// </summary>
+        /// <param name="stash">The stash to compare against.</param>
         private void CloseToolWindowsNotInStash(ToolWindowStash stash)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -615,6 +680,10 @@ namespace ShowToolWindows.UI.ToolWindows
             _toolWindowHelper.CloseToolWindowsNotInStash(ToolWindows, stash);
         }
 
+        /// <summary>
+        /// Refreshes the tool windows list by querying Visual Studio for all available tool windows.
+        /// Filters out unsupported windows and updates the UI with currently visible windows selected.
+        /// </summary>
         private void RefreshToolWindows()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -636,7 +705,6 @@ namespace ShowToolWindows.UI.ToolWindows
             {
                 ToolWindows.Add(entry);
 
-                // If the tool window is visible, select it in the list
                 if (entry.IsVisible)
                 {
                     ToolWindowsListBox.SelectedItems.Add(entry);
@@ -644,6 +712,12 @@ namespace ShowToolWindows.UI.ToolWindows
             }
         }
 
+        /// <summary>
+        /// Determines whether a tool window is supported for management by this control.
+        /// Excludes this tool window itself from the list.
+        /// </summary>
+        /// <param name="windowEntry">The tool window entry to check.</param>
+        /// <returns>True if the tool window is supported; otherwise, false.</returns>
         private bool IsSupportedToolWindow(ToolWindowEntry windowEntry)
         {
             if (windowEntry == null)
@@ -664,8 +738,6 @@ namespace ShowToolWindows.UI.ToolWindows
 
             return true;
         }
-
-
-#pragma warning restore VSTHRD010
+    #pragma warning restore VSTHRD010
     }
 }
