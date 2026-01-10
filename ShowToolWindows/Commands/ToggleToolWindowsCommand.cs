@@ -33,7 +33,7 @@ namespace ShowToolWindows.Commands
             }
 
             var menuCommandId = new CommandID(CommandSet, CommandId);
-            var menuItem = new MenuCommand((s, e) => ThreadHelper.JoinableTaskFactory.RunAsync(() => ExecuteAsync()), menuCommandId);
+            var menuItem = new MenuCommand((s, e) => ThreadHelper.JoinableTaskFactory.Run(async() => await ExecuteAsync()), menuCommandId);
             commandService.AddCommand(menuItem);
         }
 
