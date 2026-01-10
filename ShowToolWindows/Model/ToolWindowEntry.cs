@@ -11,7 +11,6 @@ namespace ShowToolWindows.Model
     /// </summary>
     public sealed class ToolWindowEntry : INotifyPropertyChanged
     {
-        private readonly Window _window;
         private bool _isVisible;
 
         /// <summary>
@@ -22,7 +21,6 @@ namespace ShowToolWindows.Model
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            _window = window ?? throw new ArgumentNullException(nameof(window));
             Caption = window.Caption;
             ObjectKind = window.ObjectKind;
             _isVisible = window.Visible;
@@ -69,43 +67,6 @@ namespace ShowToolWindows.Model
         /// Occurs when a property value changes.
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// Applies visibility changes to the underlying Visual Studio window.
-        /// </summary>
-        /// <param name="isVisible">Whether the window should be visible.</param>
-        public void SetVisibility(bool isVisible)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            try
-            {
-                if (isVisible)
-                {
-                    _window.Visible = true;
-                    _window.Activate();
-                }
-                else
-                {
-                    _window.Visible = false;
-                }
-
-                IsVisible = _window.Visible;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Unable to change visibility for window '{Caption}': {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Syncs the state with the underlying Visual Studio window.
-        /// </summary>
-        public void Synchronize()
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            IsVisible = _window.Visible;
-        }
 
         /// <summary>
         /// Determines whether the specified object is equal to the current object.
