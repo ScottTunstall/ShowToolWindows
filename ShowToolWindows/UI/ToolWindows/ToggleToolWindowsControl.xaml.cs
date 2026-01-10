@@ -301,7 +301,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void PopAbsButton_Click(object sender, RoutedEventArgs e)
         {
-            ExecutePopAbsToolWindowsFromStash();
+            ExecutePopToolWindowsFromStashAbsolute();
         }
 
         /// <summary>
@@ -323,9 +323,19 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if ((StashListBox.SelectedItem is ToolWindowStash stash))
+            if (!(StashListBox.SelectedItem is ToolWindowStash stash))
             {
-                ExecuteRestoreStashAbsolute(stash);
+                return;
+            }
+            
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                ExecuteRestoreToolWindowsFromStash(stash);
+            }
+            else
+            if (e.RightButton == MouseButtonState.Pressed)
+            {
+                ExecuteRestoreToolWindowsFromStashAbsolute(stash);
             }
         }
 
@@ -409,7 +419,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <summary>
         /// Restores tool windows from the top stash in absolute mode (closes windows not in the stash) and displays a status bar notification.
         /// </summary>
-        private void ExecutePopAbsToolWindowsFromStash()
+        private void ExecutePopToolWindowsFromStashAbsolute()
         {
             if (Stashes.Count == 0)
             {
@@ -431,10 +441,17 @@ namespace ShowToolWindows.UI.ToolWindows
             StatusBarHelper.ShowStatusBarNotification("All tool window stashes dropped.");
         }
 
-        private void ExecuteRestoreStashAbsolute(ToolWindowStash stash)
+
+        private void ExecuteRestoreToolWindowsFromStash(ToolWindowStash stash)
         {
-            CloseToolWindowsNotInStash(stash);
             RestoreToolWindowsFromStash(stash);
+            StatusBarHelper.ShowStatusBarNotification("Tool windows restored from stash.");
+        }
+
+
+        private void ExecuteRestoreToolWindowsFromStashAbsolute(ToolWindowStash stash)
+        {
+            RestoreToolWindowsFromStashAbsolute(stash);
 
             StatusBarHelper.ShowStatusBarNotification("Tool windows restored from stash.");
         }
@@ -576,8 +593,7 @@ namespace ShowToolWindows.UI.ToolWindows
 
             var stash = Stashes[0];
 
-            CloseToolWindowsNotInStash(stash);
-            RestoreToolWindowsFromStash(stash);
+            RestoreToolWindowsFromStashAbsolute(stash);
             Stashes.RemoveAt(0);
             SaveAllToolWindowStashes();
         }
@@ -672,11 +688,7 @@ namespace ShowToolWindows.UI.ToolWindows
             RefreshToolWindows();
         }
 
-        /// <summary>
-        /// Closes all tool windows that are not present in the specified stash.
-        /// </summary>
-        /// <param name="stash">The stash to compare against.</param>
-        private void CloseToolWindowsNotInStash(ToolWindowStash stash)
+        private void RestoreToolWindowsFromStashAbsolute(ToolWindowStash stash)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -685,7 +697,10 @@ namespace ShowToolWindows.UI.ToolWindows
                 return;
             }
 
-            _toolWindowHelper.CloseToolWindowsNotInStash(ToolWindows, stash);
+            _toolWindowHelper.CloseToolWindowsNotInStash(stash);
+            _toolWindowHelper.RestoreToolWindowsFromStash(stash);
+
+            RefreshToolWindows();
         }
 
         /// <summary>
