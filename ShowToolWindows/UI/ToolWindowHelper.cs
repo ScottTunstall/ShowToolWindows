@@ -50,7 +50,7 @@ namespace ShowToolWindows.UI
             {
                 if (value == null)
                 {
-                    _excludedWindowObjectKinds.Clear(); 
+                    _excludedWindowObjectKinds.Clear();
                 }
                 else
                 {
@@ -109,7 +109,7 @@ namespace ShowToolWindows.UI
         /// This method compares the provided collection of tool windows against the stash
         /// and closes any windows whose object kind is not found in the stash.
         /// This is useful for restoring an absolute window state from a stash.
-        /// Tool windows with object kinds in the ExcludedWindowObjectKinds collection will not be closed.
+        /// Tool windows with objectKinds in the ExcludedWindowObjectKinds collection will not be closed.
         /// </remarks>
         /// <param name="toolWindows">The collection of currently available tool windows to check.</param>
         /// <param name="stash">The stash containing the object kinds of windows that should remain open.</param>
@@ -128,6 +128,121 @@ namespace ShowToolWindows.UI
                 .ToList();
 
             SetToolWindowsVisibility(toolWindowsToClose, false);
+        }
+
+
+        /// <summary>
+        /// Sets the visibility state of a single tool window.
+        /// </summary>
+        /// <remarks>
+        /// This method first checks if the tool window exists in the current collection.
+        /// If found, it attempts to open or close the window based on the isVisible parameter.
+        /// </remarks>
+        /// <param name="entry">The tool window entry to modify.</param>
+        /// <param name="isVisible">Whether the tool window should be visible.</param>
+        /// <returns><c>true</c> if the visibility was successfully changed; otherwise, <c>false</c>.</returns>
+        public bool SetToolWindowVisibility(ToolWindowEntry entry, bool isVisible)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            var allToolWindowEntries = GetAllToolWindowEntries().ToList();
+
+            var toolWindowToMutate = allToolWindowEntries
+                .FirstOrDefault(toolWindowEntry => toolWindowEntry.ObjectKind == entry.ObjectKind);
+
+            if (toolWindowToMutate == null)
+            {
+                return false;
+            }
+
+            if (isVisible)
+            {
+                return TryOpenToolWindowByObjectKind(entry.ObjectKind);
+            }
+            else
+            {
+                return TryCloseToolWindowByObjectKind(entry.ObjectKind);
+            }
+        }
+
+
+        /// <summary>
+        /// Sets the visibility state of multiple tool windows.
+        /// </summary>
+        /// <remarks>
+        /// This method iterates through the provided collection and attempts to open or close
+        /// each tool window based on the isVisible parameter. Only tool windows that exist
+        /// in the current collection will be processed.
+        /// </remarks>
+        /// <param name="toolWindows">The collection of tool window entries to modify.</param>
+        /// <param name="isVisible">Whether the tool windows should be visible.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="toolWindows"/> is null.</exception>
+        public void SetToolWindowsVisibility(IEnumerable<ToolWindowEntry> toolWindows, bool isVisible)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            var allToolWindowEntries = GetAllToolWindowEntries().ToList();
+
+            var allToolWindowEntriesHashSet = new HashSet<ToolWindowEntry>(allToolWindowEntries);
+
+            var toolWindowsToMutate = toolWindows
+                .Where(entry => allToolWindowEntriesHashSet.Contains(entry))
+                .ToList();
+
+            foreach (ToolWindowEntry entry in toolWindows)
+            {
+                if (isVisible)
+                {
+                    TryOpenToolWindowByObjectKind(entry.ObjectKind);
+                }
+                else
+                {
+                    TryCloseToolWindowByObjectKind(entry.ObjectKind);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Gets all tool windows available in the current Visual Studio instance.
+        /// </summary>
+        /// <remarks>
+        /// This method filters the windows collection to include only tool windows,
+        /// excluding the main window and other non-tool window types.
+        /// Tool windows with object kinds in the ExcludedWindowObjectKinds collection will not be returned.
+        /// </remarks>
+        /// <returns>An enumerable collection of tool windows.</returns>
+        private IEnumerable<Window> GetAllToolWindows()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            // Cache COM properties to minimize COM interop calls
+            var windowInfos = new List<(Window Window, string Kind, string ObjectKind, string Caption)>();
+
+            foreach (Window window in _dte.Windows)
+            {
+                try
+                {
+                    string kind = window.Kind;
+                    string objectKind = window.ObjectKind;
+                    string caption = window.Caption;
+
+                    windowInfos.Add((window, kind, objectKind, caption));
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error accessing window properties: {ex.Message}");
+                }
+            }
+
+            // Exclude non-tool windows & VS main window
+            var allWindows = windowInfos
+                .Where(info => string.Equals(info.Kind, WindowKindConsts.ToolWindowKind, StringComparison.OrdinalIgnoreCase))
+                .Where(info => !string.Equals(info.ObjectKind, EnvDTE.Constants.vsWindowKindMainWindow, StringComparison.OrdinalIgnoreCase))
+                .Where(info => !_excludedWindowObjectKinds.Contains(info.ObjectKind))
+                .ToList();
+
+            return allWindows.Select(info => info.Window).ToList();
         }
 
         /// <summary>
@@ -180,86 +295,33 @@ namespace ShowToolWindows.UI
         }
 
         /// <summary>
-        /// Sets the visibility state of a single tool window.
+        /// Attempts to close a tool window by its object kind GUID.
         /// </summary>
         /// <remarks>
-        /// This method updates the visibility state of the specified tool window entry
-        /// and synchronizes the changes with the underlying Visual Studio window object.
+        /// This method attempts to find the window in the existing windows collection
+        /// and sets its visibility to false if found.
         /// </remarks>
-        /// <param name="entry">The tool window entry to modify.</param>
-        /// <param name="isVisible">Whether the tool window should be visible.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="entry"/> is null.</exception>
-        public void SetToolWindowVisibility(ToolWindowEntry entry, bool isVisible)
+        /// <param name="objectKind">The tool window object kind GUID in string format.</param>
+        /// <returns><c>true</c> if the window is found and closed; otherwise, <c>false</c>.</returns>
+        private bool TryCloseToolWindowByObjectKind(string objectKind)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            entry.SetVisibility(isVisible);
-            entry.Synchronize();
-        }
-
-        /// <summary>
-        /// Sets the visibility state of multiple tool windows.
-        /// </summary>
-        /// <remarks>
-        /// This method iterates through the provided collection and updates the visibility
-        /// state of each tool window entry, synchronizing changes with the underlying
-        /// Visual Studio window objects.
-        /// </remarks>
-        /// <param name="toolWindows">The collection of tool window entries to modify.</param>
-        /// <param name="isVisible">Whether the tool windows should be visible.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="toolWindows"/> is null.</exception>
-        public void SetToolWindowsVisibility(IEnumerable<ToolWindowEntry> toolWindows, bool isVisible)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            foreach (ToolWindowEntry entry in toolWindows)
+            try
             {
-                entry.SetVisibility(isVisible);
-                entry.Synchronize();
-            }
-        }
-
-
-        /// <summary>
-        /// Gets all tool windows available in the current Visual Studio instance.
-        /// </summary>
-        /// <remarks>
-        /// This method filters the windows collection to include only tool windows,
-        /// excluding the main window and other non-tool window types.
-        /// Tool windows with object kinds in the ExcludedWindowObjectKinds collection will not be returned.
-        /// </remarks>
-        /// <returns>An enumerable collection of tool windows.</returns>
-        private IEnumerable<Window> GetAllToolWindows()
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            // Cache COM properties to minimize COM interop calls
-            var windowInfos = new List<(Window Window, string Kind, string ObjectKind, string Caption)>();
-
-            foreach (Window window in _dte.Windows)
-            {
-                try
+                var window = _dte.Windows.Item(objectKind);
+                if (window != null)
                 {
-                    string kind = window.Kind;
-                    string objectKind = window.ObjectKind;
-                    string caption = window.Caption;
-
-                    windowInfos.Add((window, kind, objectKind, caption));
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error accessing window properties: {ex.Message}");
+                    window.Visible = false;
+                    return true;
                 }
             }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Window '{objectKind}' not in collection. {ex.Message}");
+            }
 
-            // Exclude non-tool windows & VS main window
-            var allWindows = windowInfos
-                .Where(info => string.Equals(info.Kind, WindowKindConsts.ToolWindowKind, StringComparison.OrdinalIgnoreCase))
-                .Where(info => !string.Equals(info.ObjectKind, EnvDTE.Constants.vsWindowKindMainWindow, StringComparison.OrdinalIgnoreCase))
-                .Where(info => !_excludedWindowObjectKinds.Contains(info.ObjectKind))
-                .ToList();
-
-            return allWindows.Select(info => info.Window).ToList();
+            return false;
         }
     }
 }
