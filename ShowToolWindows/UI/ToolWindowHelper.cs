@@ -29,51 +29,6 @@ namespace ShowToolWindows.UI
             _uiShell = vsUiShell ?? throw new ArgumentNullException(nameof(vsUiShell));
         }
 
-        /// <summary>
-        /// Gets all tool windows available in the current Visual Studio instance.
-        /// </summary>
-        /// <remarks>
-        /// This method filters the windows collection to include only tool windows,
-        /// excluding the main window and other non-tool window types.
-        /// </remarks>
-        /// <returns>An enumerable collection of tool windows.</returns>
-        public IEnumerable<Window> GetAllToolWindows()
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            // Cache COM properties to minimize COM interop calls
-            var windowInfos = new List<(Window Window, string Kind, string ObjectKind, string Caption)>();
-            
-            foreach (Window window in _dte.Windows)
-            {
-                try
-                {
-                    string kind = window.Kind;
-                    string objectKind = window.ObjectKind;
-                    string caption = window.Caption;
-                    
-                    windowInfos.Add((window, kind, objectKind, caption));
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error accessing window properties: {ex.Message}");
-                }
-            }
-
-            // Exclude non-tool windows & VS main window
-            var allWindows = windowInfos
-                .Where(info => string.Equals(info.Kind, WindowKindConsts.ToolWindowKind, StringComparison.OrdinalIgnoreCase))
-                .Where(info => !string.Equals(info.ObjectKind, EnvDTE.Constants.vsWindowKindMainWindow, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            System.Diagnostics.Debug.WriteLine($"=== Total Windows Found: {allWindows.Count} ===");
-            foreach (var info in allWindows)
-            {
-                System.Diagnostics.Debug.WriteLine($"Caption: '{info.Caption}', Kind: '{info.Kind}', ObjectKind: '{info.ObjectKind}'");
-            }
-
-            return allWindows.Select(info => info.Window).ToList();
-        }
 
         /// <summary>
         /// Gets all tool windows as <see cref="ToolWindowEntry"/> objects.
@@ -126,13 +81,15 @@ namespace ShowToolWindows.UI
         /// <param name="toolWindows">The collection of currently available tool windows to check.</param>
         /// <param name="stash">The stash containing the object kinds of windows that should remain open.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="toolWindows"/> or <paramref name="stash"/> is null.</exception>
-        public void CloseToolWindowsNotInStash(IEnumerable<ToolWindowEntry> toolWindows, ToolWindowStash stash)
+        public void CloseToolWindowsNotInStash(ToolWindowStash stash)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
+            var allToolWindowEntries = GetAllToolWindowEntries().ToList();
+
             var stashObjectKinds = new HashSet<string>(stash.WindowObjectKinds, StringComparer.OrdinalIgnoreCase);
 
-            var toolWindowsToClose = toolWindows
+            var toolWindowsToClose = allToolWindowEntries
                 .Where(entry => !stashObjectKinds.Contains(entry.ObjectKind))
                 .ToList();
 
@@ -226,6 +183,53 @@ namespace ShowToolWindows.UI
                 entry.SetVisibility(isVisible);
                 entry.Synchronize();
             }
+        }
+
+
+        /// <summary>
+        /// Gets all tool windows available in the current Visual Studio instance.
+        /// </summary>
+        /// <remarks>
+        /// This method filters the windows collection to include only tool windows,
+        /// excluding the main window and other non-tool window types.
+        /// </remarks>
+        /// <returns>An enumerable collection of tool windows.</returns>
+        private IEnumerable<Window> GetAllToolWindows()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            // Cache COM properties to minimize COM interop calls
+            var windowInfos = new List<(Window Window, string Kind, string ObjectKind, string Caption)>();
+
+            foreach (Window window in _dte.Windows)
+            {
+                try
+                {
+                    string kind = window.Kind;
+                    string objectKind = window.ObjectKind;
+                    string caption = window.Caption;
+
+                    windowInfos.Add((window, kind, objectKind, caption));
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error accessing window properties: {ex.Message}");
+                }
+            }
+
+            // Exclude non-tool windows & VS main window
+            var allWindows = windowInfos
+                .Where(info => string.Equals(info.Kind, WindowKindConsts.ToolWindowKind, StringComparison.OrdinalIgnoreCase))
+                .Where(info => !string.Equals(info.ObjectKind, EnvDTE.Constants.vsWindowKindMainWindow, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            System.Diagnostics.Debug.WriteLine($"=== Total Windows Found: {allWindows.Count} ===");
+            foreach (var info in allWindows)
+            {
+                System.Diagnostics.Debug.WriteLine($"Caption: '{info.Caption}', Kind: '{info.Kind}', ObjectKind: '{info.ObjectKind}'");
+            }
+
+            return allWindows.Select(info => info.Window).ToList();
         }
     }
 }
