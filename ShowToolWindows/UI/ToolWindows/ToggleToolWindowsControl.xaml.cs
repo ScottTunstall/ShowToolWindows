@@ -45,7 +45,6 @@ namespace ShowToolWindows.UI.ToolWindows
             Unloaded += ToggleToolWindowsControl_Unloaded;
         }
 
-
         /// <summary>
         /// Gets the command for refreshing the tool windows list.
         /// Bound to the F5 keybinding for user convenience.
@@ -129,7 +128,6 @@ namespace ShowToolWindows.UI.ToolWindows
         /// Occurs when a property value changes.
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
-
 
         /// <summary>
         /// Initializes the control with Visual Studio services asynchronously.
@@ -297,7 +295,6 @@ namespace ShowToolWindows.UI.ToolWindows
             ExecutePopAndMergeToolWindowsFromStash();
         }
 
-
         /// <summary>
         /// Handles the Pop (Abs) button click to restore tool windows from the top stash in absolute mode.
         /// Closes all windows not in the stash before restoring. The stash is removed after restoration.
@@ -318,7 +315,7 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ExecuteDropAllStashes();
         }
-        
+
         /// <summary>
         /// Handles double-click on a stash item to restore the tool windows from that stash.
         /// Left-click restores in merge mode. Right-click restores in absolute mode.
@@ -333,7 +330,7 @@ namespace ShowToolWindows.UI.ToolWindows
             {
                 return;
             }
-            
+
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 ExecuteRestoreToolWindowsFromStash(stash);
@@ -447,7 +444,6 @@ namespace ShowToolWindows.UI.ToolWindows
             StatusBarHelper.ShowStatusBarNotification("All tool window stashes dropped.");
         }
 
-
         /// <summary>
         /// Restores tool windows from a specific stash in merge mode (keeps existing windows open).
         /// Does not remove the stash.
@@ -458,7 +454,6 @@ namespace ShowToolWindows.UI.ToolWindows
             RestoreToolWindowsFromStash(stash);
             StatusBarHelper.ShowStatusBarNotification("Tool windows restored from stash.");
         }
-
 
         /// <summary>
         /// Restores tool windows from a specific stash in absolute mode (closes windows not in the stash).
@@ -559,11 +554,11 @@ namespace ShowToolWindows.UI.ToolWindows
                 objectKinds.Add(entry.ObjectKind);
             }
 
-            var stash = new ToolWindowStash 
-            { 
-                WindowCaptions = captions.ToArray(), 
-                WindowObjectKinds = objectKinds.ToArray(), 
-                CreatedAt = DateTimeOffset.UtcNow 
+            var stash = new ToolWindowStash
+            {
+                WindowCaptions = captions.ToArray(),
+                WindowObjectKinds = objectKinds.ToArray(),
+                CreatedAt = DateTimeOffset.UtcNow
             };
 
             Stashes.Insert(0, stash);
@@ -788,6 +783,7 @@ namespace ShowToolWindows.UI.ToolWindows
 
             return true;
         }
-    #pragma warning restore VSTHRD010
+
+#pragma warning restore VSTHRD010
     }
 }
