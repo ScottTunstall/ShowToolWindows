@@ -144,6 +144,8 @@ namespace ShowToolWindows.UI.ToolWindows
                 throw new ArgumentNullException(nameof(package));
             }
 
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
+
             if (_package != null)
             {
                 RefreshToolWindows();
@@ -151,8 +153,6 @@ namespace ShowToolWindows.UI.ToolWindows
             }
 
             _package = package;
-
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
 
             object dteService = await package.GetServiceAsync(typeof(DTE));
             _dte = dteService as DTE ?? throw new InvalidOperationException("Failed to get DTE service.");
@@ -323,9 +323,9 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (StashListBox.SelectedItem is ToolWindowStash stash)
+            if ((StashListBox.SelectedItem is ToolWindowStash stash))
             {
-                RestoreToolWindowsFromStash(stash);
+                ExecuteRestoreStashAbsolute(stash);
             }
         }
 
@@ -429,6 +429,14 @@ namespace ShowToolWindows.UI.ToolWindows
             DropAllStashes();
 
             StatusBarHelper.ShowStatusBarNotification("All tool window stashes dropped.");
+        }
+
+        private void ExecuteRestoreStashAbsolute(ToolWindowStash stash)
+        {
+            CloseToolWindowsNotInStash(stash);
+            RestoreToolWindowsFromStash(stash);
+
+            StatusBarHelper.ShowStatusBarNotification("Tool windows restored from stash.");
         }
 
         /// <summary>
