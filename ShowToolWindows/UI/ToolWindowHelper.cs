@@ -48,7 +48,7 @@ namespace ShowToolWindows.UI
             }
             set
             {
-                if (value == null)
+                if (value == null || !value.Any())
                 {
                     _excludedWindowObjectKinds.Clear();
                 }
@@ -124,7 +124,6 @@ namespace ShowToolWindows.UI
 
             var toolWindowsToClose = allToolWindowEntries
                 .Where(entry => !stashObjectKinds.Contains(entry.ObjectKind))
-                .Where(entry => !_excludedWindowObjectKinds.Contains(entry.ObjectKind))
                 .ToList();
 
             SetToolWindowsVisibility(toolWindowsToClose, false);
