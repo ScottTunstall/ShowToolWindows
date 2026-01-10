@@ -41,22 +41,38 @@ namespace ShowToolWindows.UI
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-#pragma warning disable VSTHRD010
-            var allWindows = _dte.Windows
-                .Cast<Window>()
-                .Where(window => string.Equals(window.Kind, WindowKindConsts.ToolWindowKind, StringComparison.OrdinalIgnoreCase))
-                .Where(window => !string.Equals(window.ObjectKind, EnvDTE.Constants.vsWindowKindMainWindow, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-#pragma warning restore VSTHRD010
-
-            System.Diagnostics.Debug.WriteLine($"=== Total Windows Found: {allWindows.Count} ===");
-            foreach (var w in allWindows)
+            // Cache COM properties to minimize COM interop calls
+            var windowInfos = new List<(Window Window, string Kind, string ObjectKind, string Caption)>();
+            
+            foreach (Window window in _dte.Windows)
             {
-                System.Diagnostics.Debug.WriteLine($"Caption: '{w.Caption}', Kind: '{w.Kind}', ObjectKind: '{w.ObjectKind}'");
+                try
+                {
+                    string kind = window.Kind;
+                    string objectKind = window.ObjectKind;
+                    string caption = window.Caption;
+                    
+                    windowInfos.Add((window, kind, objectKind, caption));
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error accessing window properties: {ex.Message}");
+                }
             }
 
-            return allWindows
+            // Exclude non-tool windows & VS main window
+            var allWindows = windowInfos
+                .Where(info => string.Equals(info.Kind, WindowKindConsts.ToolWindowKind, StringComparison.OrdinalIgnoreCase))
+                .Where(info => !string.Equals(info.ObjectKind, EnvDTE.Constants.vsWindowKindMainWindow, StringComparison.OrdinalIgnoreCase))
                 .ToList();
+
+            System.Diagnostics.Debug.WriteLine($"=== Total Windows Found: {allWindows.Count} ===");
+            foreach (var info in allWindows)
+            {
+                System.Diagnostics.Debug.WriteLine($"Caption: '{info.Caption}', Kind: '{info.Kind}', ObjectKind: '{info.ObjectKind}'");
+            }
+
+            return allWindows.Select(info => info.Window).ToList();
         }
 
         /// <summary>
@@ -69,6 +85,8 @@ namespace ShowToolWindows.UI
         /// <returns>An enumerable collection of <see cref="ToolWindowEntry"/> objects representing all available tool windows.</returns>
         public IEnumerable<ToolWindowEntry> GetAllToolWindowEntries()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             var toolWindows = GetAllToolWindows();
             return toolWindows.Select(window => new ToolWindowEntry(window)).ToList();
         }
