@@ -160,7 +160,11 @@ namespace ShowToolWindows.UI.ToolWindows
             _uiShell = await _package.GetServiceAsync(typeof(SVsUIShell)) as IVsUIShell ?? throw new InvalidOperationException("Failed to get IVsUIShell service.");
 
             _stashService = new StashSettingsService(_package);
-            _toolWindowHelper = new ToolWindowHelper(_dte, _uiShell);
+            _toolWindowHelper = new ToolWindowHelper(_dte, _uiShell)
+            {
+                // We do not want to allow stashing or toggling this tool window itself
+                ExcludedWindowObjectKinds = new HashSet<string>() { ToggleToolWindowsToolWindow.ToolWindowGuidString }
+            };
             LoadAllToolWindowStashes();
 
             IsInitialised = true;
@@ -543,7 +547,12 @@ namespace ShowToolWindows.UI.ToolWindows
                 objectKinds.Add(entry.ObjectKind);
             }
 
-            var stash = new ToolWindowStash { WindowCaptions = captions.ToArray(), WindowObjectKinds = objectKinds.ToArray(), CreatedAt = DateTimeOffset.UtcNow };
+            var stash = new ToolWindowStash 
+            { 
+                WindowCaptions = captions.ToArray(), 
+                WindowObjectKinds = objectKinds.ToArray(), 
+                CreatedAt = DateTimeOffset.UtcNow 
+            };
 
             Stashes.Insert(0, stash);
             SaveAllToolWindowStashes();
