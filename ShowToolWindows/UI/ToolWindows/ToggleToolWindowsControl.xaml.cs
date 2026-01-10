@@ -242,14 +242,20 @@ namespace ShowToolWindows.UI.ToolWindows
             ExecuteStashSelectedToolWindows();
         }
 
+        private void PopMergeButton_Click(object sender, RoutedEventArgs e)
+        {
+            ExecutePopAndMergeToolWindowsFromStash();
+        }
+
+
         /// <summary>
-        /// Handles the Pop button click to restore and remove the top stashed item.
+        /// Handles the Pop (Abs) button click to restore and remove the top stashed item in absolute mode.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private void PopButton_Click(object sender, RoutedEventArgs e)
+        private void PopAbsButton_Click(object sender, RoutedEventArgs e)
         {
-            ExecutePopToolWindowsFromStash();
+            ExecutePopAbsToolWindowsFromStash();
         }
 
         /// <summary>
@@ -329,7 +335,7 @@ namespace ShowToolWindows.UI.ToolWindows
             StatusBarHelper.ShowStatusBarNotification($"{selectedCount} selected tool window(s) stashed.");
         }
 
-        private void ExecutePopToolWindowsFromStash()
+        private void ExecutePopAndMergeToolWindowsFromStash()
         {
             if (Stashes.Count == 0)
             {
@@ -338,7 +344,19 @@ namespace ShowToolWindows.UI.ToolWindows
 
             PopToolWindowsFromStash();
 
-            StatusBarHelper.ShowStatusBarNotification("Tool windows popped from stash.");
+            StatusBarHelper.ShowStatusBarNotification("Tool windows merged from stash.");
+        }
+
+        private void ExecutePopAbsToolWindowsFromStash()
+        {
+            if (Stashes.Count == 0)
+            {
+                return;
+            }
+
+            PopAbsToolWindowsFromStash();
+
+            StatusBarHelper.ShowStatusBarNotification("Tool windows replaced by stash.");
         }
 
         private void ExecuteDropAllStashes()
@@ -450,6 +468,28 @@ namespace ShowToolWindows.UI.ToolWindows
             SaveAllToolWindowStashes();
         }
 
+        private void PopAbsToolWindowsFromStash()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!IsInitialised)
+            {
+                return;
+            }
+
+            if (Stashes.Count == 0)
+            {
+                return;
+            }
+
+            var stash = Stashes[0];
+
+            CloseToolWindowsNotInStash(stash);
+            RestoreToolWindowsFromStash(stash);
+            Stashes.RemoveAt(0);
+            SaveAllToolWindowStashes();
+        }
+
         private void DropAllStashes()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -522,18 +562,22 @@ namespace ShowToolWindows.UI.ToolWindows
                 return;
             }
 
-            var objectKinds = stash.WindowObjectKinds;
-
-            for (int i = 0; i < objectKinds.Length; i++)
-            {
-                var objectKind = objectKinds[i];
-
-                _toolWindowHelper.TryOpenToolWindowByObjectKind(objectKind);
-            }
+            _toolWindowHelper.RestoreToolWindowsFromStash(stash);
 
             RefreshToolWindows();
         }
 
+        private void CloseToolWindowsNotInStash(ToolWindowStash stash)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!IsInitialised)
+            {
+                return;
+            }
+
+            _toolWindowHelper.CloseToolWindowsNotInStash(ToolWindows, stash);
+        }
 
         private void RefreshToolWindows()
         {
@@ -546,24 +590,14 @@ namespace ShowToolWindows.UI.ToolWindows
 
             ToolWindows.Clear();
 
-            var allWindows = _dte.Windows
-                .Cast<Window>()
+            var allToolWindowEntries = _toolWindowHelper.GetAllToolWindowEntries();
+            var supportedToolWindowEntries = allToolWindowEntries
+                .Where(entry => IsSupportedToolWindow(entry))
+                .OrderBy(entry => entry.Caption, StringComparer.CurrentCultureIgnoreCase)
                 .ToList();
 
-            System.Diagnostics.Debug.WriteLine($"=== Total Windows Found: {allWindows.Count} ===");
-            foreach (var w in allWindows)
+            foreach (var entry in supportedToolWindowEntries)
             {
-                System.Diagnostics.Debug.WriteLine($"Caption: '{w.Caption}', Kind: '{w.Kind}', ObjectKind: '{w.ObjectKind}'");
-            }
-
-            var windows = allWindows
-                .Where(IsSupportedToolWindow)
-                .OrderBy(w => w.Caption, StringComparer.CurrentCultureIgnoreCase)
-                .ToList();
-
-            foreach (Window window in windows)
-            {
-                var entry = new ToolWindowEntry(window);
                 ToolWindows.Add(entry);
 
                 // If the tool window is visible, select it in the list
@@ -574,36 +608,27 @@ namespace ShowToolWindows.UI.ToolWindows
             }
         }
 
-        private static bool IsSupportedToolWindow(Window window)
+        private bool IsSupportedToolWindow(ToolWindowEntry windowEntry)
         {
-            if (window == null)
+            if (windowEntry == null)
             {
                 return false;
             }
 
-            if (!string.Equals(window.Kind, WindowKindConsts.ToolWindowKind, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-            if (string.Equals(window.ObjectKind, EnvDTE.Constants.vsWindowKindMainWindow, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-            string objectKindNormalized = window.ObjectKind.Trim('{', '}');
+            string objectKindNormalized = windowEntry.ObjectKind.Trim('{', '}');
             if (string.Equals(objectKindNormalized, ToggleToolWindowsToolWindow.ToolWindowGuidString, StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
 
-            if (string.Equals(window.Caption, ToggleToolWindowsToolWindow.ToolWindowTitle, StringComparison.Ordinal))
+            if (string.Equals(windowEntry.Caption, ToggleToolWindowsToolWindow.ToolWindowTitle, StringComparison.Ordinal))
             {
                 return false;
             }
 
             return true;
         }
+
 
 #pragma warning restore VSTHRD010
     }

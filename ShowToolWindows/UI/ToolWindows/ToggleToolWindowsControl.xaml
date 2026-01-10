@@ -79,10 +79,15 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <Button Content="Pop"
+                    <Button Content="Pop (Abs)"
                             Width="80"
                             IsEnabled="{Binding CanMutateStash}"
-                            Click="PopButton_Click" />
+                            Click="PopAbsButton_Click" />
+                    <Button Content="Pop (Merge)"
+                            Width="90"
+                            Margin="8,0,0,0"
+                            IsEnabled="{Binding CanMutateStash}"
+                            Click="PopMergeButton_Click" />
                     <Button Content="Drop All"
                             Width="80"
                             Margin="8,0,0,0"
