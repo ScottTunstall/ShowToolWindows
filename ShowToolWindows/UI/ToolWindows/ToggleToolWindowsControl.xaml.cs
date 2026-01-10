@@ -288,6 +288,7 @@ namespace ShowToolWindows.UI.ToolWindows
 
         /// <summary>
         /// Handles the Pop/Merge button click to restore tool windows from the top stash while keeping current windows open.
+        /// The stash is removed after restoration.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
@@ -299,7 +300,7 @@ namespace ShowToolWindows.UI.ToolWindows
 
         /// <summary>
         /// Handles the Pop (Abs) button click to restore tool windows from the top stash in absolute mode.
-        /// Closes all windows not in the stash before restoring.
+        /// Closes all windows not in the stash before restoring. The stash is removed after restoration.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
@@ -320,6 +321,7 @@ namespace ShowToolWindows.UI.ToolWindows
         
         /// <summary>
         /// Handles double-click on a stash item to restore the tool windows from that stash.
+        /// Left-click restores in merge mode. Right-click restores in absolute mode.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
@@ -446,6 +448,11 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
 
+        /// <summary>
+        /// Restores tool windows from a specific stash in merge mode (keeps existing windows open).
+        /// Does not remove the stash.
+        /// </summary>
+        /// <param name="stash">The stash containing the tool windows to restore.</param>
         private void ExecuteRestoreToolWindowsFromStash(ToolWindowStash stash)
         {
             RestoreToolWindowsFromStash(stash);
@@ -453,6 +460,11 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
 
+        /// <summary>
+        /// Restores tool windows from a specific stash in absolute mode (closes windows not in the stash).
+        /// Does not remove the stash.
+        /// </summary>
+        /// <param name="stash">The stash containing the tool windows to restore.</param>
         private void ExecuteRestoreToolWindowsFromStashAbsolute(ToolWindowStash stash)
         {
             RestoreToolWindowsFromStashAbsolute(stash);
@@ -680,7 +692,8 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
-        /// Restores (shows) the tool windows specified in the given stash and refreshes the tool windows list.
+        /// Restores (shows) the tool windows specified in the given stash in merge mode and refreshes the tool windows list.
+        /// Does not close windows that are not in the stash.
         /// </summary>
         /// <param name="stash">The stash containing the tool windows to restore.</param>
         private void RestoreToolWindowsFromStash(ToolWindowStash stash)
@@ -697,6 +710,11 @@ namespace ShowToolWindows.UI.ToolWindows
             RefreshToolWindows();
         }
 
+        /// <summary>
+        /// Restores tool windows from the given stash in absolute mode and refreshes the tool windows list.
+        /// Closes all windows not in the stash before restoring.
+        /// </summary>
+        /// <param name="stash">The stash containing the tool windows to restore.</param>
         private void RestoreToolWindowsFromStashAbsolute(ToolWindowStash stash)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -746,7 +764,7 @@ namespace ShowToolWindows.UI.ToolWindows
 
         /// <summary>
         /// Determines whether a tool window is supported for management by this control.
-        /// Excludes this tool window itself from the list.
+        /// Excludes tool windows with object kinds in the ExcludedWindowObjectKinds collection.
         /// </summary>
         /// <param name="windowEntry">The tool window entry to check.</param>
         /// <returns>True if the tool window is supported; otherwise, false.</returns>
