@@ -367,6 +367,7 @@ namespace ShowToolWindows.UI.ToolWindows
         private void ExecuteShowAllAvailableToolWindows()
         {
             SetAllToolWindowsVisibility(true);
+            RefreshToolWindows();
 
             StatusBarHelper.ShowStatusBarNotification("All available tool windows shown.");
         }
@@ -377,6 +378,7 @@ namespace ShowToolWindows.UI.ToolWindows
         private void ExecuteHideAllAvailableToolWindows()
         {
             SetAllToolWindowsVisibility(false);
+            RefreshToolWindows();
 
             StatusBarHelper.ShowStatusBarNotification("All available tool windows hidden.");
         }
