@@ -68,24 +68,24 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <summary>
         /// Gets a value indicating whether there are any stashes available.
         /// </summary>
-        public bool HasStashes => Stashes.Count > 0;
+        public bool HaveStashes => Stashes.Count > 0;
 
         /// <summary>
         /// Gets a value indicating whether stash modification operations (pop, drop) can be performed.
         /// Requires both initialization and at least one stash to be available.
         /// </summary>
-        public bool CanMutateStash => IsInitialised && HasStashes;
+        public bool CanMutateStash => IsInitialised && HaveStashes;
 
         /// <summary>
         /// Gets a value indicating whether the stash button should be enabled.
         /// Requires both initialization and at least one selected tool window.
         /// </summary>
-        public bool CanStashSelected => IsInitialised && HasSelectedItems;
+        public bool CanStashSelected => IsInitialised && HaveSelectedItems;
 
         /// <summary>
         /// Gets or sets a value indicating whether any items are selected in the tool windows list box.
         /// </summary>
-        public bool HasSelectedItems
+        public bool HaveSelectedItems
         {
             get => _hasSelectedItems;
             private set
@@ -93,7 +93,7 @@ namespace ShowToolWindows.UI.ToolWindows
                 if (_hasSelectedItems != value)
                 {
                     _hasSelectedItems = value;
-                    OnPropertyChanged(nameof(HasSelectedItems));
+                    OnPropertyChanged(nameof(HaveSelectedItems));
                     OnPropertyChanged(nameof(CanStashSelected));
                 }
             }
@@ -203,7 +203,7 @@ namespace ShowToolWindows.UI.ToolWindows
         private void Stashes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(nameof(StashesHeader));
-            OnPropertyChanged(nameof(HasStashes));
+            OnPropertyChanged(nameof(HaveStashes));
             OnPropertyChanged(nameof(CanMutateStash));
         }
 
@@ -214,7 +214,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <param name="e">The <see cref="SelectionChangedEventArgs"/> instance containing the event data.</param>
         private void ToolWindowsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            HasSelectedItems = ToolWindowsListBox.SelectedItems.Count > 0;
+            HaveSelectedItems = ToolWindowsListBox.SelectedItems.Count > 0;
         }
 
         /// <summary>
