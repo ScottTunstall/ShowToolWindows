@@ -133,7 +133,7 @@ namespace ShowToolWindows.UI.ToolWindows
 
             _stashService = new StashSettingsService(_package);
             _toolWindowHelper = new ToolWindowHelper(_dte, _uiShell);
-            LoadToolWindowStashes();
+            LoadAllToolWindowStashes();
 
             IsInitialised = true;
             RefreshToolWindows();
@@ -274,7 +274,7 @@ namespace ShowToolWindows.UI.ToolWindows
 
             if (StashListBox.SelectedItem is ToolWindowStash stash)
             {
-                RestoreToolWindowStash(stash);
+                RestoreToolWindowsFromStash(stash);
             }
         }
 
@@ -427,7 +427,7 @@ namespace ShowToolWindows.UI.ToolWindows
             };
 
             Stashes.Insert(0, stash);
-            SaveToolWindowStashes();
+            SaveAllToolWindowStashes();
         }
 
         private void PopToolWindowsFromStash()
@@ -445,9 +445,9 @@ namespace ShowToolWindows.UI.ToolWindows
             }
 
             var stash = Stashes[0];
-            RestoreToolWindowStash(stash);
+            RestoreToolWindowsFromStash(stash);
             Stashes.RemoveAt(0);
-            SaveToolWindowStashes();
+            SaveAllToolWindowStashes();
         }
 
         private void DropAllStashes()
@@ -484,10 +484,10 @@ namespace ShowToolWindows.UI.ToolWindows
             }
 
             Stashes.Clear();
-            SaveToolWindowStashes();
+            SaveAllToolWindowStashes();
         }
 
-        private void LoadToolWindowStashes()
+        private void LoadAllToolWindowStashes()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -500,7 +500,7 @@ namespace ShowToolWindows.UI.ToolWindows
             }
         }
 
-        private void SaveToolWindowStashes()
+        private void SaveAllToolWindowStashes()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -513,7 +513,7 @@ namespace ShowToolWindows.UI.ToolWindows
             _stashService.SaveStashes(stashList);
         }
 
-        private void RestoreToolWindowStash(ToolWindowStash stash)
+        private void RestoreToolWindowsFromStash(ToolWindowStash stash)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
