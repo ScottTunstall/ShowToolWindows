@@ -16,6 +16,7 @@ namespace ShowToolWindows.UI
     {
         private readonly DTE _dte;
         private readonly IVsUIShell _uiShell;
+        private HashSet<string> _excludedWindowObjectKinds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ToolWindowHelper"/> class.
@@ -29,6 +30,37 @@ namespace ShowToolWindows.UI
             _uiShell = vsUiShell ?? throw new ArgumentNullException(nameof(vsUiShell));
         }
 
+        /// <summary>
+        /// Gets or sets the collection of window object kinds to exclude from operations.
+        /// </summary>
+        /// <remarks>
+        /// Tool windows with object kinds in this collection will be excluded from:
+        /// - GetAllToolWindows results
+        /// - CloseToolWindowsNotInStash operations
+        /// The setter sanitizes the input by removing null, empty, and whitespace-only entries.
+        /// GUIDs are normalized to include enclosing curly braces.
+        /// </remarks>
+        public IEnumerable<string> ExcludedWindowObjectKinds
+        {
+            get
+            {
+                return _excludedWindowObjectKinds.ToList();
+            }
+            set
+            {
+                if (value == null)
+                {
+                    _excludedWindowObjectKinds.Clear(); 
+                }
+                else
+                {
+                    _excludedWindowObjectKinds = new HashSet<string>(
+                        value.Where(s => !string.IsNullOrWhiteSpace(s))
+                             .Select(s => ObjectKindHelper.NormalizeObjectKind(s.Trim())),
+                        StringComparer.OrdinalIgnoreCase);
+                }
+            }
+        }
 
         /// <summary>
         /// Gets all tool windows as <see cref="ToolWindowEntry"/> objects.
@@ -77,6 +109,7 @@ namespace ShowToolWindows.UI
         /// This method compares the provided collection of tool windows against the stash
         /// and closes any windows whose object kind is not found in the stash.
         /// This is useful for restoring an absolute window state from a stash.
+        /// Tool windows with object kinds in the ExcludedWindowObjectKinds collection will not be closed.
         /// </remarks>
         /// <param name="toolWindows">The collection of currently available tool windows to check.</param>
         /// <param name="stash">The stash containing the object kinds of windows that should remain open.</param>
@@ -91,6 +124,7 @@ namespace ShowToolWindows.UI
 
             var toolWindowsToClose = allToolWindowEntries
                 .Where(entry => !stashObjectKinds.Contains(entry.ObjectKind))
+                .Where(entry => !_excludedWindowObjectKinds.Contains(entry.ObjectKind))
                 .ToList();
 
             SetToolWindowsVisibility(toolWindowsToClose, false);
@@ -192,6 +226,7 @@ namespace ShowToolWindows.UI
         /// <remarks>
         /// This method filters the windows collection to include only tool windows,
         /// excluding the main window and other non-tool window types.
+        /// Tool windows with object kinds in the ExcludedWindowObjectKinds collection will not be returned.
         /// </remarks>
         /// <returns>An enumerable collection of tool windows.</returns>
         private IEnumerable<Window> GetAllToolWindows()
@@ -221,13 +256,8 @@ namespace ShowToolWindows.UI
             var allWindows = windowInfos
                 .Where(info => string.Equals(info.Kind, WindowKindConsts.ToolWindowKind, StringComparison.OrdinalIgnoreCase))
                 .Where(info => !string.Equals(info.ObjectKind, EnvDTE.Constants.vsWindowKindMainWindow, StringComparison.OrdinalIgnoreCase))
+                .Where(info => !_excludedWindowObjectKinds.Contains(info.ObjectKind))
                 .ToList();
-
-            System.Diagnostics.Debug.WriteLine($"=== Total Windows Found: {allWindows.Count} ===");
-            foreach (var info in allWindows)
-            {
-                System.Diagnostics.Debug.WriteLine($"Caption: '{info.Caption}', Kind: '{info.Kind}', ObjectKind: '{info.ObjectKind}'");
-            }
 
             return allWindows.Select(info => info.Window).ToList();
         }
