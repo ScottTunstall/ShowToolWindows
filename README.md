@@ -30,7 +30,7 @@ Yeah, I know its a mouthful - I'll probably think of a better name for this tool
 
 
   - This is super easy to use. First use Visual Studio's **View** menu to view the toolbars you'd like to stash for later use.
-  - Click the **Show/Hide specific tool windows** menu item on the **Tools** menu. The **Show/Hide specific tool windows** tool window should appear. It looks like this:  
+  - Click the **Show/Hide/Stash/Restore specific tool windows** menu item on the **Tools** menu. The **Show/Hide specific tool windows** tool window should appear. It looks like this:  
 
 <img width="695" height="361" alt="image" src="https://github.com/user-attachments/assets/d8c33999-dd84-44e1-b62a-34e346ad8bf3" />
   
