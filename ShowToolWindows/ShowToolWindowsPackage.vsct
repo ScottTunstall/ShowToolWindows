@@ -76,7 +76,7 @@
       <Button guid="guidShowToolWindowsPackageCmdSet" id="CloseSpecificToolWindowsCommandId" priority="0x0100" type="Button">
         <Parent guid="guidShowToolWindowsPackageCmdSet" id="MyMenuGroup" />
         <Strings>
-          <ButtonText>Show/Hide specific tool windows</ButtonText>
+          <ButtonText>Show/Hide/Stash/Restore Tool Windows</ButtonText>
           <LocCanonicalName>ScottTunstall.ShowToolWindows.ShowHideSpecificToolWindows</LocCanonicalName>
         </Strings>
       </Button>
