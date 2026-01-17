@@ -19,7 +19,7 @@ namespace ShowToolWindows.UI.ToolWindows
 {
     /// <summary>
     /// User control that provides an interface for managing Visual Studio tool windows.
-    /// Supports showing, hiding, and stashing tool window configurations.
+    /// Supports selecting and stashing tool window configurations.
     /// </summary>
     public partial class ToggleToolWindowsControl : UserControl, INotifyPropertyChanged
     {
@@ -41,6 +41,7 @@ namespace ShowToolWindows.UI.ToolWindows
 
             RefreshCommand = new RelayCommand(ExecuteRefresh);
             DropStashCommand = new RelayCommand(ExecuteDropStash);
+            CheckAllCommand = new RelayCommand(ExecuteCheckAll);
 
             Loaded += ToggleToolWindowsControl_Loaded;
             Unloaded += ToggleToolWindowsControl_Unloaded;
@@ -57,6 +58,12 @@ namespace ShowToolWindows.UI.ToolWindows
         /// Bound to the Delete key on the StashListBox.
         /// </summary>
         public ICommand DropStashCommand { get; }
+
+        /// <summary>
+        /// Gets the command for checking all tool windows.
+        /// Bound to the Ctrl+A keybinding for user convenience.
+        /// </summary>
+        public ICommand CheckAllCommand { get; }
 
         /// <summary>
         /// Gets the collection of tool windows displayed in the UI.
@@ -84,12 +91,12 @@ namespace ShowToolWindows.UI.ToolWindows
 
         /// <summary>
         /// Gets a value indicating whether the stash button should be enabled.
-        /// Requires both initialization and at least one selected tool window.
+        /// Requires both initialization and at least one checked tool window.
         /// </summary>
         public bool CanStashSelected => IsInitialised && HaveSelectedItems;
 
         /// <summary>
-        /// Gets or sets a value indicating whether any items are selected in the tool windows list box.
+        /// Gets or sets a value indicating whether any items are checked in the tool windows list.
         /// </summary>
         public bool HaveSelectedItems
         {
@@ -179,25 +186,25 @@ namespace ShowToolWindows.UI.ToolWindows
 #pragma warning disable VSTHRD010
 
         /// <summary>
-        /// Handles the Loaded event of the control to subscribe to collection and selection change events.
+        /// Handles the Loaded event of the control to subscribe to collection change events.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void ToggleToolWindowsControl_Loaded(object sender, RoutedEventArgs e)
         {
             Stashes.CollectionChanged += Stashes_CollectionChanged;
-            ToolWindowsListBox.SelectionChanged += ToolWindowsListBox_SelectionChanged;
+            ToolWindows.CollectionChanged += ToolWindows_CollectionChanged;
         }
 
         /// <summary>
-        /// Handles the Unloaded event of the control to unsubscribe from collection and selection change events.
+        /// Handles the Unloaded event of the control to unsubscribe from collection change events.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void ToggleToolWindowsControl_Unloaded(object sender, RoutedEventArgs e)
         {
             Stashes.CollectionChanged -= Stashes_CollectionChanged;
-            ToolWindowsListBox.SelectionChanged -= ToolWindowsListBox_SelectionChanged;
+            ToolWindows.CollectionChanged -= ToolWindows_CollectionChanged;
         }
 
         /// <summary>
@@ -213,13 +220,50 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
-        /// Handles the SelectionChanged event of the ToolWindowsListBox to update the HasSelectedItems property.
+        /// Handles the CollectionChanged event of the ToolWindows collection to subscribe to item property changes.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="SelectionChangedEventArgs"/> instance containing the event data.</param>
-        private void ToolWindowsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/> instance containing the event data.</param>
+        private void ToolWindows_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            HaveSelectedItems = ToolWindowsListBox.SelectedItems.Count > 0;
+            if (e.OldItems != null)
+            {
+                foreach (ToolWindowEntry item in e.OldItems)
+                {
+                    item.PropertyChanged -= ToolWindowEntry_PropertyChanged;
+                }
+            }
+
+            if (e.NewItems != null)
+            {
+                foreach (ToolWindowEntry item in e.NewItems)
+                {
+                    item.PropertyChanged += ToolWindowEntry_PropertyChanged;
+                }
+            }
+
+            UpdateHaveSelectedItems();
+        }
+
+        /// <summary>
+        /// Handles property changes on ToolWindowEntry items to update the HaveSelectedItems property.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="PropertyChangedEventArgs"/> instance containing the event data.</param>
+        private void ToolWindowEntry_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ToolWindowEntry.IsSelected))
+            {
+                UpdateHaveSelectedItems();
+            }
+        }
+
+        /// <summary>
+        /// Updates the HaveSelectedItems property based on the current checked state of tool windows.
+        /// </summary>
+        private void UpdateHaveSelectedItems()
+        {
+            HaveSelectedItems = ToolWindows.Any(w => w.IsSelected);
         }
 
         /// <summary>
@@ -229,26 +273,6 @@ namespace ShowToolWindows.UI.ToolWindows
         private void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        /// <summary>
-        /// Handles the Checked event of a tool window checkbox to show the corresponding tool window.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private void WindowCheckbox_Checked(object sender, RoutedEventArgs e)
-        {
-            SelectCheckBoxItem(sender as FrameworkElement);
-        }
-
-        /// <summary>
-        /// Handles the Unchecked event of a tool window checkbox to hide the corresponding tool window.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private void WindowCheckbox_Unchecked(object sender, RoutedEventArgs e)
-        {
-            DeselectCheckBoxItem(sender as FrameworkElement);
         }
 
         /// <summary>
@@ -262,27 +286,7 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
-        /// Handles the Show All button click to display all available tool windows.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private void ShowAllButton_Click(object sender, RoutedEventArgs e)
-        {
-            ExecuteShowAllAvailableToolWindows();
-        }
-
-        /// <summary>
-        /// Handles the Hide All button click to hide all available tool windows.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private void HideAllButton_Click(object sender, RoutedEventArgs e)
-        {
-            ExecuteHideAllAvailableToolWindows();
-        }
-
-        /// <summary>
-        /// Handles the Stash button click to save the currently selected tool windows to a new stash.
+        /// Handles the Stash button click to save the currently checked tool windows to a new stash.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
@@ -419,6 +423,23 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
+        /// Executes the check all command to select all tool windows.
+        /// </summary>
+        /// <param name="parameter">The command parameter (unused).</param>
+        private void ExecuteCheckAll(object parameter)
+        {
+            if (!IsInitialised)
+            {
+                return;
+            }
+
+            foreach (var window in ToolWindows)
+            {
+                window.IsSelected = true;
+            }
+        }
+
+        /// <summary>
         /// Executes the refresh operation and displays a status bar notification.
         /// </summary>
         private void ExecuteRefreshToolWindows()
@@ -429,29 +450,7 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
-        /// Shows all available tool windows and displays a status bar notification.
-        /// </summary>
-        private void ExecuteShowAllAvailableToolWindows()
-        {
-            SetAllToolWindowsVisibility(true);
-            RefreshToolWindows();
-
-            StatusBarHelper.ShowStatusBarNotification("All available tool windows shown.");
-        }
-
-        /// <summary>
-        /// Hides all available tool windows and displays a status bar notification.
-        /// </summary>
-        private void ExecuteHideAllAvailableToolWindows()
-        {
-            SetAllToolWindowsVisibility(false);
-            RefreshToolWindows();
-
-            StatusBarHelper.ShowStatusBarNotification("All available tool windows hidden.");
-        }
-
-        /// <summary>
-        /// Creates a new stash from the currently selected tool windows and displays a status bar notification.
+        /// Creates a new stash from the currently checked tool windows and displays a status bar notification.
         /// </summary>
         private void ExecuteStashSelectedToolWindows()
         {
@@ -460,17 +459,17 @@ namespace ShowToolWindows.UI.ToolWindows
                 return;
             }
 
-            int selectedCount = ToolWindowsListBox.SelectedItems.Count;
+            int selectedCount = ToolWindows.Count(w => w.IsSelected);
 
             if (selectedCount == 0)
             {
-                StatusBarHelper.ShowStatusBarNotification("No tool windows selected to stash. Select items in the list first.");
+                StatusBarHelper.ShowStatusBarNotification("No tool windows checked to stash. Check items in the list first.");
                 return;
             }
 
             StashSelectedToolWindows();
 
-            StatusBarHelper.ShowStatusBarNotification($"{selectedCount} selected tool window(s) stashed.");
+            StatusBarHelper.ShowStatusBarNotification($"{selectedCount} checked tool window(s) stashed.");
         }
 
         /// <summary>
@@ -602,62 +601,7 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
-        /// Shows a tool window and adds it to the list box selection.
-        /// </summary>
-        /// <param name="sender">The framework element that triggered the event.</param>
-        /// <exception cref="InvalidOperationException">Thrown when the sender's DataContext is not a ToolWindowEntry.</exception>
-        private void SelectCheckBoxItem(FrameworkElement sender)
-        {
-            if (!(sender.DataContext is ToolWindowEntry entry))
-            {
-                throw new InvalidOperationException();
-            }
-
-            _toolWindowHelper.SetToolWindowVisibility(entry, true);
-
-            if (!ToolWindowsListBox.SelectedItems.Contains(entry))
-            {
-                ToolWindowsListBox.SelectedItems.Add(entry);
-            }
-        }
-
-        /// <summary>
-        /// Hides a tool window and removes it from the list box selection.
-        /// </summary>
-        /// <param name="sender">The framework element that triggered the event.</param>
-        private void DeselectCheckBoxItem(FrameworkElement sender)
-        {
-            if (!(sender.DataContext is ToolWindowEntry entry))
-            {
-                return;
-            }
-
-            _toolWindowHelper.SetToolWindowVisibility(entry, false);
-
-            if (ToolWindowsListBox.SelectedItems.Contains(entry))
-            {
-                ToolWindowsListBox.SelectedItems.Remove(entry);
-            }
-        }
-
-        /// <summary>
-        /// Sets the visibility of all tool windows in the collection.
-        /// </summary>
-        /// <param name="isVisible">True to show all windows; false to hide all windows.</param>
-        private void SetAllToolWindowsVisibility(bool isVisible)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!IsInitialised)
-            {
-                return;
-            }
-
-            _toolWindowHelper.SetToolWindowsVisibility(ToolWindows, isVisible);
-        }
-
-        /// <summary>
-        /// Creates a new stash from the currently selected tool windows.
+        /// Creates a new stash from the currently checked tool windows.
         /// The stash is added to the top of the stash collection and persisted to settings.
         /// </summary>
         private void StashSelectedToolWindows()
@@ -669,15 +613,15 @@ namespace ShowToolWindows.UI.ToolWindows
                 return;
             }
 
-            if (ToolWindowsListBox.SelectedItems.Count == 0)
+            var windowsToStash = ToolWindows
+                .Where(w => w.IsSelected)
+                .OrderBy(entry => entry.Caption, StringComparer.CurrentCultureIgnoreCase)
+                .ToList();
+
+            if (windowsToStash.Count == 0)
             {
                 return;
             }
-
-            var windowsToStash = ToolWindowsListBox.SelectedItems
-                .Cast<ToolWindowEntry>()
-                .OrderBy(entry => entry.Caption, StringComparer.CurrentCultureIgnoreCase)
-                .ToList();
 
             var captions = new List<string>();
             var objectKinds = new List<string>();
@@ -836,7 +780,7 @@ namespace ShowToolWindows.UI.ToolWindows
 
         /// <summary>
         /// Refreshes the tool windows list by querying Visual Studio for all available tool windows.
-        /// Filters out unsupported windows and updates the UI with currently visible windows selected.
+        /// Filters out unsupported windows and populates the list with unchecked items.
         /// </summary>
         private void RefreshToolWindows()
         {
@@ -858,11 +802,6 @@ namespace ShowToolWindows.UI.ToolWindows
             foreach (var entry in supportedToolWindowEntries)
             {
                 ToolWindows.Add(entry);
-
-                if (entry.IsVisible)
-                {
-                    ToolWindowsListBox.SelectedItems.Add(entry);
-                }
             }
         }
 

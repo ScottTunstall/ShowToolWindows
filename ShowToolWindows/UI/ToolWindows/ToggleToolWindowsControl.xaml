@@ -22,7 +22,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" 
-                   Text="Toggle tool windows to show or hide them." 
+                   Text="Check tool windows to select them for stashing." 
                    Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}"
                    VerticalAlignment="Center" />
 
@@ -31,17 +31,7 @@
                     Width="90"
                     IsEnabled="{Binding IsInitialised}"
                     Click="RefreshButton_Click" />
-            <Button Content="Show All"
-                    Width="80"
-                    Margin="8,0,0,0"
-                    IsEnabled="{Binding IsInitialised}"
-                    Click="ShowAllButton_Click" />
-            <Button Content="Hide All"
-                    Width="80"
-                    Margin="8,0,0,0"
-                    IsEnabled="{Binding IsInitialised}"
-                    Click="HideAllButton_Click" />
-            <Button Content="Stash Selected"
+            <Button Content="Stash Checked"
                     Padding="8,2"
                     Margin="8,0,0,0"
                     IsEnabled="{Binding CanStashSelected}"
@@ -52,15 +42,15 @@
                  x:Name="ToolWindowsListBox"
                  ItemsSource="{Binding ToolWindows}"
                  IsEnabled="{Binding IsInitialised}"
-                 SelectionMode="Extended"
                  BorderThickness="0"
                  ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListBox.InputBindings>
+                <KeyBinding Key="A" Modifiers="Control" Command="{Binding CheckAllCommand}" />
+            </ListBox.InputBindings>
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <CheckBox Content="{Binding Caption}"
-                              IsChecked="{Binding IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              Checked="WindowCheckbox_Checked"
-                              Unchecked="WindowCheckbox_Unchecked"
+                              IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               Margin="0,2" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
