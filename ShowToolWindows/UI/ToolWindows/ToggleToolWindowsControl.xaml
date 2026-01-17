@@ -16,9 +16,9 @@
             <RowDefinition Height="8" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="8" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="16" />
+            <RowDefinition Height="*" MinHeight="80" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" MinHeight="120" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" 
@@ -66,6 +66,14 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
+        <!-- GridSplitter for resizing -->
+        <GridSplitter Grid.Row="5"
+                      Height="5"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Center"
+                      Background="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBorderBrushKey}}"
+                      ShowsPreview="False" />
+
         <!-- Stashes UI section -->
         <Expander Grid.Row="6"
                   Header="{Binding StashesHeader}"
@@ -75,7 +83,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="8" />
-                    <RowDefinition Height="150" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
