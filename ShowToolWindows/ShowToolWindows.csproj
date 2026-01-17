@@ -47,16 +47,16 @@
   <ItemGroup>
     <Compile Include="Commands\CloseAllToolWindowsCommand.cs" />
     <Compile Include="Commands\CloseAllToolWindowsExceptSolutionExplorerCommand.cs" />
-    <Compile Include="Commands\ToggleToolWindowsCommand.cs" />
+    <Compile Include="Commands\StashRestoreToolWindowsCommand.cs" />
     <Compile Include="Model\ToolWindowStash.cs" />
     <Compile Include="Services\StashSettingsService.cs" />
     <Compile Include="UI\ObjectKindHelper.cs" />
     <Compile Include="UI\RelayCommand.cs" />
     <Compile Include="UI\ToolWindowHelper.cs" />
-    <Compile Include="UI\ToolWindows\ToggleToolWindowsControl.xaml.cs">
-      <DependentUpon>ToggleToolWindowsControl.xaml</DependentUpon>
+    <Compile Include="UI\ToolWindows\StashRestoreToolWindowsControl.xaml.cs">
+      <DependentUpon>StashRestoreToolWindowsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ToolWindows\ToggleToolWindowsToolWindow.cs" />
+    <Compile Include="UI\ToolWindows\StashRestoreToolWindowsToolWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Commands\ShowSolutionExplorerCommand.cs" />
     <Compile Include="ShowToolWindowsPackage.cs" />
@@ -101,7 +101,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="UI\ToolWindows\ToggleToolWindowsControl.xaml">
+    <Page Include="UI\ToolWindows\StashRestoreToolWindowsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
