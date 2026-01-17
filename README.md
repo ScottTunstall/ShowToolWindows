@@ -47,6 +47,6 @@ After installing the extension, you should see four new commands (circled in ima
 
 I recommend you assign keyboard shortcuts to these commands. To do this, click **Tools | Options** then open **Environment | Keyboard**, like so:
 
-![image](https://github.com/user-attachments/assets/be8c2e2b-e840-452e-9220-e81ea408da81)
+<img width="872" height="653" alt="image" src="https://github.com/user-attachments/assets/b1b55c27-b7e4-4e6a-a60d-3999a72a0df0" />
 
-Search for **ScottTunstall** in the **Show Commands Containing** textbox. You should see the 3 commands listed on screen. Assign shortcuts to each command as desired.
+Search for **ScottTunstall** in the **Show Commands Containing** textbox. You should see the four commands listed on screen. Assign shortcuts to each command as desired.
