@@ -350,6 +350,22 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
+        /// Handles right-click on a stash item to select it before the context menu appears.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
+        private void StashListBox_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var listBoxItem = FindAncestor<ListBoxItem>((DependencyObject)e.OriginalSource);
+
+            if (listBoxItem != null)
+            {
+                listBoxItem.IsSelected = true;
+                listBoxItem.Focus();
+            }
+        }
+
+        /// <summary>
         /// Handles the Apply (Absolute) context menu click to restore tool windows from the selected stash in absolute mode.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -848,6 +864,25 @@ namespace ShowToolWindows.UI.ToolWindows
                     ToolWindowsListBox.SelectedItems.Add(entry);
                 }
             }
+        }
+
+        /// <summary>
+        /// Finds an ancestor of a specific type in the visual tree.
+        /// </summary>
+        /// <typeparam name="T">The type of ancestor to find.</typeparam>
+        /// <param name="current">The starting dependency object.</param>
+        /// <returns>The ancestor of type T, or null if not found.</returns>
+        private static T FindAncestor<T>(DependencyObject current) where T : DependencyObject
+        {
+            while (current != null)
+            {
+                if (current is T ancestor)
+                {
+                    return ancestor;
+                }
+                current = System.Windows.Media.VisualTreeHelper.GetParent(current);
+            }
+            return null;
         }
 
         /// <summary>

@@ -102,6 +102,7 @@
                          BorderThickness="1"
                          BorderBrush="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBorderBrushKey}}"
                          MouseDoubleClick="StashListBox_MouseDoubleClick"
+                         PreviewMouseRightButtonDown="StashListBox_PreviewMouseRightButtonDown"
                          ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListBox.ContextMenu>
                         <ContextMenu>
