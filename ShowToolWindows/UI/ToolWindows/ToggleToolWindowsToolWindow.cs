@@ -16,7 +16,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// </summary>
         public const string ToolWindowGuidString = "9c6ea6bd-2b57-4ff3-b429-3caa28b3e31c";
 
-        internal const string ToolWindowTitle = "Show/Hide specific tool windows";
+        internal const string ToolWindowTitle = "Show/Hide/Stash/Restore Tool Windows";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ToggleToolWindowsToolWindow"/> class.
