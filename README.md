@@ -40,7 +40,7 @@ Yeah, I know its a mouthful - I'll probably think of a better name for this tool
   - The tool window configurations are PERMANENTLY stored in the stash until you **Drop** (delete) them or **Pop** (restore then discard) top item. The stash persists between Visual Studio sessions.
     - Pop has two buttons - **Pop (Merge)** will **merge** the tool windows in the stash with those currently visible. **Pop (Abs)** will **replace** the tool windows with those in the stash.
     - **Only use Pop when you want to discard the top stash.**
-  - Tool windows  can be recalled at ANY TIME without popping, simply by double left clicking on them (**Merge mode**) or double right clicking (**Absolute replace mode**)
+  - Tool windows  can be recalled at ANY TIME without popping, simply by double left clicking (**Merge mode**) or double right clicking (**Absolute replace mode**) on a stash list item.
   - You can also right click on a stashed item to get a context menu.
    
   
