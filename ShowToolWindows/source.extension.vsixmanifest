@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="ShowToolWindows.aa7eea29-c26b-493f-8bff-84df7d1490c2" Version="2.5.1" Language="en-US" Publisher="Scott Tunstall" />
+        <Identity Id="ShowToolWindows.aa7eea29-c26b-493f-8bff-84df7d1490c2" Version="2.5.2" Language="en-US" Publisher="Scott Tunstall" />
         <DisplayName>ShowToolWindows</DisplayName>
         <Description xml:space="preserve">Commands to handle Tool Windows that have got out of control. Via the Tools menu, you now can close all tool windows except solution explorer, close all tool windows completely, or stash (save) and restore tool windows that you use frequently - save multiple tool window configurations! - no more messing around with the View menu!
 </Description>
         <MoreInfo>https://github.com/ScottTunstall/ShowToolWindows</MoreInfo>
-        <ReleaseNotes>Version 2.5.1</ReleaseNotes>
+        <ReleaseNotes>Version 2.5.2</ReleaseNotes>
         <Icon>renegade_realistic_2.png</Icon>
         <PreviewImage>renegade_realistic_2.png</PreviewImage>
         <Tags>Tool, Windows, Close, Show, Stash, Apply, Drop, Pop, Push, Solution, Explorer</Tags>
