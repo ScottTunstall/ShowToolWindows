@@ -7,11 +7,11 @@ using System.Diagnostics;
 namespace ShowToolWindows.Model
 {
     /// <summary>
-    /// Represents a Visual Studio tool window entry that can be shown or hidden.
+    /// Represents a Visual Studio tool window entry that can be selected for stashing.
     /// </summary>
     public sealed class ToolWindowEntry : INotifyPropertyChanged
     {
-        private bool _isVisible;
+        private bool _isSelected;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ToolWindowEntry"/> class.
@@ -23,7 +23,7 @@ namespace ShowToolWindows.Model
 
             Caption = window.Caption;
             ObjectKind = window.ObjectKind;
-            _isVisible = window.Visible;
+            _isSelected = false;
         }
 
         /// <summary>
@@ -43,23 +43,23 @@ namespace ShowToolWindows.Model
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the tool window is visible.
+        /// Gets or sets a value indicating whether the tool window is selected for stashing.
         /// </summary>
-        public bool IsVisible
+        public bool IsSelected
         {
             get
             {
-                return _isVisible;
+                return _isSelected;
             }
             set
             {
-                if (_isVisible == value)
+                if (_isSelected == value)
                 {
                     return;
                 }
 
-                _isVisible = value;
-                OnPropertyChanged(nameof(IsVisible));
+                _isSelected = value;
+                OnPropertyChanged(nameof(IsSelected));
             }
         }
 
