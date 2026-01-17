@@ -175,7 +175,7 @@ namespace ShowToolWindows.UI.ToolWindows
             _toolWindowHelper = new ToolWindowHelper(_dte, _uiShell)
             {
                 // We do not want to allow stashing or toggling this tool window itself
-                ExcludedWindowObjectKinds = new HashSet<string>() { ToggleToolWindowsToolWindow.ToolWindowGuidString }
+                ExcludedWindowObjectKinds = new HashSet<string>() { StashRestoreToolWindowsToolWindow.ToolWindowGuidString }
             };
             LoadAllToolWindowStashes();
 
@@ -838,12 +838,12 @@ namespace ShowToolWindows.UI.ToolWindows
             }
 
             string objectKindNormalized = windowEntry.ObjectKind.Trim('{', '}');
-            if (string.Equals(objectKindNormalized, ToggleToolWindowsToolWindow.ToolWindowGuidString, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(objectKindNormalized, StashRestoreToolWindowsToolWindow.ToolWindowGuidString, StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
 
-            if (string.Equals(windowEntry.Caption, ToggleToolWindowsToolWindow.ToolWindowTitle, StringComparison.Ordinal))
+            if (string.Equals(windowEntry.Caption, StashRestoreToolWindowsToolWindow.ToolWindowTitle, StringComparison.Ordinal))
             {
                 return false;
             }
