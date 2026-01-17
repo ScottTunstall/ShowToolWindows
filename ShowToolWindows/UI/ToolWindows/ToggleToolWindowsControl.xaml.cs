@@ -40,6 +40,7 @@ namespace ShowToolWindows.UI.ToolWindows
             DataContext = this;
 
             RefreshCommand = new RelayCommand(ExecuteRefresh);
+            DropStashCommand = new RelayCommand(ExecuteDropStash);
 
             Loaded += ToggleToolWindowsControl_Loaded;
             Unloaded += ToggleToolWindowsControl_Unloaded;
@@ -50,6 +51,12 @@ namespace ShowToolWindows.UI.ToolWindows
         /// Bound to the F5 keybinding for user convenience.
         /// </summary>
         public ICommand RefreshCommand { get; }
+
+        /// <summary>
+        /// Gets the command for dropping a stash.
+        /// Bound to the Delete key on the StashListBox.
+        /// </summary>
+        public ICommand DropStashCommand { get; }
 
         /// <summary>
         /// Gets the collection of tool windows displayed in the UI.
@@ -343,6 +350,50 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
+        /// Handles the Apply (Absolute) context menu click to restore tool windows from the selected stash in absolute mode.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        private void ApplyStashAbsolute_Click(object sender, RoutedEventArgs e)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!(StashListBox.SelectedItem is ToolWindowStash stash))
+            {
+                return;
+            }
+
+            ExecuteRestoreToolWindowsFromStashAbsolute(stash);
+        }
+
+        /// <summary>
+        /// Handles the Apply (Merge) context menu click to restore tool windows from the selected stash in merge mode.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        private void ApplyStashMerge_Click(object sender, RoutedEventArgs e)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!(StashListBox.SelectedItem is ToolWindowStash stash))
+            {
+                return;
+            }
+
+            ExecuteRestoreToolWindowsFromStash(stash);
+        }
+
+        /// <summary>
+        /// Handles the Drop context menu click to remove the selected stash.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        private void DropStash_Click(object sender, RoutedEventArgs e)
+        {
+            ExecuteDropStash(null);
+        }
+
+        /// <summary>
         /// Executes the refresh command to reload the tool windows list.
         /// </summary>
         /// <param name="parameter">The command parameter (unused).</param>
@@ -437,12 +488,78 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
+        /// Executes the drop stash command to remove the selected stash from the collection after user confirmation.
+        /// </summary>
+        /// <param name="parameter">Optional parameter (not used).</param>
+        private void ExecuteDropStash(object parameter)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!IsInitialised)
+            {
+                return;
+            }
+
+            if (!(StashListBox.SelectedItem is ToolWindowStash stash))
+            {
+                return;
+            }
+
+            Guid clsid = Guid.Empty;
+            _uiShell.ShowMessageBox(
+                0,
+                ref clsid,
+                "Drop Stash",
+                "Are you sure you wish to drop this stash?",
+                null,
+                0,
+                OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
+                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_SECOND,
+                OLEMSGICON.OLEMSGICON_QUERY,
+                0,
+                out int result);
+
+            if (result != (int)VSConstants.MessageBoxResult.IDYES)
+            {
+                return;
+            }
+
+            DropStash(stash);
+            StatusBarHelper.ShowStatusBarNotification("Stash dropped.");
+        }
+
+        /// <summary>
         /// Clears all stashes after user confirmation and displays a status bar notification.
         /// </summary>
         private void ExecuteDropAllStashes()
         {
-            DropAllStashes();
+            ThreadHelper.ThrowIfNotOnUIThread();
 
+            if (!IsInitialised)
+            {
+                return;
+            }
+
+            Guid clsid = Guid.Empty;
+            _uiShell.ShowMessageBox(
+                0,
+                ref clsid,
+                "Drop All Stashes",
+                "Are you sure you wish to drop all stashes?",
+                null,
+                0,
+                OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
+                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_SECOND,
+                OLEMSGICON.OLEMSGICON_QUERY,
+                0,
+                out int result);
+
+            if (result != (int)VSConstants.MessageBoxResult.IDYES)
+            {
+                return;
+            }
+
+            DropAllStashes();
             StatusBarHelper.ShowStatusBarNotification("All tool window stashes dropped.");
         }
 
@@ -465,7 +582,6 @@ namespace ShowToolWindows.UI.ToolWindows
         private void ExecuteRestoreToolWindowsFromStashAbsolute(ToolWindowStash stash)
         {
             RestoreToolWindowsFromStashAbsolute(stash);
-
             StatusBarHelper.ShowStatusBarNotification("Tool windows restored from stash.");
         }
 
@@ -616,42 +732,17 @@ namespace ShowToolWindows.UI.ToolWindows
             SaveAllToolWindowStashes();
         }
 
+        private void DropStash(ToolWindowStash stash)
+        {
+            Stashes.Remove(stash);
+            SaveAllToolWindowStashes();
+        }
+
         /// <summary>
-        /// Clears all stashes after prompting the user for confirmation.
+        /// Clears all stashes and saves the updated stash list.
         /// </summary>
         private void DropAllStashes()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!IsInitialised)
-            {
-                return;
-            }
-
-            if (Stashes.Count == 0)
-            {
-                return;
-            }
-
-            Guid clsid = Guid.Empty;
-            _uiShell.ShowMessageBox(
-                0,
-                ref clsid,
-                "Drop All Stashes",
-                "Are you sure you wish to drop all stashes?",
-                null,
-                0,
-                OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_SECOND,
-                OLEMSGICON.OLEMSGICON_QUERY,
-                0,
-                out int result);
-
-            if (result != (int)VSConstants.MessageBoxResult.IDYES)
-            {
-                return;
-            }
-
             Stashes.Clear();
             SaveAllToolWindowStashes();
         }

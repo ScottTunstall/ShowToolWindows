@@ -103,6 +103,17 @@
                          BorderBrush="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBorderBrushKey}}"
                          MouseDoubleClick="StashListBox_MouseDoubleClick"
                          ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Apply (Absolute)" Click="ApplyStashAbsolute_Click" />
+                            <MenuItem Header="Apply (Merge)" Click="ApplyStashMerge_Click" />
+                            <Separator />
+                            <MenuItem Header="Drop" InputGestureText="Del" Click="DropStash_Click" />
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                    <ListBox.InputBindings>
+                        <KeyBinding Key="Delete" Command="{Binding DropStashCommand}" />
+                    </ListBox.InputBindings>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding}" 
