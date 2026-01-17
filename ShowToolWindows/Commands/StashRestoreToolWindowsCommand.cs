@@ -8,9 +8,9 @@ using Task = System.Threading.Tasks.Task;
 namespace ShowToolWindows.Commands
 {
     /// <summary>
-    /// Command handler that shows the Show/Hide specific tool windows tool window.
+    /// Command handler that shows the Stash/Restore tool windows tool window.
     /// </summary>
-    internal sealed class ToggleToolWindowsCommand
+    internal sealed class StashRestoreToolWindowsCommand
     {
         /// <summary>
         /// Command ID.
@@ -24,7 +24,7 @@ namespace ShowToolWindows.Commands
 
         private readonly AsyncPackage _package;
 
-        private ToggleToolWindowsCommand(AsyncPackage package, OleMenuCommandService commandService)
+        private StashRestoreToolWindowsCommand(AsyncPackage package, OleMenuCommandService commandService)
         {
             _package = package ?? throw new ArgumentNullException(nameof(package));
             if (commandService == null)
@@ -40,7 +40,7 @@ namespace ShowToolWindows.Commands
         /// <summary>
         /// Gets the singleton instance of the command.
         /// </summary>
-        public static ToggleToolWindowsCommand Instance
+        public static StashRestoreToolWindowsCommand Instance
         {
             get;
             private set;
@@ -55,20 +55,20 @@ namespace ShowToolWindows.Commands
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
 
             OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
-            Instance = new ToggleToolWindowsCommand(package, commandService);
+            Instance = new StashRestoreToolWindowsCommand(package, commandService);
         }
 
         private async Task ExecuteAsync()
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(_package.DisposalToken);
 
-            ToolWindowPane window = await _package.ShowToolWindowAsync(typeof(ToggleToolWindowsToolWindow), 0, true, _package.DisposalToken);
+            ToolWindowPane window = await _package.ShowToolWindowAsync(typeof(StashRestoreToolWindowsToolWindow), 0, true, _package.DisposalToken);
             if (window?.Frame == null)
             {
-                throw new NotSupportedException("Cannot create Show/Hide specific tool windows tool window.");
+                throw new NotSupportedException("Cannot create Stash/Restore tool windows tool window.");
             }
 
-            ToggleToolWindowsToolWindow pane = (ToggleToolWindowsToolWindow)window;
+            StashRestoreToolWindowsToolWindow pane = (StashRestoreToolWindowsToolWindow)window;
             await pane.InitializeAsync(_package);
 
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
