@@ -99,9 +99,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Resources\CloseAllToolWindowsCommand.png" />
-    <Content Include="Resources\CloseAllToolWindowsExceptSolutionExplorerCommand.png" />
-    <Content Include="Resources\ShowSolutionExplorerCommand.png" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="UI\ToolWindows\ToggleToolWindowsControl.xaml">
