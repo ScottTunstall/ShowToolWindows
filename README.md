@@ -25,8 +25,8 @@ After installing the extension, you should see four new commands (circled in ima
 
 ### The Stash/Restore Tool Windows floating tool window
 
-  - **_What's a stash?_** you ask? Its a collection of tool windows that you saved (for showing all at once) for later. 
-  - This is super easy to use. First use Visual Studio's **View** menu to view the tool windows you'd like to stash (save) for later use. This brings them into the Stash/Restore tool window's "view" of the IDE.   
+  - **"_What's a stash?_"** you ask? Its a collection of tool windows that you saved for later retrieval. 
+  - The tool window is super easy to use. First use Visual Studio's **View** menu to view the tool windows you'd like to stash. This brings them into the Stash/Restore tool window's "view" of the IDE.   
   - Now click the **Stash/Restore  tool windows** menu item on the **Tools** menu. The **Show/Hide specific tool windows** tool window should appear. It looks like this (NB: the list contents may vary from what you see):  
 
 <img width="535" height="395" alt="image" src="https://github.com/user-attachments/assets/df26b936-c891-4eac-88e5-4347a391b091" />
