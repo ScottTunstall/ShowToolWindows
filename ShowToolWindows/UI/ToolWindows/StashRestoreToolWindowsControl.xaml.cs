@@ -40,7 +40,7 @@ namespace ShowToolWindows.UI.ToolWindows
             DataContext = this;
 
             RefreshCommand = new RelayCommand(ExecuteRefresh);
-            DropStashCommand = new RelayCommand(ExecuteDropStash);
+            DropStashCommand = new RelayCommand(parameter => ExecuteDropStash());
             CheckAllCommand = new RelayCommand(ExecuteCheckAll);
 
             Loaded += ToggleToolWindowsControl_Loaded;
@@ -405,7 +405,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void DropStash_Click(object sender, RoutedEventArgs e)
         {
-            ExecuteDropStash(null);
+            ExecuteDropStash();
         }
 
         /// <summary>
@@ -500,8 +500,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// <summary>
         /// Executes the drop stash command to remove the selected stash from the collection after user confirmation.
         /// </summary>
-        /// <param name="parameter">Optional parameter (not used).</param>
-        private void ExecuteDropStash(object parameter)
+        private void ExecuteDropStash()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -555,7 +554,7 @@ namespace ShowToolWindows.UI.ToolWindows
                 0,
                 ref clsid,
                 "Drop All Stashes",
-                "Are you sure you wish to drop all stashes?",
+                "Are you sure you wish to drop all stashes? This cannot be undone.",
                 null,
                 0,
                 OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
