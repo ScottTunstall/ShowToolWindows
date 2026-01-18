@@ -57,6 +57,7 @@ After installing the extension, you should see four new commands (circled in ima
 #### Dropping a stash
 
   - **Drop All** permanently deletes all stashes. You will be asked to confirm if you are sure, as deletion cannot be undone.
+  - You can drop individual stashes by using the **context menu** - see below.
 
 #### The Stash item context menu
 
