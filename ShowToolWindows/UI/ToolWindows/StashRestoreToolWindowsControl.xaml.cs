@@ -399,6 +399,23 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
+        /// Handles the Hide all visible context menu click to hide all tool windows referenced in the selected stash.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        private void HideAllVisible_Click(object sender, RoutedEventArgs e)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!(StashListBox.SelectedItem is ToolWindowStash stash))
+            {
+                return;
+            }
+
+            ExecuteHideAllVisibleInStash(stash);
+        }
+
+        /// <summary>
         /// Handles the Drop context menu click to remove the selected stash.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -595,6 +612,16 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
+        /// Hides all visible tool windows that are referenced in the specified stash.
+        /// </summary>
+        /// <param name="stash">The stash containing the tool windows to hide.</param>
+        private void ExecuteHideAllVisibleInStash(ToolWindowStash stash)
+        {
+            HideAllVisibleInStash(stash);
+            StatusBarHelper.ShowStatusBarNotification("Tool windows in stash hidden.");
+        }
+
+        /// <summary>
         /// Creates a new stash from the currently checked tool windows.
         /// The stash is added to the top of the stash collection and persisted to settings.
         /// </summary>
@@ -768,6 +795,31 @@ namespace ShowToolWindows.UI.ToolWindows
 
             _toolWindowHelper.CloseToolWindowsNotInStash(stash);
             _toolWindowHelper.RestoreToolWindowsFromStash(stash);
+
+            RefreshToolWindows();
+        }
+
+        /// <summary>
+        /// Hides all visible tool windows that are referenced in the specified stash.
+        /// </summary>
+        /// <param name="stash">The stash containing the tool windows to hide.</param>
+        private void HideAllVisibleInStash(ToolWindowStash stash)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!IsInitialised)
+            {
+                return;
+            }
+
+            var allToolWindowEntries = _toolWindowHelper.GetAllToolWindowEntries().ToList();
+            var stashObjectKinds = new HashSet<string>(stash.WindowObjectKinds, StringComparer.OrdinalIgnoreCase);
+
+            var toolWindowsToHide = allToolWindowEntries
+                .Where(entry => stashObjectKinds.Contains(entry.ObjectKind))
+                .ToList();
+
+            _toolWindowHelper.SetToolWindowsVisibility(toolWindowsToHide, false);
 
             RefreshToolWindows();
         }

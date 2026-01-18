@@ -104,9 +104,10 @@
                          ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListBox.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="Apply (Absolute)" Click="ApplyStashAbsolute_Click" />
                             <MenuItem Header="Apply (Merge)" Click="ApplyStashMerge_Click" />
+                            <MenuItem Header="Apply (Absolute)" Click="ApplyStashAbsolute_Click" />
                             <Separator />
+                            <MenuItem Header="Hide all visible" Click="HideAllVisible_Click" />
                             <MenuItem Header="Drop" InputGestureText="Del" Click="DropStash_Click" />
                         </ContextMenu>
                     </ListBox.ContextMenu>
