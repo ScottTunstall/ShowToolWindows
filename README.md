@@ -4,9 +4,9 @@
 
 Are you using Visual Studio 2019, 2022 or 2026?
 
-Does your Solution Explorer end up wandering off screen or get stuck under a pile of windows and you have a torrid time trying to find it?
-Or do you end up with a load of Tool Windows open and you don't want to reset window layout but would like to close them all?
-Or do you have a set, or sets, of tool windows you use frequently and want a quick way to show them in one go? 
+* Does your Solution Explorer end up wandering off screen or get stuck under a pile of windows and you have a torrid time trying to find it?
+* Do you end up with a load of Tool Windows open and you don't want to reset window layout but would like to close them all?
+* Do you have a set, or sets, of tool windows you use frequently and want a quick way to show them in one go, _save them for later_, so to speak? 
 
 Fret no more. Reign in naughty tool windows with this extension.
 
