@@ -27,16 +27,16 @@ After installing the extension, you should see four new commands (circled in ima
 
 (Yeah, I know the name is a mouthful - I'll probably think of a better name for this tool window later!!!) 
 
-  - This is super easy to use. First use Visual Studio's **View** menu to view the toolbars you'd like to stash for later use.
-  - Click the **Show/Hide/Stash/Restore specific tool windows** menu item on the **Tools** menu. The **Show/Hide specific tool windows** tool window should appear. It looks like this:  
+  - This is super easy to use. First use Visual Studio's **View** menu to view the toolbars you'd like to stash for later use. 
+  - Now click the **Show/Hide/Stash/Restore specific tool windows** menu item on the **Tools** menu. The **Show/Hide specific tool windows** tool window should appear. It looks like this:  
 
 <img width="695" height="361" alt="image" src="https://github.com/user-attachments/assets/d8c33999-dd84-44e1-b62a-34e346ad8bf3" />
   
-  - Hit the Refresh button on the **Show/Hide specific tool windows** tool window to sync the visible windows with the toolbar's list  (shortcut is **F5**)
+  - Hit the Refresh button on the **Show/Hide specific tool windows** tool window to list the other visible tool windows. (shortcut is **F5**)
   - Select the tool windows you wish to stash by checking the checkboxes, if not already checked for you.
   - Click the "Stash Selected" button. The visible tool window configuration (excluding the tool management window itself!) will be added to the top of the stash.
-  - The stash persists between Visual Studio sessions. 
-  - Stashed tool window configurations are PERMANENTLY stored in the stash until you **Drop** (delete) them or **Pop** (restore then discard) top item. 
+  - You now never need to use the View Menu to open this set of tool windows again. Simply double click the stash and they open for you.
+  - The stash persists between Visual Studio sessions:  configurations are PERMANENTLY stored in the stash until you **Drop** (delete) them or **Pop** (restore then discard) top item. 
     - Pop has two buttons - **Pop (Merge)** will **merge** the tool windows in the stash with those currently visible. **Pop (Abs)** will **replace** the tool windows with those in the stash.
     - **Only use Pop when you want to discard the top stash.**
   - Tool windows  can be recalled at ANY TIME without popping, simply by double left clicking (**Merge mode**) or double right clicking (**Absolute replace mode**) on a stash list item.
