@@ -29,7 +29,8 @@ After installing the extension, you should see four new commands (circled in ima
 
 
 #### View the tool windows you wish to stash (do this first!) 
-  - First use Visual Studio's **View** menu to view the tool windows you'd like to stash. This brings them into the **Stash/Restore Tool Window**'s "view".   
+  - First use Visual Studio's **View** menu to view the tool windows you'd like to stash. This brings them into the **Stash/Restore Tool Window**'s "view".
+    - If you can't see all of the tool windows in the list because the listbox is too small, there's a **horizontal splitter bar** just above the **Stashes** collapsible panel.   
   - Now click the **Stash/Restore tool windows** menu item on the **Tools** menu. The **Stash/Restore Tool Windows** modeless tool window should appear. It looks like this (NB: the list contents will differ from what you see):  
 
 <img width="535" height="395" alt="image" src="https://github.com/user-attachments/assets/df26b936-c891-4eac-88e5-4347a391b091" />
@@ -41,6 +42,7 @@ After installing the extension, you should see four new commands (circled in ima
   - Select the tool windows you wish to stash by checking the respective checkboxes, if not already checked for you.
   - Click the **Stash Checked** button. A stash for the checked tool windows will be _pushed_ to the top of the stash list - yes, just like a LIFO stack. **You can now use the Pop/Apply stash functions to show the stashed tool windows in one go, rather than the chore of doing it with the View Menu!**
   - There's no limit to the amount of stashes you can add, although I wouldn't recommend adding hundreds.
+    - If you _do_ add a lot of stashes and screen real estate is getting tight, remember there's a horizontal splitter bar above the **Stashes** button which you can use to size the stashes listbox. And of course, you can size the **Stash/Restore** tool window as well. 
   - Stashes persist between Visual Studio sessions, until you **Drop** (delete) or **Pop** (restore then delete) them.
 
 #### Applying a stash  
