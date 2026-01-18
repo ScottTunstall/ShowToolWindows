@@ -22,7 +22,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" 
-                   Text="Registered Tool Windows are shown below. Check items in the list for stashing." 
+                   Text="Stashable Tool Windows are shown below." 
                    Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}"
                    VerticalAlignment="Center" />
 
