@@ -38,7 +38,7 @@ After installing the extension, you should see four new commands (circled in ima
   - Hit the **Refresh** button to list the available tool windows (shortcut is **F5**).
     - Note the use of the word _available_ rather than "visible" - once Visual Studio opens a tool window, even if its invisible, its usually still lurking.
   - Select the tool windows you wish to stash by checking the respective checkboxes, if not already checked for you.
-  - Click the **Stash Checked** button. A stash for the checked tool windows will be _pushed_ to the top of the stash list - yes, just like a LIFO stack. **You can now use the stash functions to show the stashed tool windows in one go, rather than the chore of doing it with the View Menu!**
+  - Click the **Stash Checked** button. A stash for the checked tool windows will be _pushed_ to the top of the stash list - yes, just like a LIFO stack. **You can now use the Pop/Apply stash functions to show the stashed tool windows in one go, rather than the chore of doing it with the View Menu!**
   - There's no limit to the amount of stashes you can add, although I wouldn't recommend adding hundreds.
   - Stashes persist between Visual Studio sessions, until you **Drop** (delete) or **Pop** (restore then delete) them.
 
