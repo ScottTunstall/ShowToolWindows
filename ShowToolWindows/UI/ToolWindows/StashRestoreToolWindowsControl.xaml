@@ -22,7 +22,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" 
-                   Text="Check tool windows to select them for stashing." 
+                   Text="Registered Tool Windows are shown below. Check items in the list for stashing." 
                    Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}"
                    VerticalAlignment="Center" />
 
@@ -107,7 +107,7 @@
                             <MenuItem Header="Apply (Merge)" Click="ApplyStashMerge_Click" />
                             <MenuItem Header="Apply (Absolute)" Click="ApplyStashAbsolute_Click" />
                             <Separator />
-                            <MenuItem Header="Hide all visible" Click="HideAllVisible_Click" />
+                            <MenuItem Header="Hide all ref'd by stash" Click="HideAllVisible_Click" />
                             <MenuItem Header="Drop" InputGestureText="Del" Click="DropStash_Click" />
                         </ContextMenu>
                     </ListBox.ContextMenu>
