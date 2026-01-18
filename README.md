@@ -66,7 +66,7 @@ When you **right click** on a stash item, the item will be selected and a contex
    
   - **Apply (Merge)** will **merge** the tool windows in the selected stash with those currently visible.
   - **Apply (Absolute)** will **replace** the currently visible tool windows with those in the selected stash.
-  - **Hide All ref'd by Stash** will hide all of the toolbar windows referenced by the stash.
+  - **Hide All ref'd by Stash** will hide all of the tool windows referenced by the stash.
   - **Drop** will delete the stash permanently.
 
 
