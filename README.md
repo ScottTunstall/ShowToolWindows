@@ -29,7 +29,7 @@ After installing the extension, you should see four new commands (circled in ima
 
 #### View the tool windows you wish to stash (do this first!) 
   - First use Visual Studio's **View** menu to view the tool windows you'd like to stash. This brings them into the **Stash/Restore Tool Window**'s "view".   
-  - Now click the **Stash/Restore tool windows** menu item on the **Tools** menu. The **Stash/Restore Tool Windows** modeless tool window should appear. It looks like this (NB: the list contents may vary from what you see):  
+  - Now click the **Stash/Restore tool windows** menu item on the **Tools** menu. The **Stash/Restore Tool Windows** modeless tool window should appear. It looks like this (NB: the list contents will differ from what you see):  
 
 <img width="535" height="395" alt="image" src="https://github.com/user-attachments/assets/df26b936-c891-4eac-88e5-4347a391b091" />
 
@@ -38,18 +38,18 @@ After installing the extension, you should see four new commands (circled in ima
   - Hit the **Refresh** button to list the available tool windows (shortcut is **F5**).
     - Note the use of the word _available_ rather than "visible" - once Visual Studio opens a tool window, even if its invisible, its usually still lurking.
   - Select the tool windows you wish to stash by checking the respective checkboxes, if not already checked for you.
-  - Click the **Stash Checked** button. The checked tool windows (excluding the tool management window itself!) will be stashed at the top of the stash list - yes, just like a LIFO stack. **You can now use the stash functions to show the stashed tool windows in one go, rather than the chore of doing it with the View Menu!**
+  - Click the **Stash Checked** button. **Tool Window Metadata** (basically identity references) for the checked tool windows will be stashed at the top of the stash list - yes, just like a LIFO stack. **You can now use the stash functions to show the stashed tool windows in one go, rather than the chore of doing it with the View Menu!**
   - There's no limit to the amount of stashes you can add, although I wouldn't recommend adding hundreds.
-  - Tool windows are PERMANENTLY "stored" in the stash, and persist between Visual Studio sessions, until you **Drop** (delete) them or **Pop** (restore then delete) top item.
+  - Stashes persist between Visual Studio sessions, until you **Drop** (delete) or **Pop** (restore then delete) them.
 
 #### Applying a stash  
-  - Tool windows in the stash can be applied (shown) at ANY TIME, simply by double left clicking (**Merge mode**) on a stash list item. You can also right click on a stashed item to get a context menu (see below).
+  - Tool windows referred to by a stash can be applied (shown) at ANY TIME, simply by double left clicking (**Merge mode**) on a stash list item. You can also right click on a stashed item to get a context menu (see below).
 
 #### Popping a stash  
   - If you want to pop the top item from the list, you can use either the **Pop (Merge)** or the **Pop (Abs)** button.    
     - **Pop (Merge)** will **merge** the tool windows in the popped stash with those currently visible.
-    - **Pop (Abs)** , where Abs is short for **Absolute**, will **replace** currently visible tool windows with those in the popped stash.
-    - The Pop operation permanently deletes the stash item. If you don't want to delete the stash, use the context menu (see below)
+    - **Pop (Abs)** , where Abs is short for **Absolute**, will **replace** currently visible tool windows with those referred to by the popped stash.
+    - The Pop operation **permanently deletes** the stash item. If you don't want to delete the stash, use the **context menu** (see below)
 
 #### Dropping a stash
 
@@ -57,12 +57,14 @@ After installing the extension, you should see four new commands (circled in ima
 
 #### The Stash item context menu
 
-When you right click on a stash in the list, the context menu below will appear:
+When you **right click** on a stash item, the item will be selected and a context menu will appear:
 
 <img width="730" height="403" alt="image" src="https://github.com/user-attachments/assets/d460fc83-594a-4587-8ac0-65fe44602c07" />
    
   - **Apply (Merge)** will **merge** the tool windows in the selected stash with those currently visible.
-  - **Apply (Abs)** will **replace** the currently visible tool windows with those in the selected stash.
+  - **Apply (Absolute)** will **replace** the currently visible tool windows with those in the selected stash.
+  - **Hide All ref'd by Stash** will hide all of the toolbar windows referenced by the stash.
+  - **Drop** will delete the stash permanently.
 
 
   
