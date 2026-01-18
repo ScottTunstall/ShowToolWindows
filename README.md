@@ -25,7 +25,7 @@ After installing the extension, you should see four new commands (circled in ima
 
 ### The Stash/Restore Tool Windows floating tool window
 
-  - **"_What's a stash?_"** you ask? Its a collection of tool windows that you saved for later retrieval.
+"_What's a stash?_"** you ask? **Its a collection of tool windows that you saved for later retrieval**. (Or rather, _references_ to tool windows)
 
 #### View the tool windows you wish to stash (do this first!) 
   - First use Visual Studio's **View** menu to view the tool windows you'd like to stash. This brings them into the **Stash/Restore Tool Window**'s "view".   
@@ -38,7 +38,7 @@ After installing the extension, you should see four new commands (circled in ima
   - Hit the **Refresh** button to list the available tool windows (shortcut is **F5**).
     - Note the use of the word _available_ rather than "visible" - once Visual Studio opens a tool window, even if its invisible, its usually still lurking.
   - Select the tool windows you wish to stash by checking the respective checkboxes, if not already checked for you.
-  - Click the **Stash Checked** button. **Tool Window Metadata** (basically identity references) for the checked tool windows will be stashed at the top of the stash list - yes, just like a LIFO stack. **You can now use the stash functions to show the stashed tool windows in one go, rather than the chore of doing it with the View Menu!**
+  - Click the **Stash Checked** button. A stash for the checked tool windows will be _pushed_ to the top of the stash list - yes, just like a LIFO stack. **You can now use the stash functions to show the stashed tool windows in one go, rather than the chore of doing it with the View Menu!**
   - There's no limit to the amount of stashes you can add, although I wouldn't recommend adding hundreds.
   - Stashes persist between Visual Studio sessions, until you **Drop** (delete) or **Pop** (restore then delete) them.
 
