@@ -312,7 +312,7 @@ namespace ShowToolWindows.UI.ToolWindows
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private void PopAbsButton_Click(object sender, RoutedEventArgs e)
+        private void PopAbsoluteButton_Click(object sender, RoutedEventArgs e)
         {
             ExecutePopToolWindowsFromStashAbsolute();
         }

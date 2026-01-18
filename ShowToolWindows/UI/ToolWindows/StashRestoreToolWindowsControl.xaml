@@ -80,7 +80,7 @@
                     <Button Content="Pop (Abs)"
                             Width="80"
                             IsEnabled="{Binding CanMutateStash}"
-                            Click="PopAbsButton_Click" />
+                            Click="PopAbsoluteButton_Click" />
                     <Button Content="Pop (Merge)"
                             Width="90"
                             Margin="8,0,0,0"
