@@ -52,7 +52,7 @@ After installing the extension, you should see four new commands (circled in ima
   - If you want to pop the top item from the list, you can use either the **Pop (Merge)** or the **Pop (Abs)** button.    
     - **Pop (Merge)** will **merge** the tool windows in the popped stash with those currently visible.
     - **Pop (Abs)** , where Abs is short for **Absolute**, will **replace** currently visible tool windows with those referred to by the popped stash.
-    - The Pop operation **permanently deletes** the stash item. If you don't want to delete the stash, use the **context menu** (see below)
+    - The Pop operation **permanently deletes** the stash item. If you don't want to delete the stash, use the **Apply** functionality in the **context menu** (see below)
 
 #### Dropping a stash
 
