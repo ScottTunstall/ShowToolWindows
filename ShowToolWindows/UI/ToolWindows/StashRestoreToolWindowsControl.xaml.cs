@@ -346,11 +346,6 @@ namespace ShowToolWindows.UI.ToolWindows
             {
                 ExecuteRestoreToolWindowsFromStash(stash);
             }
-            else
-            if (e.RightButton == MouseButtonState.Pressed)
-            {
-                ExecuteRestoreToolWindowsFromStashAbsolute(stash);
-            }
         }
 
         /// <summary>
