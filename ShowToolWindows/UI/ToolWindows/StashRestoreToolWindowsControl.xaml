@@ -108,6 +108,7 @@
                             <MenuItem Header="Apply (Absolute)" Click="ApplyStashAbsolute_Click" />
                             <Separator />
                             <MenuItem Header="Hide all ref'd by stash" Click="HideAllVisible_Click" />
+                            <Separator />
                             <MenuItem Header="Drop" InputGestureText="Del" Click="DropStash_Click" />
                         </ContextMenu>
                     </ListBox.ContextMenu>
