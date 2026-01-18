@@ -21,7 +21,7 @@ After installing the extension, you should see four new commands (circled in ima
 * The first command, **Show Solution Explorer** will make the solution explorer FULLY VISIBLE even if it was partially or mostly offscreen before.
 * The second command, **Close all Tool Windows except Solution Explorer** will close all tool windows except the solution explorer - very useful when you're in Tool Window Hell. 
 * The third command, **Close all Tool Windows** is the nuclear option and does as you expect. Every tool window goes, but your code windows will be left untouched. 
-* The fourth command, **Stash/Restore tool windows** is for power users. This pops up a floating toolbar window which allows you to stash (save) and restore tool windows configurations at the click of a button! More below.
+* The fourth command, **Stash/Restore tool windows** is for power users. This pops up a **floating tool window** which allows you to stash (save) and restore tool windows configurations at the click of a button! More below.
 
 ### The Stash/Restore Tool Windows floating tool window
 
