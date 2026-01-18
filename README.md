@@ -28,11 +28,12 @@ After installing the extension, you should see four new commands (circled in ima
 (Yeah, I know the name is a mouthful - I'll probably think of a better name for this tool window later!!!) 
 
   - This is super easy to use. First use Visual Studio's **View** menu to view the toolbars you'd like to stash for later use. 
-  - Now click the **Show/Hide/Stash/Restore specific tool windows** menu item on the **Tools** menu. The **Show/Hide specific tool windows** tool window should appear. It looks like this:  
+  - Now click the **Show/Hide/Stash/Restore specific tool windows** menu item on the **Tools** menu. The **Show/Hide specific tool windows** tool window should appear. It looks like this (NB: the list contents may vary from what you see):  
 
-<img width="695" height="361" alt="image" src="https://github.com/user-attachments/assets/d8c33999-dd84-44e1-b62a-34e346ad8bf3" />
+<img width="626" height="409" alt="image" src="https://github.com/user-attachments/assets/0c8eb986-5ec4-4d45-9b93-33a8f73ee91f" />
+
   
-  - Hit the Refresh button on the **Show/Hide specific tool windows** tool window to list the other visible tool windows. (shortcut is **F5**)
+  - Hit the Refresh button on the **Show/Hide specific tool windows** tool window to list the visible tool windows. (shortcut is **F5**)
   - Select the tool windows you wish to stash by checking the checkboxes, if not already checked for you.
   - Click the "Stash Selected" button. The visible tool window configuration (excluding the tool management window itself!) will be added to the top of the stash. In future you don't need to use the View menu to show these toolbars - simply double click the stash and they open for you.
   - Tool windows  can be recalled at ANY TIME without popping, simply by double left clicking (**Merge mode**) on a stash list item. 
