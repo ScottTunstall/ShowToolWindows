@@ -6,6 +6,7 @@ Are you using Visual Studio 2019, 2022 or 2026?
 
 Does your Solution Explorer end up wandering off screen or get stuck under a pile of windows and you have a torrid time trying to find it?
 Or do you end up with a load of Tool Windows open and you don't want to reset window layout but would like to close them all?
+Or do you have a set, or sets, of tool windows you use frequently and want a quick way to show them in one go? 
 
 Fret no more. Reign in naughty tool windows with this extension.
 
@@ -15,7 +16,6 @@ Fret no more. Reign in naughty tool windows with this extension.
 After installing the extension, you should see four new commands (circled in image) on the Visual Studio **Tools** menu :
 
 <img width="442" height="634" alt="image" src="https://github.com/user-attachments/assets/b9f0f04b-ecdc-434e-8d9f-776b39fc17bd" />
-
 
 
 * The first command, **Show Solution Explorer** will make the solution explorer FULLY VISIBLE even if it was partially or mostly offscreen before.
