@@ -29,7 +29,7 @@ After installing the extension, you should see four new commands (circled in ima
 
 
 #### View the tool windows you wish to stash (do this first!) 
-  - First use Visual Studio's **View** menu to view the tool windows you'd like to stash. This brings them into the **Stash/Restore Tool Window**'s "view".
+  - First use Visual Studio's **View** menu to view the tool windows you'd like to stash. This brings the tool windows into the **Stash/Restore Tool Window**'s "view".
     - If you can't see all of the tool windows in the list because the listbox is too small, there's a **horizontal splitter bar** just above the **Stashes** collapsible panel.   
   - Now click the **Stash/Restore tool windows** menu item on the **Tools** menu. The **Stash/Restore Tool Windows** modeless tool window should appear. It looks like this (NB: the list contents will differ from what you see):  
 
