@@ -28,8 +28,8 @@ After installing the extension, you should see four new commands (circled in ima
   - **"_What's a stash?_"** you ask? Its a collection of tool windows that you saved for later retrieval.
 
 #### View the tool windows you wish to stash (do this first!) 
-  - First use Visual Studio's **View** menu to view the tool windows you'd like to stash. This brings them into the **Stash/Restore tool window**'s "view".   
-  - Now click the **Stash/Restore  tool windows** menu item on the **Tools** menu. The **Show/Hide specific tool windows** tool window should appear. It looks like this (NB: the list contents may vary from what you see):  
+  - First use Visual Studio's **View** menu to view the tool windows you'd like to stash. This brings them into the **Stash/Restore Tool Window**'s "view".   
+  - Now click the **Stash/Restore tool windows** menu item on the **Tools** menu. The **Stash/Restore Tool Windows** modeless tool window should appear. It looks like this (NB: the list contents may vary from what you see):  
 
 <img width="535" height="395" alt="image" src="https://github.com/user-attachments/assets/df26b936-c891-4eac-88e5-4347a391b091" />
 
@@ -47,16 +47,23 @@ After installing the extension, you should see four new commands (circled in ima
 
 #### Popping a stash  
   - If you want to pop the top item from the list, you can use either the **Pop (Merge)** or the **Pop (Abs)** button.    
-    - **Pop (Merge)** will **merge** the tool windows in the stash with those currently visible.
-    - **Pop (Abs)** , where Abs is short for **Absolute**, will **replace** the tool windows with those in the stash.
+    - **Pop (Merge)** will **merge** the tool windows in the popped stash with those currently visible.
+    - **Pop (Abs)** , where Abs is short for **Absolute**, will **replace** currently visible tool windows with those in the popped stash.
+    - The Pop operation permanently deletes the stash item. If you don't want to delete the stash, use the context menu (see below)
 
 #### Dropping a stash
 
   - **Drop All** permanently deletes all stashes. You will be asked to confirm if you are sure, as deletion cannot be undone.
 
- #### Stash item context menu
+#### The Stash item context menu
 
-    <img width="730" height="403" alt="image" src="https://github.com/user-attachments/assets/a52a5d62-da27-45d6-88dd-c36882c32379" />
+When you right click on a stash in the list, the context menu below will appear:
+
+<img width="730" height="403" alt="image" src="https://github.com/user-attachments/assets/d460fc83-594a-4587-8ac0-65fe44602c07" />
+   
+  - **Apply (Merge)** will **merge** the tool windows in the selected stash with those currently visible.
+  - **Apply (Abs)** will **replace** the currently visible tool windows with those in the selected stash.
+
 
   
 ## Assigning Keyboard Shortcuts (recommended)
