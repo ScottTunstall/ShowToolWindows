@@ -73,6 +73,6 @@ When you **right click** on a stash item, the item will be selected and a contex
 
 I recommend you assign keyboard shortcuts to these commands. To do this, click **Tools | Options** then open **Environment | Keyboard**, like so:
 
-<img width="872" height="653" alt="image" src="https://github.com/user-attachments/assets/b1b55c27-b7e4-4e6a-a60d-3999a72a0df0" />
+<img width="743" height="445" alt="image" src="https://github.com/user-attachments/assets/fddec3ae-009e-4a47-8fc9-bd2b450abec6" />
 
 Search for **ScottTunstall** in the **Show Commands Containing** textbox. You should see the four commands listed on screen. Assign shortcuts to each command as desired.
