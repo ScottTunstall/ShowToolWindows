@@ -29,12 +29,12 @@ Unlike **Window ? Apply Window Layout**, the Stash/Restore system provides:
 
 | Feature | Visual Studio Built-in | This Extension |
 |---------|----------------------|----------------|
-| **Merge tool windows** | ? No - replaces everything | ? Yes - add to current workspace |
-| **Quick save without naming** | ? No - must create named layout | ? Yes - instant stash to stack |
-| **Multiple saved configurations** | ? Yes | ? Yes |
-| **Context menu operations** | ? No | ? Yes - apply, hide, drop |
-| **Persistent across sessions** | ? Yes | ? Yes |
-| **Affects code editor layout** | ? Yes - overwrites everything | ? No - tool windows only |
+| **Merge tool windows** | No - replaces everything | Yes - add to current workspace |
+| **Quick save without naming** | No - must create named layout | Yes - instant stash to stack |
+| **Multiple saved configurations** | Yes | Yes |
+| **Context menu operations** | No | Yes - apply, hide, drop |
+| **Persistent across sessions** | Yes | Yes |
+| **Affects code editor layout** | Yes - overwrites everything | No - tool windows only |
 
 
 
