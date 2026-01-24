@@ -1,81 +1,162 @@
-# Show Tool Window Extension for Visual Studio 2019, 2022 and 2026.
+# Show Tool Windows - Advanced Tool Window Management for Visual Studio
 
-## About
+**For Visual Studio 2019, 2022, and 2026**
 
-Are you using Visual Studio 2019, 2022 or 2026?
+## The Problem
 
-* Does your Solution Explorer end up wandering off screen or get stuck under a pile of windows and you have a torrid time trying to find it?
-* Do you end up with a load of Tool Windows open and you don't want to reset window layout but would like to close them all?
-* Do you have a set, or sets, of tool windows you use frequently and want a quick way to show them in one go, _save them for later_, so to speak? 
+Visual Studio's built-in **Window ? Apply Window Layout** feature has limitations:
+- **Replaces all windows** - you cannot merge layouts with your current tool windows
+- **Named layouts only** - requires creating and naming layouts before use
+- **Affects all windows** - includes code editor layouts, not just tool windows
 
-Fret no more. Reign in naughty tool windows with this extension.
+During a typical development session:
+- Solution Explorer disappears offscreen or gets buried under other windows
+- Tool windows accumulate until your workspace becomes cluttered
+- You repeatedly open the same combinations of tool windows for specific tasks (debugging, profiling, database work, etc.)
 
+## The Solution
 
-## How to use
+This extension provides **flexible, stack-based tool window management**:
 
-After installing the extension, you should see four new commands (circled in image) on the Visual Studio **Tools** menu :
+### Quick Access Commands
+- **Show Solution Explorer** - Instantly bring Solution Explorer fully into view, even if it's offscreen
+- **Close All Tool Windows (except Solution Explorer)** - Clean your workspace while preserving navigation
+- **Close All Tool Windows** - Nuclear option for complete decluttering (code windows remain untouched)
 
-<img width="442" height="634" alt="image" src="https://github.com/user-attachments/assets/b9f0f04b-ecdc-434e-8d9f-776b39fc17bd" />
+### Stash/Restore System (The Power Feature)
 
+Unlike **Window ? Apply Window Layout**, the Stash/Restore system provides:
 
-* The first command, **Show Solution Explorer** will make the solution explorer FULLY VISIBLE even if it was partially or mostly offscreen before.
-* The second command, **Close all Tool Windows except Solution Explorer** will close all tool windows except the solution explorer - very useful when you're in Tool Window Hell. 
-* The third command, **Close all Tool Windows** is the nuclear option and does as you expect. Every tool window goes, but your code windows will be left untouched. 
-* The fourth command, **Stash/Restore tool windows** is for power users. This pops up a **floating tool window** which allows you to stash (save) and restore tool windows configurations at the click of a button! More below.
-
-### The Stash/Restore Tool Windows floating tool window
-
-**"_What's a stash?_"** you ask? **It's a collection of tool windows that you save for later retrieval**. (Or rather, _references_ to tool windows)
-
-
-#### View the tool windows you wish to stash (do this first!) 
-  - First use Visual Studio's **View** menu to view the tool windows you'd like to stash. This brings the tool windows into the **Stash/Restore Tool Window**'s "view".
-    - If you can't see all of the tool windows in the list because the listbox is too small, there's a **horizontal splitter bar** just above the **Stashes** collapsible panel.   
-  - Now click the **Stash/Restore tool windows** menu item on the **Tools** menu. The **Stash/Restore Tool Windows** modeless tool window should appear. It looks like this (NB: the list contents will differ from what you see):  
-
-<img width="535" height="395" alt="image" src="https://github.com/user-attachments/assets/df26b936-c891-4eac-88e5-4347a391b091" />
-
-#### Creating a stash (do this second!)
-
-  - Hit the **Refresh** button to list the available tool windows (shortcut is **F5**).
-    - Note the use of the word _available_ rather than "visible" - once Visual Studio opens a tool window, even if its invisible, its usually still lurking.
-  - Select the tool windows you wish to stash by checking the respective checkboxes, if not already checked for you.
-  - Click the **Stash Checked** button. A stash for the checked tool windows will be _pushed_ to the top of the stash list - yes, just like a LIFO stack. **You can now use the Pop/Apply stash functions to show the stashed tool windows in one go, rather than the chore of doing it with the View Menu!**
-  - Add more toolbar windows via Visual Studio's **View** menu and stash them too, if you like. There's no limit to the amount of stashes you can add, although I wouldn't recommend adding hundreds.
-    - If you _do_ add a lot of stashes and screen real estate is getting tight, remember there's a horizontal splitter bar above the **Stashes** button which you can use to size the stashes listbox. And of course, you can size the **Stash/Restore** tool window as well. 
-  - Stashes persist between Visual Studio sessions, until you **Drop** (delete) or **Pop** (restore then delete) them.
-
-#### Applying a stash  
-  - Tool windows referred to by a stash can be applied (shown) at ANY TIME, simply by double left clicking (**Merge mode**) on a stash list item. You can also right click on a stashed item to get a context menu (see below).
-
-#### Popping a stash  
-  - If you want to pop the top item from the list, you can use either the **Pop (Merge)** or the **Pop (Abs)** button.    
-    - **Pop (Merge)** will **merge** the tool windows in the popped stash with those currently visible.
-    - **Pop (Abs)** , where Abs is short for **Absolute**, will **replace** currently visible tool windows with those referred to by the popped stash.
-    - The Pop operation **permanently deletes** the stash item. If you don't want to delete the stash, use the **Apply** functionality in the **context menu** (see below)
-
-#### Dropping a stash
-
-  - **Drop All** permanently deletes all stashes. You will be asked to confirm if you are sure, as deletion cannot be undone.
-  - You can drop individual stashes by using the **context menu** - see below.
-
-#### The Stash item context menu
-
-When you **right click** on a stash item, the item will be selected and a context menu will appear:
-
-<img width="730" height="403" alt="image" src="https://github.com/user-attachments/assets/d460fc83-594a-4587-8ac0-65fe44602c07" />
-   
-  - **Apply (Merge)** will **merge** the tool windows in the selected stash with those currently visible.
-  - **Apply (Absolute)** will **replace** the currently visible tool windows with those in the selected stash.
-  - **Hide All ref'd by Stash** will hide all of the tool windows referenced by the stash.
-  - **Drop** will delete the stash permanently.
+| Feature | Visual Studio Built-in | This Extension |
+|---------|----------------------|----------------|
+| **Merge tool windows** | ? No - replaces everything | ? Yes - add to current workspace |
+| **Quick save without naming** | ? No - must create named layout | ? Yes - instant stash to stack |
+| **Multiple saved configurations** | ? Yes | ? Yes |
+| **Context menu operations** | ? No | ? Yes - apply, hide, drop |
+| **Persistent across sessions** | ? Yes | ? Yes |
+| **Affects code editor layout** | ? Yes - overwrites everything | ? No - tool windows only |
 
 
-  
-## Assigning Keyboard Shortcuts (recommended)
 
-I recommend you assign keyboard shortcuts to these commands. To do this, click **Tools | Options** then open **Environment | Keyboard**, like so:
+## Getting Started
 
-<img width="743" height="445" alt="image" src="https://github.com/user-attachments/assets/fddec3ae-009e-4a47-8fc9-bd2b450abec6" />
+### 1. Access the Commands
 
-Search for **ScottTunstall** in the **Show Commands Containing** textbox. You should see the four commands listed on screen. Assign shortcuts to each command as desired.
+After installation, find four new commands on the **Tools** menu:
+
+<img width="442" height="634" alt="Tools menu with Show Tool Windows commands" src="https://github.com/user-attachments/assets/b9f0f04b-ecdc-434e-8d9f-776b39fc17bd" />
+
+### 2. Using the Stash/Restore Tool Window
+
+Click **Tools ? Stash/Restore Tool Windows** to open the management window:
+
+<img width="535" height="395" alt="Stash/Restore Tool Windows interface" src="https://github.com/user-attachments/assets/df26b936-c891-4eac-88e5-4347a391b091" />
+
+## How Stashing Works
+
+### Creating a Stash
+
+1. **Open the tool windows you want to save** using Visual Studio's View menu
+2. Click **Refresh (F5)** in the Stash/Restore window to populate the list
+3. **Check the tool windows** you want to include
+4. Click **Stash Checked** - your configuration is saved to the top of the stack
+
+**Note:** Stashes persist between Visual Studio sessions until you delete them.
+
+### Applying Stashes - Two Modes
+
+The key advantage over Visual Studio's built-in layouts:
+
+#### Merge Mode (Additive)
+- **Double-click** a stash, or
+- Right-click ? **Apply (Merge)**, or  
+- Use **Pop (Merge)** for the top stash
+
+**Result:** Tool windows from the stash are **added** to your current workspace. Existing tool windows remain open.
+
+#### Absolute Mode (Replacement)
+- Right-click ? **Apply (Absolute)**, or
+- Use **Pop (Abs)** for the top stash
+
+**Result:** Current tool windows are **closed**, then the stashed tool windows are opened. Similar to built-in layouts, but tool-windows-only.
+
+### Managing Stashes
+
+**Pop Operations** (Apply + Delete):
+- **Pop (Merge)** - Add stashed tool windows to workspace, then delete the stash
+- **Pop (Abs)** - Replace workspace with stashed tool windows, then delete the stash
+
+**Context Menu** (Right-click any stash):
+
+<img width="730" height="403" alt="Stash context menu" src="https://github.com/user-attachments/assets/d460fc83-594a-4587-8ac0-65fe44602c07" />
+
+- **Apply (Merge)** - Add tool windows without deleting stash
+- **Apply (Absolute)** - Replace tool windows without deleting stash
+- **Hide All ref'd by Stash** - Close all tool windows referenced in the stash
+- **Drop** - Delete the stash permanently
+
+**Bulk Operations:**
+- **Drop All** - Delete all stashes (confirmation required)
+
+### Keyboard Shortcuts
+
+The Stash/Restore window includes built-in shortcuts:
+- **F5** - Refresh tool window list
+- **Ctrl+A** - Check all tool windows
+- **Delete** - Drop selected stash
+
+## Recommended: Assign Shortcuts to Menu Commands
+
+For maximum productivity, assign keyboard shortcuts to the main commands:
+
+1. Open **Tools ? Options ? Environment ? Keyboard**
+2. Search for **ScottTunstall** in the command filter
+3. Assign shortcuts to:
+   - `Tools.ShowSolutionExplorer`
+   - `Tools.CloseAllToolWindowsExceptSolutionExplorer`
+   - `Tools.CloseAllToolWindows`
+   - `Tools.StashRestoreToolWindows`
+
+<img width="743" height="445" alt="Keyboard shortcuts configuration" src="https://github.com/user-attachments/assets/fddec3ae-009e-4a47-8fc9-bd2b450abec6" />
+
+## Use Cases
+
+### Scenario 1: Debugging Session
+**Problem:** You need Output, Watch, Locals, Call Stack, and Diagnostic Tools.  
+**Solution:** Open them once, stash them. Apply the stash whenever you start debugging. Use Merge mode to keep your existing workspace intact.
+
+### Scenario 2: Database Work  
+**Problem:** You frequently need SQL Server Object Explorer, Server Explorer, and Data Sources.  
+**Solution:** Stash this combination. Apply in Absolute mode to clear your workspace and focus on database tasks.
+
+### Scenario 3: Lost Solution Explorer
+**Problem:** Solution Explorer has wandered offscreen or is buried.  
+**Solution:** Run **Tools ? Show Solution Explorer** - it becomes fully visible immediately.
+
+### Scenario 4: Tool Window Overload
+**Problem:** Your workspace has 15 tool windows open and you want a clean slate.  
+**Solution:** Run **Tools ? Close All Tool Windows** to reset without affecting your code editor layout.
+
+## Technical Details
+
+- **Persistence:** Stashes are stored in Visual Studio's settings and persist across sessions
+- **Scope:** Operations affect tool windows only; code editor tabs and layouts are never modified
+- **Architecture:** Uses Visual Studio's DTE automation layer for tool window management
+- **Compatibility:** Tested with Visual Studio 2019, 2022, and 2026 (x86 and amd64 architectures)
+
+## Why Not Use Built-in Window Layouts?
+
+Visual Studio's **Window ? Apply Window Layout** has its place, but this extension complements it:
+
+| When to Use Built-in Layouts | When to Use This Extension |
+|------------------------------|---------------------------|
+| You need named, persistent layouts | You want quick, unnamed stashes |
+| You want full window layout control (including code editor arrangement) | You only care about tool windows |
+| You're switching between completely different workspace configurations | You want to add tool windows to your current workspace (Merge mode) |
+| Your workflow is layout-centric | Your workflow is task-centric |
+
+Both can coexist - use **Window ? Apply Window Layout** for your base workspace arrangement, then use this extension for dynamic tool window management within that layout.
+
+## License
+
+Developed by Scott Tunstall. Forking is allowed; creating derivatives for sale is forbidden.
