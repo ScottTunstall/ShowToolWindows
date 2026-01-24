@@ -43,8 +43,10 @@ namespace ShowToolWindows.UI.ToolWindows
             DropStashCommand = new RelayCommand(parameter => ExecuteDropStash());
             CheckAllCommand = new RelayCommand(ExecuteCheckAll);
 
-            Loaded += ToggleToolWindowsControl_Loaded;
-            Unloaded += ToggleToolWindowsControl_Unloaded;
+            // Subscribe to collection events early to ensure we capture all changes,
+            // including those made during async initialization.
+            Stashes.CollectionChanged += Stashes_CollectionChanged;
+            ToolWindows.CollectionChanged += ToolWindows_CollectionChanged;
         }
 
         /// <summary>
@@ -66,8 +68,18 @@ namespace ShowToolWindows.UI.ToolWindows
         public ICommand CheckAllCommand { get; }
 
         /// <summary>
+        /// Gets the collection of stashed tool window snapshots.
+        /// </summary>
+        // ReSharper disable once MemberCanBePrivate.Global - needs to be public so Xaml can bind to it
+        public ObservableCollection<ToolWindowStash> Stashes
+        {
+            get;
+        } = new ObservableCollection<ToolWindowStash>();
+
+        /// <summary>
         /// Gets the collection of tool windows displayed in the UI.
         /// </summary>
+        // ReSharper disable once MemberCanBePrivate.Global - needs to be public so Xaml can bind to it
         public ObservableCollection<ToolWindowEntry> ToolWindows
         {
             get;
@@ -112,13 +124,6 @@ namespace ShowToolWindows.UI.ToolWindows
             }
         }
 
-        /// <summary>
-        /// Gets the collection of stashed tool window snapshots.
-        /// </summary>
-        public ObservableCollection<ToolWindowStash> Stashes
-        {
-            get;
-        } = new ObservableCollection<ToolWindowStash>();
 
         /// <summary>
         /// Gets a value indicating whether the control has been initialized with Visual Studio services.
@@ -166,7 +171,7 @@ namespace ShowToolWindows.UI.ToolWindows
 
             _package = package;
 
-            object dteService = await package.GetServiceAsync(typeof(DTE));
+            var dteService = await package.GetServiceAsync(typeof(DTE));
             _dte = dteService as DTE ?? throw new InvalidOperationException("Failed to get DTE service.");
 
             _uiShell = await _package.GetServiceAsync(typeof(SVsUIShell)) as IVsUIShell ?? throw new InvalidOperationException("Failed to get IVsUIShell service.");
@@ -184,28 +189,6 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
 #pragma warning disable VSTHRD010
-
-        /// <summary>
-        /// Handles the Loaded event of the control to subscribe to collection change events.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private void ToggleToolWindowsControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            Stashes.CollectionChanged += Stashes_CollectionChanged;
-            ToolWindows.CollectionChanged += ToolWindows_CollectionChanged;
-        }
-
-        /// <summary>
-        /// Handles the Unloaded event of the control to unsubscribe from collection change events.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private void ToggleToolWindowsControl_Unloaded(object sender, RoutedEventArgs e)
-        {
-            Stashes.CollectionChanged -= Stashes_CollectionChanged;
-            ToolWindows.CollectionChanged -= ToolWindows_CollectionChanged;
-        }
 
         /// <summary>
         /// Handles the CollectionChanged event of the Stashes collection to update related UI properties.
@@ -337,7 +320,7 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!(StashListBox.SelectedItem is ToolWindowStash stash))
+            if (!(this.StashListBox.SelectedItem is ToolWindowStash stash))
             {
                 return;
             }
@@ -373,7 +356,7 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!(StashListBox.SelectedItem is ToolWindowStash stash))
+            if (!(this.StashListBox.SelectedItem is ToolWindowStash stash))
             {
                 return;
             }
@@ -390,7 +373,7 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!(StashListBox.SelectedItem is ToolWindowStash stash))
+            if (!(this.StashListBox.SelectedItem is ToolWindowStash stash))
             {
                 return;
             }
@@ -407,7 +390,7 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!(StashListBox.SelectedItem is ToolWindowStash stash))
+            if (!(this.StashListBox.SelectedItem is ToolWindowStash stash))
             {
                 return;
             }
@@ -526,7 +509,7 @@ namespace ShowToolWindows.UI.ToolWindows
                 return;
             }
 
-            if (!(StashListBox.SelectedItem is ToolWindowStash stash))
+            if (!(this.StashListBox.SelectedItem is ToolWindowStash stash))
             {
                 return;
             }
