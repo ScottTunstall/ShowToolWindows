@@ -29,17 +29,23 @@ namespace ShowToolWindows.UI.ToolWindows
         }
 
         /// <summary>
-        /// Initializes the tool window content with package services.
+        /// Called after the tool window pane is sited. Initializes the control with the package.
         /// </summary>
-        /// <param name="package">The owning package.</param>
-        public async Task InitializeAsync(AsyncPackage package)
+        protected override void Initialize()
         {
-            if (package == null)
-            {
-                throw new ArgumentNullException(nameof(package));
-            }
+            base.Initialize();
 
-            ToggleToolWindowsControl control = (ToggleToolWindowsControl)Content;
+            if (Package is AsyncPackage asyncPackage)
+            {
+#pragma warning disable VSTHRD110 // Observe result of async calls
+                ThreadHelper.JoinableTaskFactory.RunAsync(() => InitializeControlAsync(asyncPackage));
+#pragma warning restore VSTHRD110
+            }
+        }
+
+        private async Task InitializeControlAsync(AsyncPackage package)
+        {
+            var control = (ToggleToolWindowsControl)Content;
             await control.InitializeAsync(package);
         }
     }

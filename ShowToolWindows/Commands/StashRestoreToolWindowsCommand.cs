@@ -68,9 +68,6 @@ namespace ShowToolWindows.Commands
                 throw new NotSupportedException("Cannot create Stash/Restore tool windows tool window.");
             }
 
-            StashRestoreToolWindowsToolWindow pane = (StashRestoreToolWindowsToolWindow)window;
-            await pane.InitializeAsync(_package);
-
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
