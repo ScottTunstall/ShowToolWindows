@@ -4,7 +4,7 @@
 
 ## The Problem
 
-Visual Studio's built-in **Window ? Apply Window Layout** feature has limitations:
+Visual Studio's built-in **Window -> Apply Window Layout** feature has limitations:
 - **Replaces all windows** - you cannot merge layouts with your current tool windows
 - **Named layouts only** - requires creating and naming layouts before use
 - **Affects all windows** - includes code editor layouts, not just tool windows
@@ -25,7 +25,7 @@ This extension provides **flexible, stack-based tool window management**:
 
 ### Stash/Restore System (The Power Feature)
 
-Unlike **Window ? Apply Window Layout**, the Stash/Restore system provides:
+Unlike **Window -> Apply Window Layout**, the Stash/Restore system provides:
 
 | Feature | Visual Studio Built-in | This Extension |
 |---------|----------------------|----------------|
@@ -48,7 +48,7 @@ After installation, find four new commands on the **Tools** menu:
 
 ### 2. Using the Stash/Restore Tool Window
 
-Click **Tools ? Stash/Restore Tool Windows** to open the management window:
+Click **Tools -> Stash/Restore Tool Windows** to open the management window:
 
 <img width="535" height="395" alt="Stash/Restore Tool Windows interface" src="https://github.com/user-attachments/assets/df26b936-c891-4eac-88e5-4347a391b091" />
 
@@ -69,13 +69,13 @@ The key advantage over Visual Studio's built-in layouts:
 
 #### Merge Mode (Additive)
 - **Double-click** a stash, or
-- Right-click ? **Apply (Merge)**, or  
+- Right-click a stash, select **Apply (Merge)** from the context menu, or  
 - Use **Pop (Merge)** for the top stash
 
 **Result:** Tool windows from the stash are **added** to your current workspace. Existing tool windows remain open.
 
 #### Absolute Mode (Replacement)
-- Right-click ? **Apply (Absolute)**, or
+- Right-click a stash, select **Apply (Absolute)** from the context menu, or
 - Use **Pop (Abs)** for the top stash
 
 **Result:** Current tool windows are **closed**, then the stashed tool windows are opened. Similar to built-in layouts, but tool-windows-only.
@@ -109,7 +109,7 @@ The Stash/Restore window includes built-in shortcuts:
 
 For maximum productivity, assign keyboard shortcuts to the main commands:
 
-1. Open **Tools ? Options ? Environment ? Keyboard**
+1. Open **Tools -> Options -> Environment -> Keyboard**
 2. Search for **ScottTunstall** in the command filter
 3. Assign shortcuts to:
    - `Tools.ShowSolutionExplorer`
@@ -131,11 +131,11 @@ For maximum productivity, assign keyboard shortcuts to the main commands:
 
 ### Scenario 3: Lost Solution Explorer
 **Problem:** Solution Explorer has wandered offscreen or is buried.  
-**Solution:** Run **Tools ? Show Solution Explorer** - it becomes fully visible immediately.
+**Solution:** Run **Tools -> Show Solution Explorer** - it becomes fully visible immediately.
 
 ### Scenario 4: Tool Window Overload
 **Problem:** Your workspace has 15 tool windows open and you want a clean slate.  
-**Solution:** Run **Tools ? Close All Tool Windows** to reset without affecting your code editor layout.
+**Solution:** Run **Tools -> Close All Tool Windows** to reset without affecting your code editor layout.
 
 ## Technical Details
 
@@ -146,7 +146,7 @@ For maximum productivity, assign keyboard shortcuts to the main commands:
 
 ## Why Not Use Built-in Window Layouts?
 
-Visual Studio's **Window ? Apply Window Layout** has its place, but this extension complements it:
+Visual Studio's **Window -> Apply Window Layout** has its place, but this extension complements it:
 
 | When to Use Built-in Layouts | When to Use This Extension |
 |------------------------------|---------------------------|
@@ -155,7 +155,7 @@ Visual Studio's **Window ? Apply Window Layout** has its place, but this extensi
 | You're switching between completely different workspace configurations | You want to add tool windows to your current workspace (Merge mode) |
 | Your workflow is layout-centric | Your workflow is task-centric |
 
-Both can coexist - use **Window ? Apply Window Layout** for your base workspace arrangement, then use this extension for dynamic tool window management within that layout.
+Both can coexist - use **Window -> Apply Window Layout** for your base workspace arrangement, then use this extension for dynamic tool window management within that layout.
 
 ## License
 
