@@ -77,6 +77,16 @@ namespace ShowToolWindows.UI.ToolWindows
         } = new ObservableCollection<ToolWindowStash>();
 
         /// <summary>
+        /// Gets the collection of stash display items with dynamic indices for UI binding.
+        /// </summary>
+        // ReSharper disable once CollectionNeverQueried.Global
+        // ReSharper disable once MemberCanBePrivate.Global
+        public ObservableCollection<StashListItem> StashListItems
+        {
+            get;
+        } = new ObservableCollection<StashListItem>();
+
+        /// <summary>
         /// Gets the collection of tool windows displayed in the UI.
         /// </summary>
         // ReSharper disable once MemberCanBePrivate.Global - needs to be public so Xaml can bind to it
@@ -200,6 +210,19 @@ namespace ShowToolWindows.UI.ToolWindows
             OnPropertyChanged(nameof(StashesHeader));
             OnPropertyChanged(nameof(HaveStashes));
             OnPropertyChanged(nameof(CanMutateStash));
+            RebuildStashListItems();
+        }
+
+        /// <summary>
+        /// Rebuilds the StashListItems collection and updates indices dynamically.
+        /// </summary>
+        private void RebuildStashListItems()
+        {
+            StashListItems.Clear();
+            for (int i = 0; i < Stashes.Count; i++)
+            {
+                StashListItems.Add(new StashListItem(Stashes[i], i));
+            }
         }
 
         /// <summary>
@@ -320,11 +343,12 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!(this.StashListBox.SelectedItem is ToolWindowStash stash))
+            if (!(this.StashListBox.SelectedItem is StashListItem listItem))
             {
                 return;
             }
 
+            var stash = listItem.Stash;
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 ExecuteRestoreToolWindowsFromStash(stash);
@@ -356,11 +380,12 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!(this.StashListBox.SelectedItem is ToolWindowStash stash))
+            if (!(this.StashListBox.SelectedItem is StashListItem listItem))
             {
                 return;
             }
 
+            var stash = listItem.Stash;
             ExecuteRestoreToolWindowsFromStashAbsolute(stash);
         }
 
@@ -373,11 +398,12 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!(this.StashListBox.SelectedItem is ToolWindowStash stash))
+            if (!(this.StashListBox.SelectedItem is StashListItem listItem))
             {
                 return;
             }
 
+            var stash = listItem.Stash;
             ExecuteRestoreToolWindowsFromStash(stash);
         }
 
@@ -390,11 +416,12 @@ namespace ShowToolWindows.UI.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!(this.StashListBox.SelectedItem is ToolWindowStash stash))
+            if (!(this.StashListBox.SelectedItem is StashListItem listItem))
             {
                 return;
             }
 
+            var stash = listItem.Stash;
             ExecuteHideAllVisibleInStash(stash);
         }
 
@@ -509,11 +536,12 @@ namespace ShowToolWindows.UI.ToolWindows
                 return;
             }
 
-            if (!(this.StashListBox.SelectedItem is ToolWindowStash stash))
+            if (!(this.StashListBox.SelectedItem is StashListItem listItem))
             {
                 return;
             }
 
+            var stash = listItem.Stash;
             Guid clsid = Guid.Empty;
             _uiShell.ShowMessageBox(
                 0,

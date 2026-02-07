@@ -21,8 +21,8 @@
             <RowDefinition Height="*" MinHeight="120" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" 
-                   Text="Stashable Tool Windows are shown below." 
+        <TextBlock Grid.Row="0"
+                   Text="Stashable Tool Windows are shown below."
                    Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}"
                    VerticalAlignment="Center" />
 
@@ -95,7 +95,7 @@
 
                 <ListBox Grid.Row="2"
                          x:Name="StashListBox"
-                         ItemsSource="{Binding Stashes}"
+                         ItemsSource="{Binding StashListItems}"
                          IsEnabled="{Binding IsInitialised}"
                          BorderThickness="1"
                          BorderBrush="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBorderBrushKey}}"
@@ -117,10 +117,10 @@
                     </ListBox.InputBindings>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding}" 
+                            <TextBlock Text="{Binding DisplayText}"
                                        Margin="2"
                                        TextTrimming="CharacterEllipsis"
-                                       ToolTip="{Binding}" />
+                                       ToolTip="{Binding DisplayText}" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
