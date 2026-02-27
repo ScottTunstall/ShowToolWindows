@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ShowToolWindows.Model
@@ -32,6 +33,34 @@ namespace ShowToolWindows.Model
         /// Gets or sets the timestamp when this stash was created.
         /// </summary>
         public DateTimeOffset CreatedAt { get; set; }
+
+        /// <summary>
+        /// Determines whether this stash matches the provided ordered object kind selection exactly.
+        /// </summary>
+        /// <param name="objectKinds">The selected tool window object kinds.</param>
+        /// <returns>True if object kinds match exactly in length and order; otherwise, false.</returns>
+        public bool MatchesSelection(IReadOnlyList<string> objectKinds)
+        {
+            if (WindowObjectKinds == null || objectKinds == null)
+            {
+                return false;
+            }
+
+            if (WindowObjectKinds.Length != objectKinds.Count)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < objectKinds.Count; i++)
+            {
+                if (!string.Equals(WindowObjectKinds[i], objectKinds[i], StringComparison.Ordinal))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         public override string ToString()
         {

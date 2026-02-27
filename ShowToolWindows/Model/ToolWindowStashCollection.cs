@@ -8,7 +8,7 @@ namespace ShowToolWindows.Model
     /// <summary>
     /// Collection of tool window stashes.
     /// </summary>
-    public class StashCollection : ObservableCollection<ToolWindowStash>
+    public class ToolWindowStashCollection : ObservableCollection<ToolWindowStash>
     {
         /// <summary>
         /// Determines whether a stash with the same ordered object kinds already exists.
