@@ -71,10 +71,10 @@ namespace ShowToolWindows.UI.ToolWindows
         /// Gets the collection of stashed tool window snapshots.
         /// </summary>
         // ReSharper disable once MemberCanBePrivate.Global - needs to be public so Xaml can bind to it
-        public ObservableCollection<ToolWindowStash> Stashes
+        public ToolWindowStashCollection Stashes
         {
             get;
-        } = new ObservableCollection<ToolWindowStash>();
+        } = new ToolWindowStashCollection();
 
         /// <summary>
         /// Gets the collection of stash display items with dynamic indices for UI binding.
@@ -664,15 +664,46 @@ namespace ShowToolWindows.UI.ToolWindows
                 objectKinds.Add(entry.ObjectKind);
             }
 
-            var stash = new ToolWindowStash
+            if (Stashes.HasMatchingConfiguration(objectKinds) && !ConfirmCreateDuplicateStash(captions))
             {
-                WindowCaptions = captions.ToArray(),
-                WindowObjectKinds = objectKinds.ToArray(),
-                CreatedAt = DateTimeOffset.UtcNow
-            };
+                return;
+            }
 
-            Stashes.Insert(0, stash);
+            Stashes.AddAndCreate(captions, objectKinds);
+
             SaveAllToolWindowStashes();
+        }
+
+        /// <summary>
+        /// Prompts the user before creating a duplicate stash configuration.
+        /// </summary>
+        /// <param name="captions">The tool window captions to display in the prompt.</param>
+        /// <returns>True if the user selects Yes; otherwise, false.</returns>
+        private bool ConfirmCreateDuplicateStash(IReadOnlyList<string> captions)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            string captionList = string.Join(Environment.NewLine, captions.Select(c => "- " + c));
+            string message = "A stash with the following tool windows already exists. Push another?"
+                             + Environment.NewLine
+                             + Environment.NewLine
+                             + captionList;
+
+            Guid clsid = Guid.Empty;
+            _uiShell.ShowMessageBox(
+                0,
+                ref clsid,
+                "Duplicate Stash",
+                message,
+                null,
+                0,
+                OLEMSGBUTTON.OLEMSGBUTTON_YESNOCANCEL,
+                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_SECOND,
+                OLEMSGICON.OLEMSGICON_QUERY,
+                0,
+                out int result);
+
+            return result == (int)VSConstants.MessageBoxResult.IDYES;
         }
 
         /// <summary>
@@ -695,7 +726,7 @@ namespace ShowToolWindows.UI.ToolWindows
 
             var stash = Stashes[0];
             RestoreToolWindowsFromStash(stash);
-            Stashes.RemoveAt(0);
+            Stashes.DeleteTopOfStack();
             SaveAllToolWindowStashes();
         }
 
@@ -720,7 +751,7 @@ namespace ShowToolWindows.UI.ToolWindows
             var stash = Stashes[0];
 
             RestoreToolWindowsFromStashAbsolute(stash);
-            Stashes.RemoveAt(0);
+            Stashes.DeleteTopOfStack();
             SaveAllToolWindowStashes();
         }
 
