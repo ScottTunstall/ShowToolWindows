@@ -29,7 +29,7 @@ namespace ShowToolWindows.Model
         /// The <paramref name="captions"/> and <paramref name="objectKinds"/> sequences must have a 1:1 positional mapping.
         /// Each caption must correspond to the window kind at the same index (for example, caption at index 0 must be the caption of the tool window object kind at index 0).
         /// </remarks>
-        public void CreateAndPushToTop(IEnumerable<string> captions, IEnumerable<string> objectKinds)
+        public ToolWindowStash CreateAndPushToTop(IEnumerable<string> captions, IEnumerable<string> objectKinds)
         {
             var stash = new ToolWindowStash
             {
@@ -39,6 +39,7 @@ namespace ShowToolWindows.Model
             };
 
             Insert(0, stash);
+            return stash;
         }
 
         /// <summary>
