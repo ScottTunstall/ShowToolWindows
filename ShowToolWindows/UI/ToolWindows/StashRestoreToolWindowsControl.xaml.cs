@@ -669,7 +669,7 @@ namespace ShowToolWindows.UI.ToolWindows
                 return;
             }
 
-            Stashes.AddAndCreate(captions, objectKinds);
+            Stashes.CreateAndPushToTop(captions, objectKinds);
 
             SaveAllToolWindowStashes();
         }
