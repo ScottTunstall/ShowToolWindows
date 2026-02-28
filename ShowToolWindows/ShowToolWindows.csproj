@@ -49,6 +49,7 @@
     <Compile Include="Commands\CloseAllToolWindowsExceptSolutionExplorerCommand.cs" />
     <Compile Include="Commands\StashRestoreToolWindowsCommand.cs" />
     <Compile Include="Model\ToolWindowStashCollection.cs" />
+    <Compile Include="UI\Infrastructure\KeyHelper.cs" />
     <Compile Include="UI\ViewModels\StashListItem.cs" />
     <Compile Include="Model\ToolWindowStash.cs" />
     <Compile Include="Services\StashSettingsService.cs" />
