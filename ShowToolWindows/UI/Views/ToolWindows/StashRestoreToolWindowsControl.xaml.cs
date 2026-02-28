@@ -32,6 +32,8 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         private ToolWindowHelper _toolWindowHelper;
         private bool _isInitialised;
         private bool _hasSelectedItems;
+        private readonly string _toolWindowObjectKind;
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ToggleToolWindowsControl"/> class.
@@ -39,8 +41,10 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         public ToggleToolWindowsControl()
         {
             InitializeComponent();
-            DataContext = this;
 
+            _toolWindowObjectKind = ObjectKindHelper.NormalizeObjectKind(StashRestoreToolWindowsToolWindow.ToolWindowGuidString);
+
+            DataContext = this;
             RefreshCommand = new RelayCommand(ExecuteRefresh);
             DropStashCommand = new RelayCommand(parameter => ExecuteDropStash());
             CheckAllCommand = new RelayCommand(ExecuteCheckAll);
@@ -438,6 +442,28 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         }
 
         /// <summary>
+        /// Handles digit key presses to select a stash by index from anywhere in the control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The key event data.</param>
+        private void UserControl_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (!IsInitialised || Keyboard.Modifiers != ModifierKeys.None)
+            {
+                return;
+            }
+
+            if (!KeyHelper.TryGetDigitFromKey(e.Key, out int index))
+            {
+                return;
+            }
+
+            ExecuteSelectStashByIndex(index);
+            e.Handled = true;
+        }
+
+
+        /// <summary>
         /// Executes the refresh command to reload the tool windows list.
         /// </summary>
         /// <param name="parameter">The command parameter (unused).</param>
@@ -494,6 +520,29 @@ namespace ShowToolWindows.UI.Views.ToolWindows
             StashSelectedToolWindows();
 
             StatusBarHelper.ShowStatusBarNotification($"{selectedCount} checked tool window(s) stashed.");
+        }
+
+        /// <summary>
+        /// Selects the stash list item at the specified index and applies it in merge mode, if present.
+        /// </summary>
+        /// <param name="index">The stash index to select.</param>
+        private void ExecuteSelectStashByIndex(int index)
+        {
+            if (index < 0 || index >= StashListItems.Count)
+            {
+                return;
+            }
+
+            StashListBox.SelectedIndex = index;
+            StashListBox.ScrollIntoView(StashListBox.SelectedItem);
+
+            if (!(StashListBox.SelectedItem is StashListItem listItem))
+            {
+                return;
+            }
+
+            ExecuteRestoreToolWindowsFromStash(listItem.Stash);
+            StatusBarHelper.ShowStatusBarNotification($"Tool windows merged from stash@{index}.");
         }
 
         /// <summary>
@@ -708,6 +757,7 @@ namespace ShowToolWindows.UI.Views.ToolWindows
             return result == (int)VSConstants.MessageBoxResult.IDYES;
         }
 
+
         /// <summary>
         /// Restores tool windows from the top stash in merge mode and removes the stash.
         /// Does not close windows that are not in the stash.
@@ -819,6 +869,9 @@ namespace ShowToolWindows.UI.Views.ToolWindows
             }
 
             _toolWindowHelper.RestoreToolWindowsFromStash(stash);
+
+            // Make the tool window active again after restoring from stash
+            _toolWindowHelper.TryOpenToolWindowByObjectKind(_toolWindowObjectKind);
 
             RefreshToolWindows();
         }

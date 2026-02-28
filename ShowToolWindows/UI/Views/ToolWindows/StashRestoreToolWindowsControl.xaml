@@ -6,6 +6,7 @@
              xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
              d:DesignHeight="300"
              d:DesignWidth="400"
+             PreviewKeyDown="UserControl_PreviewKeyDown"
              mc:Ignorable="d">
     <UserControl.InputBindings>
         <KeyBinding Key="F5" Command="{Binding RefreshCommand}" />
