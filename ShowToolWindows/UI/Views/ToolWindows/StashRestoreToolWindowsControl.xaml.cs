@@ -30,6 +30,7 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         private IVsUIShell _uiShell;
         private StashSettingsService _stashService;
         private ToolWindowHelper _toolWindowHelper;
+        private MessageBoxHelper _messageBoxHelper;
         private bool _isInitialised;
         private bool _hasSelectedItems;
         private readonly string _toolWindowObjectKind;
@@ -45,9 +46,33 @@ namespace ShowToolWindows.UI.Views.ToolWindows
             _toolWindowObjectKind = ObjectKindHelper.NormalizeObjectKind(StashRestoreToolWindowsToolWindow.ToolWindowGuidString);
 
             DataContext = this;
-            RefreshCommand = new RelayCommand(ExecuteRefresh);
-            DropStashCommand = new RelayCommand(parameter => ExecuteDropStash());
-            CheckAllCommand = new RelayCommand(ExecuteCheckAll);
+            RefreshCommand = new RelayCommand(parameter =>
+            {
+                if (!IsInitialised)
+                {
+                    return;
+                }
+
+                ExecuteRefresh();
+            });
+            DropStashCommand = new RelayCommand(parameter =>
+            {
+                if (!IsInitialised)
+                {
+                    return;
+                }
+
+                ExecuteDropStash();
+            });
+            CheckAllCommand = new RelayCommand(parameter =>
+            {
+                if (!IsInitialised)
+                {
+                    return;
+                }
+
+                ExecuteCheckAll();
+            });
 
             // Subscribe to collection events early to ensure we capture all changes,
             // including those made during async initialization.
@@ -193,6 +218,7 @@ namespace ShowToolWindows.UI.Views.ToolWindows
             _uiShell = await _package.GetServiceAsync(typeof(SVsUIShell)) as IVsUIShell ?? throw new InvalidOperationException("Failed to get IVsUIShell service.");
 
             _stashService = new StashSettingsService(_package);
+            _messageBoxHelper = new MessageBoxHelper(_uiShell);
             _toolWindowHelper = new ToolWindowHelper(_dte, _uiShell)
             {
                 // We do not want to allow stashing or toggling this tool window itself
@@ -213,6 +239,8 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/> instance containing the event data.</param>
         private void Stashes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             OnPropertyChanged(nameof(StashesHeader));
             OnPropertyChanged(nameof(HaveStashes));
             OnPropertyChanged(nameof(CanMutateStash));
@@ -238,6 +266,8 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/> instance containing the event data.</param>
         private void ToolWindows_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             if (e.OldItems != null)
             {
                 foreach (ToolWindowEntry item in e.OldItems)
@@ -264,6 +294,8 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="e">The <see cref="PropertyChangedEventArgs"/> instance containing the event data.</param>
         private void ToolWindowEntry_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             if (e.PropertyName == nameof(ToolWindowEntry.IsSelected))
             {
                 UpdateHaveSelectedItems();
@@ -294,6 +326,11 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsInitialised)
+            {
+                return;
+            }
+
             ExecuteRefreshToolWindows();
         }
 
@@ -304,6 +341,11 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void StashButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsInitialised)
+            {
+                return;
+            }
+
             ExecuteStashSelectedToolWindows();
         }
 
@@ -315,6 +357,11 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void PopMergeButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsInitialised)
+            {
+                return;
+            }
+
             ExecutePopAndMergeToolWindowsFromStash();
         }
 
@@ -326,6 +373,11 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void PopAbsoluteButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsInitialised)
+            {
+                return;
+            }
+
             ExecutePopToolWindowsFromStashAbsolute();
         }
 
@@ -336,6 +388,11 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void DropAllButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsInitialised)
+            {
+                return;
+            }
+
             ExecuteDropAllStashes();
         }
 
@@ -347,17 +404,14 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
         private void StashListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!(this.StashListBox.SelectedItem is StashListItem listItem))
+            if (!IsInitialised)
             {
                 return;
             }
 
-            var stash = listItem.Stash;
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                ExecuteRestoreToolWindowsFromStash(stash);
+                ExecuteRestoreToolWindowsFromStash();
             }
         }
 
@@ -368,6 +422,8 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
         private void StashListBox_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             var listBoxItem = FindAncestor<ListBoxItem>((DependencyObject)e.OriginalSource);
 
             if (listBoxItem != null)
@@ -384,15 +440,12 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void ApplyStashAbsolute_Click(object sender, RoutedEventArgs e)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!(this.StashListBox.SelectedItem is StashListItem listItem))
+            if (!IsInitialised)
             {
                 return;
             }
 
-            var stash = listItem.Stash;
-            ExecuteRestoreToolWindowsFromStashAbsolute(stash);
+            ExecuteRestoreToolWindowsFromStashAbsolute();
         }
 
         /// <summary>
@@ -402,15 +455,12 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void ApplyStashMerge_Click(object sender, RoutedEventArgs e)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!(this.StashListBox.SelectedItem is StashListItem listItem))
+            if (!IsInitialised)
             {
                 return;
             }
 
-            var stash = listItem.Stash;
-            ExecuteRestoreToolWindowsFromStash(stash);
+            ExecuteRestoreToolWindowsFromStash();
         }
 
         /// <summary>
@@ -420,15 +470,12 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void HideAllVisible_Click(object sender, RoutedEventArgs e)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!(this.StashListBox.SelectedItem is StashListItem listItem))
+            if (!IsInitialised)
             {
                 return;
             }
 
-            var stash = listItem.Stash;
-            ExecuteHideAllVisibleInStash(stash);
+            ExecuteHideAllVisibleInStash();
         }
 
         /// <summary>
@@ -438,6 +485,11 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void DropStash_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsInitialised)
+            {
+                return;
+            }
+
             ExecuteDropStash();
         }
 
@@ -466,22 +518,19 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <summary>
         /// Executes the refresh command to reload the tool windows list.
         /// </summary>
-        /// <param name="parameter">The command parameter (unused).</param>
-        private void ExecuteRefresh(object parameter)
+        private void ExecuteRefresh()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             RefreshToolWindows();
         }
 
         /// <summary>
         /// Executes the check all command to select all tool windows.
         /// </summary>
-        /// <param name="parameter">The command parameter (unused).</param>
-        private void ExecuteCheckAll(object parameter)
+        private void ExecuteCheckAll()
         {
-            if (!IsInitialised)
-            {
-                return;
-            }
+            ThreadHelper.ThrowIfNotOnUIThread();
 
             foreach (var window in ToolWindows)
             {
@@ -494,6 +543,8 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// </summary>
         private void ExecuteRefreshToolWindows()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             RefreshToolWindows();
 
             StatusBarHelper.ShowStatusBarNotification("Tool windows refreshed.");
@@ -504,10 +555,7 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// </summary>
         private void ExecuteStashSelectedToolWindows()
         {
-            if (!IsInitialised)
-            {
-                return;
-            }
+            ThreadHelper.ThrowIfNotOnUIThread();
 
             int selectedCount = ToolWindows.Count(w => w.IsSelected);
 
@@ -528,6 +576,8 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="index">The stash index to select.</param>
         private void ExecuteSelectStashByIndex(int index)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             if (index < 0 || index >= StashListItems.Count)
             {
                 return;
@@ -541,7 +591,7 @@ namespace ShowToolWindows.UI.Views.ToolWindows
                 return;
             }
 
-            ExecuteRestoreToolWindowsFromStash(listItem.Stash);
+            ExecuteRestoreToolWindowsFromStash();
             StatusBarHelper.ShowStatusBarNotification($"Tool windows merged from stash@{index}.");
         }
 
@@ -550,6 +600,8 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// </summary>
         private void ExecutePopAndMergeToolWindowsFromStash()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             if (Stashes.Count == 0)
             {
                 return;
@@ -565,6 +617,8 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// </summary>
         private void ExecutePopToolWindowsFromStashAbsolute()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             if (Stashes.Count == 0)
             {
                 return;
@@ -582,32 +636,17 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!IsInitialised)
-            {
-                return;
-            }
-
             if (!(this.StashListBox.SelectedItem is StashListItem listItem))
             {
                 return;
             }
 
             var stash = listItem.Stash;
-            Guid clsid = Guid.Empty;
-            _uiShell.ShowMessageBox(
-                0,
-                ref clsid,
+            var result = _messageBoxHelper.ShowConfirmModalDialog(
                 "Drop Stash",
-                "Are you sure you wish to drop this stash?",
-                null,
-                0,
-                OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_SECOND,
-                OLEMSGICON.OLEMSGICON_QUERY,
-                0,
-                out int result);
+                "Are you sure you wish to drop this stash?");
 
-            if (result != (int)VSConstants.MessageBoxResult.IDYES)
+            if (result != VSConstants.MessageBoxResult.IDYES)
             {
                 return;
             }
@@ -623,26 +662,11 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!IsInitialised)
-            {
-                return;
-            }
-
-            Guid clsid = Guid.Empty;
-            _uiShell.ShowMessageBox(
-                0,
-                ref clsid,
+            var result = _messageBoxHelper.ShowConfirmModalDialog(
                 "Drop All Stashes",
-                "Are you sure you wish to drop all stashes? This cannot be undone.",
-                null,
-                0,
-                OLEMSGBUTTON.OLEMSGBUTTON_YESNO,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_SECOND,
-                OLEMSGICON.OLEMSGICON_QUERY,
-                0,
-                out int result);
+                "Are you sure you wish to drop all stashes? This cannot be undone.");
 
-            if (result != (int)VSConstants.MessageBoxResult.IDYES)
+            if (result != VSConstants.MessageBoxResult.IDYES)
             {
                 return;
             }
@@ -655,9 +679,16 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// Restores tool windows from a specific stash in merge mode (keeps existing windows open).
         /// Does not remove the stash.
         /// </summary>
-        /// <param name="stash">The stash containing the tool windows to restore.</param>
-        private void ExecuteRestoreToolWindowsFromStash(ToolWindowStash stash)
+        private void ExecuteRestoreToolWindowsFromStash()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!(this.StashListBox.SelectedItem is StashListItem listItem))
+            {
+                return;
+            }
+
+            var stash = listItem.Stash;
             RestoreToolWindowsFromStash(stash);
             StatusBarHelper.ShowStatusBarNotification("Tool windows restored from stash.");
         }
@@ -666,9 +697,17 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// Restores tool windows from a specific stash in absolute mode (closes windows not in the stash).
         /// Does not remove the stash.
         /// </summary>
-        /// <param name="stash">The stash containing the tool windows to restore.</param>
-        private void ExecuteRestoreToolWindowsFromStashAbsolute(ToolWindowStash stash)
+        private void ExecuteRestoreToolWindowsFromStashAbsolute()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!(this.StashListBox.SelectedItem is StashListItem listItem))
+            {
+                return;
+            }
+
+            var stash = listItem.Stash;
+
             RestoreToolWindowsFromStashAbsolute(stash);
             StatusBarHelper.ShowStatusBarNotification("Tool windows restored from stash.");
         }
@@ -676,9 +715,17 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <summary>
         /// Hides all visible tool windows that are referenced in the specified stash.
         /// </summary>
-        /// <param name="stash">The stash containing the tool windows to hide.</param>
-        private void ExecuteHideAllVisibleInStash(ToolWindowStash stash)
+        private void ExecuteHideAllVisibleInStash()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!(this.StashListBox.SelectedItem is StashListItem listItem))
+            {
+                return;
+            }
+
+            var stash = listItem.Stash;
+
             HideAllVisibleInStash(stash);
             StatusBarHelper.ShowStatusBarNotification("Tool windows in stash hidden.");
         }
@@ -689,13 +736,6 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// </summary>
         private void StashSelectedToolWindows()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!IsInitialised)
-            {
-                return;
-            }
-
             var windowsToStash = ToolWindows
                 .Where(w => w.IsSelected)
                 .OrderBy(entry => entry.Caption, StringComparer.CurrentCultureIgnoreCase)
@@ -732,29 +772,15 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <returns>True if the user selects Yes; otherwise, false.</returns>
         private bool ConfirmCreateDuplicateStash(IReadOnlyList<string> captions)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
             string captionList = string.Join(Environment.NewLine, captions.Select(c => "- " + c));
             string message = "A stash with the following tool windows already exists. Push another?"
                              + Environment.NewLine
                              + Environment.NewLine
                              + captionList;
 
-            Guid clsid = Guid.Empty;
-            _uiShell.ShowMessageBox(
-                0,
-                ref clsid,
-                "Duplicate Stash",
-                message,
-                null,
-                0,
-                OLEMSGBUTTON.OLEMSGBUTTON_YESNOCANCEL,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_SECOND,
-                OLEMSGICON.OLEMSGICON_QUERY,
-                0,
-                out int result);
+            var result = _messageBoxHelper.ShowConfirmModalDialog("Duplicate Stash", message);
 
-            return result == (int)VSConstants.MessageBoxResult.IDYES;
+            return result == VSConstants.MessageBoxResult.IDYES;
         }
 
 
@@ -764,18 +790,6 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// </summary>
         private void PopToolWindowsFromStash()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!IsInitialised)
-            {
-                return;
-            }
-
-            if (Stashes.Count == 0)
-            {
-                return;
-            }
-
             var stash = Stashes[0];
             RestoreToolWindowsFromStash(stash);
             Stashes.DeleteTopOfStack();
@@ -788,20 +802,7 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// </summary>
         private void PopAbsToolWindowsFromStash()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!IsInitialised)
-            {
-                return;
-            }
-
-            if (Stashes.Count == 0)
-            {
-                return;
-            }
-
             var stash = Stashes[0];
-
             RestoreToolWindowsFromStashAbsolute(stash);
             Stashes.DeleteTopOfStack();
             SaveAllToolWindowStashes();
@@ -827,8 +828,6 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// </summary>
         private void LoadAllToolWindowStashes()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
             Stashes.Clear();
             var loadedStashes = _stashService.LoadStashes();
 
@@ -843,13 +842,6 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// </summary>
         private void SaveAllToolWindowStashes()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!IsInitialised)
-            {
-                return;
-            }
-
             var stashList = new List<ToolWindowStash>(Stashes);
             _stashService.SaveStashes(stashList);
         }
@@ -861,13 +853,6 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="stash">The stash containing the tool windows to restore.</param>
         private void RestoreToolWindowsFromStash(ToolWindowStash stash)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!IsInitialised)
-            {
-                return;
-            }
-
             _toolWindowHelper.RestoreToolWindowsFromStash(stash);
 
             // Make the tool window active again after restoring from stash
@@ -883,8 +868,6 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="stash">The stash containing the tool windows to restore.</param>
         private void RestoreToolWindowsFromStashAbsolute(ToolWindowStash stash)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
             if (!IsInitialised)
             {
                 return;
@@ -902,13 +885,6 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// <param name="stash">The stash containing the tool windows to hide.</param>
         private void HideAllVisibleInStash(ToolWindowStash stash)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!IsInitialised)
-            {
-                return;
-            }
-
             var allToolWindowEntries = _toolWindowHelper.GetAllToolWindowEntries().ToList();
             var stashObjectKinds = new HashSet<string>(stash.WindowObjectKinds, StringComparer.OrdinalIgnoreCase);
 
@@ -927,13 +903,6 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// </summary>
         private void RefreshToolWindows()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (!IsInitialised)
-            {
-                return;
-            }
-
             ToolWindows.Clear();
 
             var allToolWindowEntries = _toolWindowHelper.GetAllToolWindowEntries();
