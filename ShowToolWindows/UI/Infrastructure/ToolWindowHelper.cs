@@ -180,14 +180,6 @@ namespace ShowToolWindows.UI.Infrastructure
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            var allToolWindowEntries = GetAllToolWindowEntries().ToList();
-
-            var allToolWindowEntriesHashSet = new HashSet<ToolWindowEntry>(allToolWindowEntries);
-
-            var toolWindowsToMutate = toolWindows
-                .Where(entry => allToolWindowEntriesHashSet.Contains(entry))
-                .ToList();
-
             foreach (ToolWindowEntry entry in toolWindows)
             {
                 if (isVisible)
