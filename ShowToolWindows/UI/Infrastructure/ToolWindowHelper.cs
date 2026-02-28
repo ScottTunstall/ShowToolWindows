@@ -10,7 +10,7 @@ using System.Linq;
 namespace ShowToolWindows.UI.Infrastructure
 {
     /// <summary>
-    /// Provides helper methods for opening and managing Visual Studio tool windows.
+    /// Provides helper methods for opening and managing Visual Studio tool windows via <see cref="DTE"/> and <see cref="IVsUIShell"/>.
     /// </summary>
     internal class ToolWindowHelper
     {
@@ -66,8 +66,7 @@ namespace ShowToolWindows.UI.Infrastructure
         /// Gets all tool windows as <see cref="ToolWindowEntry"/> objects.
         /// </summary>
         /// <remarks>
-        /// This method wraps each tool window in a <see cref="ToolWindowEntry"/> object
-        /// which provides a convenient interface for managing tool window state.
+        /// Each returned window is wrapped in a <see cref="ToolWindowEntry"/> for easier state-based operations.
         /// </remarks>
         /// <returns>An enumerable collection of <see cref="ToolWindowEntry"/> objects representing all available tool windows.</returns>
         public IEnumerable<ToolWindowEntry> GetAllToolWindowEntries()
@@ -82,12 +81,10 @@ namespace ShowToolWindows.UI.Infrastructure
         /// Restores tool windows from a stash by opening all windows specified in the stash.
         /// </summary>
         /// <remarks>
-        /// This method iterates through all object kinds stored in the stash and attempts
-        /// to open each corresponding tool window. Windows are opened in the order they
-        /// appear in the stash.
+        /// Iterates the object kinds in <paramref name="stash"/> and calls <see cref="TryOpenToolWindowByObjectKind(string)"/>
+        /// for each one, in stash order.
         /// </remarks>
         /// <param name="stash">The stash containing the object kinds of windows to restore.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="stash"/> is null.</exception>
         public void RestoreToolWindowsFromStash(ToolWindowStash stash)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -106,14 +103,10 @@ namespace ShowToolWindows.UI.Infrastructure
         /// Closes all tool windows that are not present in the specified stash.
         /// </summary>
         /// <remarks>
-        /// This method compares the provided collection of tool windows against the stash
-        /// and closes any windows whose object kind is not found in the stash.
-        /// This is useful for restoring an absolute window state from a stash.
-        /// Tool windows with objectKinds in the ExcludedWindowObjectKinds collection will not be closed.
+        /// Compares current tool windows to the object kinds in <paramref name="stash"/> and closes any window not present.
+        /// Tool windows listed in <see cref="ExcludedWindowObjectKinds"/> are not included in the candidate set.
         /// </remarks>
-        /// <param name="toolWindows">The collection of currently available tool windows to check.</param>
         /// <param name="stash">The stash containing the object kinds of windows that should remain open.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="toolWindows"/> or <paramref name="stash"/> is null.</exception>
         public void CloseToolWindowsNotInStash(ToolWindowStash stash)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -134,8 +127,8 @@ namespace ShowToolWindows.UI.Infrastructure
         /// Sets the visibility state of a single tool window.
         /// </summary>
         /// <remarks>
-        /// This method first checks if the tool window exists in the current collection.
-        /// If found, it attempts to open or close the window based on the isVisible parameter.
+        /// Verifies that a matching window exists in the current tool window set, then opens or closes it.
+        /// Opening delegates to <see cref="TryOpenToolWindowByObjectKind(string)"/> and closing delegates to <c>TryCloseToolWindowByObjectKind</c>.
         /// </remarks>
         /// <param name="entry">The tool window entry to modify.</param>
         /// <param name="isVisible">Whether the tool window should be visible.</param>
@@ -169,13 +162,11 @@ namespace ShowToolWindows.UI.Infrastructure
         /// Sets the visibility state of multiple tool windows.
         /// </summary>
         /// <remarks>
-        /// This method iterates through the provided collection and attempts to open or close
-        /// each tool window based on the isVisible parameter. Only tool windows that exist
-        /// in the current collection will be processed.
+        /// Iterates through <paramref name="toolWindows"/> and attempts to open or close each entry by object kind.
+        /// This method does not pre-filter entries against the current window set.
         /// </remarks>
         /// <param name="toolWindows">The collection of tool window entries to modify.</param>
         /// <param name="isVisible">Whether the tool windows should be visible.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="toolWindows"/> is null.</exception>
         public void SetToolWindowsVisibility(IEnumerable<ToolWindowEntry> toolWindows, bool isVisible)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -240,14 +231,13 @@ namespace ShowToolWindows.UI.Infrastructure
         /// Attempts to open a tool window by its object kind GUID.
         /// </summary>
         /// <remarks>
-        /// This method first attempts to find the window in the existing windows collection.
-        /// If found, it makes the window visible and activates it.
-        /// If not found, it uses the UI shell service to force-create and display the window.
+        /// First attempts to find the window in <see cref="DTE.Windows"/>.
+        /// If found, the window is made visible and activated.
+        /// If not found, it attempts force-create via <see cref="IVsUIShell.FindToolWindow(uint, ref Guid, out IVsWindowFrame)"/> and shows the frame.
+        /// Exceptions are caught and written to debug output.
         /// </remarks>
         /// <param name="objectKind">The tool window object kind GUID in string format.</param>
         /// <returns><c>true</c> if the window is opened or already available; otherwise, <c>false</c>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="objectKind"/> is null.</exception>
-        /// <exception cref="FormatException">Thrown when <paramref name="objectKind"/> is not a valid GUID format.</exception>
         public bool TryOpenToolWindowByObjectKind(string objectKind)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -289,8 +279,8 @@ namespace ShowToolWindows.UI.Infrastructure
         /// Attempts to close a tool window by its object kind GUID.
         /// </summary>
         /// <remarks>
-        /// This method attempts to find the window in the existing windows collection
-        /// and sets its visibility to false if found.
+        /// Attempts to find the window in <see cref="DTE.Windows"/> and set <c>Visible</c> to <c>false</c>.
+        /// Exceptions are caught and written to debug output.
         /// </remarks>
         /// <param name="objectKind">The tool window object kind GUID in string format.</param>
         /// <returns><c>true</c> if the window is found and closed; otherwise, <c>false</c>.</returns>
