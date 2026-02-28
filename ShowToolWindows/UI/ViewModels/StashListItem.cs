@@ -1,7 +1,7 @@
 using ShowToolWindows.Model;
 using System.ComponentModel;
 
-namespace ShowToolWindows.UI
+namespace ShowToolWindows.UI.ViewModels
 {
     /// <summary>
     /// Wrapper class for displaying a ToolWindowStash with a dynamic index.

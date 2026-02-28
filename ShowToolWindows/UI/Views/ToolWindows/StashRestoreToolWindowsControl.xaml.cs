@@ -4,6 +4,8 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using ShowToolWindows.Model;
 using ShowToolWindows.Services;
+using ShowToolWindows.UI.Infrastructure;
+using ShowToolWindows.UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,7 +17,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace ShowToolWindows.UI.ToolWindows
+namespace ShowToolWindows.UI.Views.ToolWindows
 {
     /// <summary>
     /// User control that provides an interface for managing Visual Studio tool windows.

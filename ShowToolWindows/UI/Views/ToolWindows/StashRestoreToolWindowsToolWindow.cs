@@ -1,9 +1,8 @@
 using Microsoft.VisualStudio.Shell;
-using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace ShowToolWindows.UI.ToolWindows
+namespace ShowToolWindows.UI.Views.ToolWindows
 {
     /// <summary>
     /// Tool window that hosts the UI for stashing and restoring tool windows.
