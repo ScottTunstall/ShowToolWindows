@@ -1,6 +1,7 @@
 ﻿using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using ShowToolWindows.UI;
+using ShowToolWindows.UI.Infrastructure;
 using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
