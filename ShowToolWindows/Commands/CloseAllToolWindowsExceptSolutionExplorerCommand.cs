@@ -1,5 +1,6 @@
 ﻿using EnvDTE;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using ShowToolWindows.UI.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -59,7 +60,7 @@ namespace ShowToolWindows.Commands
         }
 
         /// <summary>
-        /// Initializes the singleton instance of the command.
+        /// Initialises the singleton instance of the command.
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
         public static async Task InitializeAsync(AsyncPackage package)
@@ -98,8 +99,15 @@ namespace ShowToolWindows.Commands
                     return;
                 }
 
-                var excluded = new HashSet<string> { Constants.vsWindowKindSolutionExplorer };
-                int closedCount = WindowHelper.CloseVisibleToolWindows(dte, excluded);
+                if (!(Package.GetGlobalService(typeof(SVsUIShell)) is IVsUIShell uiShell))
+                {
+                    Debug.WriteLine("ERROR: Could not get IVsUIShell service");
+                    StatusBarHelper.ShowStatusBarNotification("Error: Could not access Visual Studio services");
+                    return;
+                }
+
+                var toolWindowHelper = ToolWindowHelper.Create(dte, uiShell);
+                int closedCount = toolWindowHelper.CloseVisibleToolWindows();
 
                 string message = closedCount == 1
                     ? "Closed 1 tool window."

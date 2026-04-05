@@ -47,7 +47,7 @@ namespace ShowToolWindows.Commands
         }
 
         /// <summary>
-        /// Initializes the command and registers it with the Visual Studio command service.
+        /// Initialises the command and registers it with the Visual Studio command service.
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
         public static async Task InitializeAsync(AsyncPackage package)

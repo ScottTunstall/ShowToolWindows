@@ -60,7 +60,7 @@ namespace ShowToolWindows.Commands
         }
 
         /// <summary>
-        /// Initializes the singleton instance of the command.
+        /// Initialises the singleton instance of the command.
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
         public static async Task InitializeAsync(AsyncPackage package)

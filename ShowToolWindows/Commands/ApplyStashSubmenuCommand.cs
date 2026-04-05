@@ -4,10 +4,9 @@ using Microsoft.VisualStudio.Shell.Interop;
 using ShowToolWindows.Model;
 using ShowToolWindows.Services;
 using ShowToolWindows.UI.Infrastructure;
-using ShowToolWindows.UI.Views.ToolWindows;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using Task = System.Threading.Tasks.Task;
 
 namespace ShowToolWindows.Commands
@@ -24,16 +23,15 @@ namespace ShowToolWindows.Commands
         /// <summary>
         /// Base command ID for the dynamic stash menu items.
         /// </summary>
-        public const int BaseCommandId = 0x2000;
+        private const int BaseCommandId = 0x2000;
 
         /// <summary>
         /// Command menu group (command set GUID).
         /// </summary>
-        public static readonly Guid CommandSet = new Guid("a2a7f2af-5e8b-4a37-a078-5a8dbe625606");
+        private static readonly Guid _commandSet = new Guid("a2a7f2af-5e8b-4a37-a078-5a8dbe625606");
 
         private readonly AsyncPackage _package;
         private StashSettingsService _stashService;
-        private ToolWindowHelper _toolWindowHelper;
 
         private ApplyStashSubmenuCommand(AsyncPackage package, OleMenuCommandService commandService)
         {
@@ -43,7 +41,7 @@ namespace ShowToolWindows.Commands
                 throw new ArgumentNullException(nameof(commandService));
             }
 
-            var dynamicItemRootId = new CommandID(CommandSet, BaseCommandId);
+            var dynamicItemRootId = new CommandID(_commandSet, BaseCommandId);
             var dynamicCommand = new DynamicItemMenuCommand(
                 dynamicItemRootId,
                 OnInvokedDynamicItem,
@@ -89,14 +87,14 @@ namespace ShowToolWindows.Commands
         /// </summary>
         private void OnBeforeQueryStatusDynamicItem(object sender, EventArgs e)
         {
-            ExecuteUpdateDynamicItemStatus(sender);
+            ExecuteUpdateDynamicMenuItemStatus(sender);
         }
 
         /// <summary>
         /// Sets the text, visibility and enabled state for each dynamic menu item
         /// based on the current stash collection.
         /// </summary>
-        private void ExecuteUpdateDynamicItemStatus(object sender)
+        private void ExecuteUpdateDynamicMenuItemStatus(object sender)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -128,37 +126,7 @@ namespace ShowToolWindows.Commands
         /// </summary>
         private StashSettingsService GetStashService()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (_stashService == null)
-            {
-                _stashService = new StashSettingsService(_package);
-            }
-
-            return _stashService;
-        }
-
-        /// <summary>
-        /// Returns the <see cref="ToolWindowHelper"/>, creating it on first use.
-        /// </summary>
-        private ToolWindowHelper GetToolWindowHelper()
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (_toolWindowHelper != null)
-            {
-                return _toolWindowHelper;
-            }
-
-            var dte = Package.GetGlobalService(typeof(DTE)) as DTE ?? throw new InvalidOperationException("Failed to get DTE service.");
-            var uiShell = Package.GetGlobalService(typeof(SVsUIShell)) as IVsUIShell ?? throw new InvalidOperationException("Failed to get IVsUIShell service.");
-
-            _toolWindowHelper = new ToolWindowHelper(dte, uiShell)
-            {
-                ExcludedWindowObjectKinds = new HashSet<string> { StashRestoreToolWindowsToolWindow.ToolWindowGuidString }
-            };
-
-            return _toolWindowHelper;
+            return _stashService ?? (_stashService = new StashSettingsService(_package));
         }
 
         /// <summary>
@@ -188,7 +156,23 @@ namespace ShowToolWindows.Commands
         /// </summary>
         private void ApplyStashAbsolute(ToolWindowStash stash)
         {
-            var helper = GetToolWindowHelper();
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (!(Package.GetGlobalService(typeof(DTE)) is DTE dte))
+            {
+                Debug.WriteLine("ERROR: Could not get DTE service");
+                StatusBarHelper.ShowStatusBarNotification("Error: Could not access Visual Studio services");
+                return;
+            }
+
+            if (!(Package.GetGlobalService(typeof(SVsUIShell)) is IVsUIShell uiShell))
+            {
+                Debug.WriteLine("ERROR: Could not get IVsUIShell service");
+                StatusBarHelper.ShowStatusBarNotification("Error: Could not access Visual Studio services");
+                return;
+            }
+
+            var helper = ToolWindowHelper.Create(dte, uiShell);
             helper.CloseToolWindowsNotInStash(stash);
             helper.RestoreToolWindowsFromStash(stash);
         }
@@ -197,6 +181,7 @@ namespace ShowToolWindows.Commands
         /// Calculates the stash index from the matched command identifier.
         /// </summary>
 #pragma warning disable SA1204
+
         private static int GetStashIndex(DynamicItemMenuCommand command)
 #pragma warning restore SA1204
         {
