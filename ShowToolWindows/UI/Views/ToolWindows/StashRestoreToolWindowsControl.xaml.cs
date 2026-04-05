@@ -17,6 +17,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
+#pragma warning disable SA1101
+
 namespace ShowToolWindows.UI.Views.ToolWindows
 {
     /// <summary>
@@ -34,7 +36,6 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         private bool _isInitialised;
         private bool _hasSelectedItems;
         private readonly string _toolWindowObjectKind;
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ToggleToolWindowsControl"/> class.
@@ -164,7 +165,6 @@ namespace ShowToolWindows.UI.Views.ToolWindows
                 }
             }
         }
-
 
         /// <summary>
         /// Gets a value indicating whether the control has been initialized with Visual Studio services.
@@ -514,7 +514,6 @@ namespace ShowToolWindows.UI.Views.ToolWindows
             e.Handled = true;
         }
 
-
         /// <summary>
         /// Executes the refresh command to reload the tool windows list.
         /// </summary>
@@ -782,7 +781,6 @@ namespace ShowToolWindows.UI.Views.ToolWindows
 
             return result == VSConstants.MessageBoxResult.IDYES;
         }
-
 
         /// <summary>
         /// Restores tool windows from the top stash in merge mode and removes the stash.

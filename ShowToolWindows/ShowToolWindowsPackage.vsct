@@ -35,9 +35,21 @@
          other menus or buttons (commands); from a visual point of view you can see the
          group as the part of a menu contained between two lines. The parent of a group
          must be a menu. -->
+    <Menus>
+      <Menu guid="guidShowToolWindowsPackageCmdSet" id="ApplyStashSubmenu" priority="0x0200" type="Menu">
+        <Parent guid="guidShowToolWindowsPackageCmdSet" id="MyMenuGroup" />
+        <Strings>
+          <ButtonText>Apply Tool Window Stash...</ButtonText>
+        </Strings>
+      </Menu>
+    </Menus>
+
     <Groups>
       <Group guid="guidShowToolWindowsPackageCmdSet" id="MyMenuGroup" priority="0x0600">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
+      </Group>
+      <Group guid="guidShowToolWindowsPackageCmdSet" id="ApplyStashSubmenuGroup" priority="0x0100">
+        <Parent guid="guidShowToolWindowsPackageCmdSet" id="ApplyStashSubmenu" />
       </Group>
     </Groups>
 
@@ -80,8 +92,18 @@
           <LocCanonicalName>ScottTunstall.ShowToolWindows.StashRestoreToolWindows</LocCanonicalName>
         </Strings>
       </Button>
-    </Buttons>
-  </Commands>
+        <Button guid="guidShowToolWindowsPackageCmdSet" id="cmdidApplyStashDynamic" priority="0x0100" type="Button">
+            <Parent guid="guidShowToolWindowsPackageCmdSet" id="ApplyStashSubmenuGroup" />
+            <CommandFlag>DynamicItemStart</CommandFlag>
+            <CommandFlag>DynamicVisibility</CommandFlag>
+            <CommandFlag>DefaultInvisible</CommandFlag>
+            <CommandFlag>TextChanges</CommandFlag>
+            <Strings>
+              <ButtonText>Stash Placeholder</ButtonText>
+            </Strings>
+          </Button>
+      </Buttons>
+    </Commands>
 
   <Symbols>
     <!-- This is the package guid. -->
@@ -94,6 +116,9 @@
       <IDSymbol name="CloseAllToolWindowsExceptSolutionExplorerCommandId" value="4129" />
       <IDSymbol name="CloseAllToolWindowsCommandId" value="4130" />
       <IDSymbol name="CloseSpecificToolWindowsCommandId" value="4131" />
+      <IDSymbol name="ApplyStashSubmenu" value="0x1100" />
+      <IDSymbol name="ApplyStashSubmenuGroup" value="0x1200" />
+      <IDSymbol name="cmdidApplyStashDynamic" value="0x2000" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>
