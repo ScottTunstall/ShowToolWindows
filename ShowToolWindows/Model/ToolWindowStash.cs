@@ -63,6 +63,10 @@ namespace ShowToolWindows.Model
             return true;
         }
 
+        /// <summary>
+        /// Returns a comma-separated list of the stashed window captions.
+        /// </summary>
+        /// <returns>A string describing this stash.</returns>
         public override string ToString()
         {
             return _description;
