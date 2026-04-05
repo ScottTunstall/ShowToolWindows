@@ -19,6 +19,10 @@ namespace ShowToolWindows.Services
 
         private readonly WritableSettingsStore _settingsStore;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StashSettingsService"/> class.
+        /// </summary>
+        /// <param name="serviceProvider">The service provider used to access the Visual Studio settings store.</param>
         public StashSettingsService(IServiceProvider serviceProvider)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -33,9 +37,10 @@ namespace ShowToolWindows.Services
         }
 
         /// <summary>
-        /// Saves all stashes to settings.
+        /// Saves all stashes to persistent settings, replacing any previously saved stashes.
         /// </summary>
-        public void SaveStashes(List<ToolWindowStash> stashes)
+        /// <param name="stashes">The stashes to persist.</param>
+        public void SaveStashes(IEnumerable<ToolWindowStash> stashes)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -48,26 +53,27 @@ namespace ShowToolWindows.Services
                 }
             }
 
-            for (int i = 0; i < stashes.Count; i++)
+            int index = 0;
+            foreach (var stash in stashes)
             {
-                var stash = stashes[i];
-                var key = StashPrefix + i;
+                var key = StashPrefix + index++;
                 var jsonValue = JsonConvert.SerializeObject(stash);
                 _settingsStore.SetString(CollectionPath, key, jsonValue);
             }
         }
 
         /// <summary>
-        /// Loads all stashes from settings.
+        /// Loads all previously saved stashes from persistent settings.
         /// </summary>
-        public List<ToolWindowStash> LoadStashes()
+        /// <returns>A list of <see cref="ToolWindowStash"/> objects in the order they were saved.</returns>
+        public IReadOnlyList<ToolWindowStash> LoadStashes()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
             var properties = _settingsStore.GetPropertyNames(CollectionPath);
             var stashProperties = properties
                 .Where(p => p.StartsWith(StashPrefix))
-                .OrderBy(p => p)
+                .OrderBy(p => int.TryParse(p.Substring(StashPrefix.Length), out int i) ? i : int.MaxValue)
                 .ToList();
 
             var stashes = new List<ToolWindowStash>();
@@ -78,7 +84,7 @@ namespace ShowToolWindows.Services
                 stashes.Add(stash);
             }
 
-            return stashes;
+            return stashes.AsReadOnly();
         }
     }
 }
