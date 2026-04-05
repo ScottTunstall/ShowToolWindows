@@ -2,9 +2,9 @@
 using Microsoft.VisualStudio.Shell;
 using ShowToolWindows.UI.Infrastructure;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
-using System.Linq;
 using Task = System.Threading.Tasks.Task;
 
 namespace ShowToolWindows.Commands
@@ -41,11 +41,11 @@ namespace ShowToolWindows.Commands
         /// <param name="commandService">Command service to add command to, not null.</param>
         private CloseAllToolWindowsExceptSolutionExplorerCommand(AsyncPackage package, OleMenuCommandService commandService)
         {
-            this._package = package ?? throw new ArgumentNullException(nameof(package));
+            _package = package ?? throw new ArgumentNullException(nameof(package));
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
             var menuCommandId = new CommandID(CommandSet, CommandId);
-            var menuItem = new MenuCommand(this.Execute, menuCommandId);
+            var menuItem = new MenuCommand(Execute, menuCommandId);
             commandService.AddCommand(menuItem);
         }
 
@@ -56,17 +56,6 @@ namespace ShowToolWindows.Commands
         {
             get;
             private set;
-        }
-
-        /// <summary>
-        /// Gets the service provider from the owner package.
-        /// </summary>
-        private IAsyncServiceProvider ServiceProvider
-        {
-            get
-            {
-                return this._package;
-            }
         }
 
         /// <summary>
@@ -84,37 +73,33 @@ namespace ShowToolWindows.Commands
         }
 
         /// <summary>
-        /// This function is the callback used to execute the command when the menu item is clicked.
-        /// See the constructor to see how the menu item is associated with this function using
-        /// OleMenuCommandService service and MenuCommand class.
+        /// Handles the menu item click to close all tool windows except Solution Explorer.
         /// </summary>
         /// <param name="sender">Event sender.</param>
         /// <param name="e">Event args.</param>
         private void Execute(object sender, EventArgs e)
         {
+            ExecuteCloseAllToolWindowsExceptSolutionExplorer();
+        }
+
+        /// <summary>
+        /// Closes all visible tool windows except Solution Explorer and displays a status bar notification.
+        /// </summary>
+        private void ExecuteCloseAllToolWindowsExceptSolutionExplorer()
+        {
             ThreadHelper.ThrowIfNotOnUIThread();
 
             try
             {
-                // Get the Solution Explorer tool window
-                if (!(Package.GetGlobalService(typeof(EnvDTE.DTE)) is DTE dte))
+                if (!(Package.GetGlobalService(typeof(DTE)) is DTE dte))
                 {
                     Debug.WriteLine("ERROR: Could not get DTE service");
                     StatusBarHelper.ShowStatusBarNotification("Error: Could not access Visual Studio services");
                     return;
                 }
 
-#pragma warning disable VSTHRD010
-                var windowsToClose = dte.Windows
-                    .Cast<EnvDTE.Window>()
-                    .Where(w => w.Visible)
-                    .Where(w => w.Kind == WindowKindConsts.ToolWindowKind)
-                    .Where(w => w.ObjectKind != EnvDTE.Constants.vsWindowKindMainWindow)
-                    .Where(w => w.ObjectKind != EnvDTE.Constants.vsWindowKindSolutionExplorer)
-                    .ToList();
-#pragma warning restore VSTHRD010
-
-                int closedCount = WindowHelper.CloseWindows(windowsToClose);
+                var excluded = new HashSet<string> { Constants.vsWindowKindSolutionExplorer };
+                int closedCount = WindowHelper.CloseVisibleToolWindows(dte, excluded);
 
                 string message = closedCount == 1
                     ? "Closed 1 tool window."
@@ -123,7 +108,6 @@ namespace ShowToolWindows.Commands
             }
             catch (Exception ex)
             {
-                // Log the error or show a message
                 Debug.WriteLine($"ERROR closing tool windows: {ex.Message}");
                 Debug.WriteLine($"Stack trace: {ex.StackTrace}");
                 StatusBarHelper.ShowStatusBarNotification($"Error closing tool windows: {ex.Message}");

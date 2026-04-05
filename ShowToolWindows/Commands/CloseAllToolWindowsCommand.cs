@@ -4,7 +4,6 @@ using ShowToolWindows.UI.Infrastructure;
 using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
-using System.Linq;
 
 using Task = System.Threading.Tasks.Task;
 
@@ -60,17 +59,6 @@ namespace ShowToolWindows.Commands
         }
 
         /// <summary>
-        /// Gets the service provider from the owner package.
-        /// </summary>
-        private IAsyncServiceProvider ServiceProvider
-        {
-            get
-            {
-                return _package;
-            }
-        }
-
-        /// <summary>
         /// Initializes the singleton instance of the command.
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
@@ -85,13 +73,19 @@ namespace ShowToolWindows.Commands
         }
 
         /// <summary>
-        /// This function is the callback used to execute the command when the menu item is clicked.
-        /// See the constructor to see how the menu item is associated with this function using
-        /// OleMenuCommandService service and MenuCommand class.
+        /// Handles the menu item click to close all tool windows.
         /// </summary>
         /// <param name="sender">Event sender.</param>
         /// <param name="e">Event args.</param>
         private void Execute(object sender, EventArgs e)
+        {
+            ExecuteCloseAllToolWindows();
+        }
+
+        /// <summary>
+        /// Closes all visible tool windows and displays a status bar notification.
+        /// </summary>
+        private void ExecuteCloseAllToolWindows()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -104,16 +98,7 @@ namespace ShowToolWindows.Commands
                     return;
                 }
 
-#pragma warning disable VSTHRD010
-                var windowsToClose = dte.Windows
-                    .Cast<Window>()
-                    .Where(w => w.Visible)
-                    .Where(w => w.Kind == WindowKindConsts.ToolWindowKind)
-                    .Where(w => w.ObjectKind != Constants.vsWindowKindMainWindow)
-                    .ToList();
-#pragma warning restore VSTHRD010
-
-                int closedCount = WindowHelper.CloseWindows(windowsToClose);
+                int closedCount = WindowHelper.CloseVisibleToolWindows(dte);
 
                 string message = closedCount == 1
                     ? "Closed 1 tool window."
@@ -122,7 +107,6 @@ namespace ShowToolWindows.Commands
             }
             catch (Exception ex)
             {
-                // Log the error or show a message
                 Debug.WriteLine($"ERROR closing tool windows: {ex.Message}");
                 Debug.WriteLine($"Stack trace: {ex.StackTrace}");
                 StatusBarHelper.ShowStatusBarNotification($"Error closing tool windows: {ex.Message}");

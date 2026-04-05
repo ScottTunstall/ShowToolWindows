@@ -1,6 +1,6 @@
 ﻿namespace ShowToolWindows.UI.Infrastructure
 {
-    internal class WindowKindConsts
+    internal static class WindowKindConsts
     {
         public const string ToolWindowKind = "Tool";
     }
