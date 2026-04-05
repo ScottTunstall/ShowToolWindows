@@ -11,6 +11,11 @@ namespace ShowToolWindows.UI.ViewModels
         private int _index;
         private ToolWindowStash _stash;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StashListItem"/> class.
+        /// </summary>
+        /// <param name="stash">The stash to display.</param>
+        /// <param name="index">The display index for the stash.</param>
         public StashListItem(ToolWindowStash stash, int index)
         {
             _stash = stash;
@@ -39,6 +44,9 @@ namespace ShowToolWindows.UI.ViewModels
         /// </summary>
         public string DisplayText => $"{{{_index}}} - {_stash}";
 
+        /// <summary>
+        /// Occurs when a property value changes.
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void OnPropertyChanged(string propertyName)
@@ -46,6 +54,10 @@ namespace ShowToolWindows.UI.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        /// <summary>
+        /// Returns the display text for the stash list item.
+        /// </summary>
+        /// <returns>The formatted display text.</returns>
         public override string ToString()
         {
             return DisplayText;
