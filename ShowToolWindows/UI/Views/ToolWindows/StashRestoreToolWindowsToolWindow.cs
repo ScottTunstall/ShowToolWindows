@@ -28,8 +28,11 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         }
 
         /// <summary>
-        /// Called after the tool window pane is sited. Initializes the control with the package.
+        /// Initialises the tool window after it has been sited.
         /// </summary>
+        /// <remarks>
+        /// The hosted control is initialised when the owning package is available.
+        /// </remarks>
         protected override void Initialize()
         {
             base.Initialize();

@@ -139,13 +139,13 @@ namespace ShowToolWindows.UI.Views.ToolWindows
 
         /// <summary>
         /// Gets a value indicating whether stash modification operations (pop, drop) can be performed.
-        /// Requires both initialization and at least one stash to be available.
+        /// Requires both initialisation and at least one stash to be available.
         /// </summary>
         public bool CanMutateStash => IsInitialised && HaveStashes;
 
         /// <summary>
         /// Gets a value indicating whether the stash button should be enabled.
-        /// Requires both initialization and at least one checked tool window.
+        /// Requires both initialisation and at least one checked tool window.
         /// </summary>
         public bool CanStashSelected => IsInitialised && HaveSelectedItems;
 
