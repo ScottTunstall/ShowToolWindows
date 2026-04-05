@@ -260,6 +260,7 @@ dotnet_naming_style.underscore_prefix_camel_case.capitalization = camel_case
 
 # StyleCop Analyser rule overrides
 dotnet_diagnostic.SA1101.severity = none
+dotnet_diagnostic.SA1127.severity = none
 dotnet_diagnostic.SA1309.severity = none
 dotnet_diagnostic.SA1413.severity = none
 dotnet_diagnostic.SA1633.severity = none
