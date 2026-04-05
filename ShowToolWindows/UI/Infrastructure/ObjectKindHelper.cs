@@ -8,10 +8,10 @@ namespace ShowToolWindows.UI.Infrastructure
     internal static class ObjectKindHelper
     {
         /// <summary>
-        /// Normalizes an object kind string by ensuring GUIDs have enclosing curly braces.
+        /// Normalises an object kind string by ensuring GUIDs have enclosing curly braces.
         /// </summary>
-        /// <param name="objectKind">The object kind string to normalize.</param>
-        /// <returns>The normalized object kind string with curly braces if it's a valid GUID.</returns>
+        /// <param name="objectKind">The object kind string to normalise.</param>
+        /// <returns>The normalised object kind string with curly braces if it is a valid GUID.</returns>
         public static string NormalizeObjectKind(string objectKind)
         {
             if (string.IsNullOrWhiteSpace(objectKind))

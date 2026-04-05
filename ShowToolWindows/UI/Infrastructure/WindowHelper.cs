@@ -51,29 +51,6 @@ namespace ShowToolWindows.UI.Infrastructure
         }
 
         /// <summary>
-        /// Closes all visible tool windows, optionally excluding specific window object kinds.
-        /// </summary>
-        /// <param name="dte">The Visual Studio automation object.</param>
-        /// <param name="excludedObjectKinds">Optional set of object kind GUIDs to exclude from closing.</param>
-        /// <returns>The number of windows that were successfully closed.</returns>
-#pragma warning disable VSTHRD010
-        public static int CloseVisibleToolWindows(DTE dte, ISet<string> excludedObjectKinds = null)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            var windowsToClose = dte.Windows
-                .Cast<Window>()
-                .Where(w => w.Visible)
-                .Where(w => w.Kind == WindowKindConsts.ToolWindowKind)
-                .Where(w => w.ObjectKind != Constants.vsWindowKindMainWindow)
-                .Where(w => excludedObjectKinds == null || !excludedObjectKinds.Contains(w.ObjectKind))
-                .ToList();
-
-            return CloseWindows(windowsToClose);
-        }
-#pragma warning restore VSTHRD010
-
-        /// <summary>
         /// Repositions a Visual Studio tool window if any part of it is off-screen.
         /// </summary>
         /// <param name="visualStudioWindow">The main Visual Studio window used to determine the vertical position.</param>
