@@ -14,7 +14,7 @@ namespace ShowToolWindows.Commands
     /// </summary>
     /// <remarks>
     /// This command makes the Solution Explorer visible and brings it to the foreground.
-    /// If the Solution Explorer is positioned off-screen, the command automatically repositions 
+    /// If the Solution Explorer is positioned off-screen, the command automatically repositions
     /// it to be visible within the current screen bounds.
     /// </remarks>
     internal sealed class ShowSolutionExplorerCommand
@@ -114,7 +114,7 @@ namespace ShowToolWindows.Commands
                     Debug.WriteLine("ERROR: Solution Explorer window not found");
                     return;
                 }
-                
+
                 solutionWindow.Visible = true;
                 solutionWindow.Activate();
 
@@ -129,6 +129,7 @@ namespace ShowToolWindows.Commands
         }
 
 #pragma warning disable VSTHRD010
+
         private void RepositionIfOffscreen(Window visualStudioWindow, Window windowToRepos, Rectangle screen)
         {
             int winLeft = windowToRepos.Left;
@@ -160,7 +161,7 @@ namespace ShowToolWindows.Commands
                 return;
             }
 
-            // Any part of the solution explorer off bottom edge of screen?  
+            // Any part of the solution explorer off bottom edge of screen?
             if (winBottom > screen.Bottom)
             {
                 // Float and move to top edge
@@ -173,6 +174,7 @@ namespace ShowToolWindows.Commands
         private void FloatWindowAt(Window window, int left, int top, int width, int height, Rectangle screen)
         {
             window.IsFloating = true;
+
             // Clamp width/height to screen
             int screenHeight = screen.Height;
             window.Width = Math.Min(width, 400); // reasonable default width

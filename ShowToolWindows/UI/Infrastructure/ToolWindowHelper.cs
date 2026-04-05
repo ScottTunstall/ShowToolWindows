@@ -122,7 +122,6 @@ namespace ShowToolWindows.UI.Infrastructure
             SetToolWindowsVisibility(toolWindowsToClose, false);
         }
 
-
         /// <summary>
         /// Sets the visibility state of a single tool window.
         /// </summary>
@@ -157,7 +156,6 @@ namespace ShowToolWindows.UI.Infrastructure
             }
         }
 
-
         /// <summary>
         /// Sets the visibility state of multiple tool windows.
         /// </summary>
@@ -183,7 +181,6 @@ namespace ShowToolWindows.UI.Infrastructure
                 }
             }
         }
-
 
         /// <summary>
         /// Gets all tool windows available in the current Visual Studio instance.

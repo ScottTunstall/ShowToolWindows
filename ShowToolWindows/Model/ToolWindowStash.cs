@@ -18,7 +18,8 @@ namespace ShowToolWindows.Model
         public string[] WindowCaptions
         {
             get => _windowCaptions;
-            set {
+            set
+            {
                 _windowCaptions = value.Where(caption => !string.IsNullOrWhiteSpace(caption)).ToArray();
                 _description = string.Join(", ", _windowCaptions);
             }

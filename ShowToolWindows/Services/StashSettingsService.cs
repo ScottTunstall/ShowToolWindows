@@ -63,7 +63,7 @@ namespace ShowToolWindows.Services
         public List<ToolWindowStash> LoadStashes()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            
+
             var properties = _settingsStore.GetPropertyNames(CollectionPath);
             var stashProperties = properties
                 .Where(p => p.StartsWith(StashPrefix))

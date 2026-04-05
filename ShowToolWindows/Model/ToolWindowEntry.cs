@@ -2,7 +2,6 @@ using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 
 namespace ShowToolWindows.Model
 {

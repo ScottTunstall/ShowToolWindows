@@ -1,6 +1,5 @@
 ﻿using EnvDTE;
 using Microsoft.VisualStudio.Shell;
-using ShowToolWindows.UI;
 using ShowToolWindows.UI.Infrastructure;
 using System;
 using System.ComponentModel.Design;
@@ -14,7 +13,7 @@ namespace ShowToolWindows.Commands
     /// Command handler that closes all visible tool windows in Visual Studio except Solution Explorer.
     /// </summary>
     /// <remarks>
-    /// This command closes all tool windows except the main window and Solution Explorer, providing a way to 
+    /// This command closes all tool windows except the main window and Solution Explorer, providing a way to
     /// quickly clean up the Visual Studio workspace while preserving access to the solution structure.
     /// </remarks>
     internal sealed class CloseAllToolWindowsExceptSolutionExplorerCommand
@@ -108,17 +107,17 @@ namespace ShowToolWindows.Commands
 #pragma warning disable VSTHRD010
                 var windowsToClose = dte.Windows
                     .Cast<EnvDTE.Window>()
-                    .Where(w=>w.Visible)
-                    .Where(w=>w.Kind == WindowKindConsts.ToolWindowKind)
-                    .Where(w=>w.ObjectKind != EnvDTE.Constants.vsWindowKindMainWindow)
-                    .Where(w=> w.ObjectKind != EnvDTE.Constants.vsWindowKindSolutionExplorer)
+                    .Where(w => w.Visible)
+                    .Where(w => w.Kind == WindowKindConsts.ToolWindowKind)
+                    .Where(w => w.ObjectKind != EnvDTE.Constants.vsWindowKindMainWindow)
+                    .Where(w => w.ObjectKind != EnvDTE.Constants.vsWindowKindSolutionExplorer)
                     .ToList();
 #pragma warning restore VSTHRD010
 
                 int closedCount = WindowHelper.CloseWindows(windowsToClose);
-                
-                string message = closedCount == 1 
-                    ? "Closed 1 tool window." 
+
+                string message = closedCount == 1
+                    ? "Closed 1 tool window."
                     : $"Closed {closedCount} tool windows.";
                 StatusBarHelper.ShowStatusBarNotification(message);
             }
