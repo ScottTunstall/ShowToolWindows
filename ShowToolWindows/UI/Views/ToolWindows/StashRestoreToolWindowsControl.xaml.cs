@@ -167,7 +167,7 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         }
 
         /// <summary>
-        /// Gets a value indicating whether the control has been initialized with Visual Studio services.
+        /// Gets a value indicating whether the control has been initialised with Visual Studio services.
         /// </summary>
         public bool IsInitialised
         {
@@ -190,7 +190,7 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
-        /// Initializes the control with Visual Studio services asynchronously.
+        /// Initialises the control with Visual Studio services asynchronously.
         /// </summary>
         /// <param name="package">The owning package.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="package"/> is null.</exception>
@@ -212,18 +212,16 @@ namespace ShowToolWindows.UI.Views.ToolWindows
 
             _package = package;
 
+            _stashService = new StashSettingsService(_package);
+
             var dteService = await package.GetServiceAsync(typeof(DTE));
             _dte = dteService as DTE ?? throw new InvalidOperationException("Failed to get DTE service.");
 
             _uiShell = await _package.GetServiceAsync(typeof(SVsUIShell)) as IVsUIShell ?? throw new InvalidOperationException("Failed to get IVsUIShell service.");
 
-            _stashService = new StashSettingsService(_package);
             _messageBoxHelper = new MessageBoxHelper(_uiShell);
-            _toolWindowHelper = new ToolWindowHelper(_dte, _uiShell)
-            {
-                // We do not want to allow stashing or toggling this tool window itself
-                ExcludedWindowObjectKinds = new HashSet<string>() { StashRestoreToolWindowsToolWindow.ToolWindowGuidString }
-            };
+            _toolWindowHelper = ToolWindowHelper.Create(_dte, _uiShell);
+
             LoadAllToolWindowStashes();
 
             IsInitialised = true;
@@ -397,8 +395,7 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         }
 
         /// <summary>
-        /// Handles double-click on a stash item to restore the tool windows from that stash.
-        /// Left-click restores in merge mode. Right-click restores in absolute mode.
+        /// Handles double-click on a stash item to restore the tool windows from that stash in merge mode.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
@@ -806,6 +803,10 @@ namespace ShowToolWindows.UI.Views.ToolWindows
             SaveAllToolWindowStashes();
         }
 
+        /// <summary>
+        /// Removes the specified stash from the collection and persists the updated stash list.
+        /// </summary>
+        /// <param name="stash">The stash to remove.</param>
         private void DropStash(ToolWindowStash stash)
         {
             Stashes.Remove(stash);
@@ -840,8 +841,7 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         /// </summary>
         private void SaveAllToolWindowStashes()
         {
-            var stashList = new List<ToolWindowStash>(Stashes);
-            _stashService.SaveStashes(stashList);
+            _stashService.SaveStashes(Stashes);
         }
 
         /// <summary>
@@ -884,7 +884,7 @@ namespace ShowToolWindows.UI.Views.ToolWindows
         private void HideAllVisibleInStash(ToolWindowStash stash)
         {
             var allToolWindowEntries = _toolWindowHelper.GetAllToolWindowEntries().ToList();
-            var stashObjectKinds = new HashSet<string>(stash.WindowObjectKinds, StringComparer.OrdinalIgnoreCase);
+            var stashObjectKinds = stash.WindowObjectKinds.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
             var toolWindowsToHide = allToolWindowEntries
                 .Where(entry => stashObjectKinds.Contains(entry.ObjectKind))
@@ -929,8 +929,10 @@ namespace ShowToolWindows.UI.Views.ToolWindows
                 {
                     return ancestor;
                 }
+
                 current = System.Windows.Media.VisualTreeHelper.GetParent(current);
             }
+
             return null;
         }
 
