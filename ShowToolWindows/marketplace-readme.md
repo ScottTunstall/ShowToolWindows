@@ -18,6 +18,8 @@
 | **Stash/Restore Tool Windows** | Opens the dedicated stash management window |
 | **Apply Stash ▶** | Applies any of your 10 most recent stashes in absolute mode, directly from the menu |
 
+<img width="443" height="668" alt="Tools menu with Show Tool Windows commands" src="https://github.com/user-attachments/assets/d58a8458-c5ca-479b-9896-d813defd2995" />
+
 ---
 
 ## The Stash System
@@ -28,10 +30,25 @@ Stashes are lightweight snapshots of which tool windows you want open. They live
 
 | Mode | What Happens | How to Trigger |
 |------|-------------|----------------|
-| **Merge** | Stashed windows are opened; all existing windows stay open | Double-click a stash · Digit key 0–9 · Pop (Merge) |
+| **Merge** | Stashed windows are opened; all existing windows stay open | Double-click · Right-click → Apply (Merge) · Digit key 0–9 · Pop (Merge) |
 | **Absolute** | All current tool windows close, then the stash windows open | Right-click → Apply (Absolute) · Pop (Abs) · Tools → Apply Stash submenu |
 
 This is the key advantage over **Window → Apply Window Layout**: you choose whether to *add to* your workspace or *replace* it.
+
+#### Merge Mode (Additive)
+- **Double-click** a stash, or
+- Right-click a stash, select **Apply (Merge)** from the context menu, or
+- Use **Pop (Merge)** for the top stash, or
+- Press a **digit key (0–9)** to select and apply the stash at that index
+
+**Result:** Tool windows from the stash are **added** to your current workspace. Existing tool windows remain open.
+
+#### Absolute Mode (Replacement)
+- Right-click a stash, select **Apply (Absolute)** from the context menu, or
+- Use **Pop (Abs)** for the top stash, or
+- Select **Tools → Apply Stash** and choose a stash from the submenu
+
+**Result:** Current tool windows are **closed**, then the stashed tool windows are opened. Tool windows only — code editor tabs are never affected.
 
 ### Saving a Stash
 
@@ -47,11 +64,13 @@ Stashes survive session restarts and are stored in Visual Studio's settings. If 
 
 The **Tools → Apply Stash** submenu shows up to 10 of your most recent stashes by name. Click any entry to apply it immediately in absolute mode — no need to open the Stash/Restore window. Perfect for fast task-switching without leaving your current code file.
 
+<img width="659" height="663" alt="Apply Stash submenu" src="https://github.com/user-attachments/assets/01823a18-fb61-4427-a8e1-fa10d022c278" />
+
 ---
 
 ## The Stash/Restore Window
 
-<img width="535" height="395" alt="Stash/Restore Tool Windows interface" src="https://github.com/user-attachments/assets/df26b936-c891-4eac-88e5-4347a391b091" />
+<img width="435" height="340" alt="Stash/Restore Tool Windows interface" src="https://github.com/user-attachments/assets/e277dd79-1c63-412c-80c8-1b8747025db0" />
 
 The window gives you full control over your stash stack:
 
@@ -59,6 +78,17 @@ The window gives you full control over your stash stack:
 - A **stash list** with per-stash operations via right-click context menu
 - **Pop (Merge)** and **Pop (Abs)** buttons that apply and delete a stash in a single action
 - **Drop All** with confirmation for a clean slate
+
+### Pop vs Apply
+
+Apply operations open the stash windows but keep the stash in the list. Pop operations do the same in a single action, then remove the stash from the stack.
+
+| Operation | Applies stash | Removes from stack |
+|-----------|:---:|:---:|
+| Apply (Merge) | ✓ | ✗ |
+| Apply (Absolute) | ✓ | ✗ |
+| Pop (Merge) | ✓ | ✓ |
+| Pop (Abs) | ✓ | ✓ |
 
 ### Context Menu (Right-click Any Stash)
 
@@ -70,6 +100,9 @@ The window gives you full control over your stash stack:
 | **Apply (Absolute)** | Replace the current workspace with the stash windows |
 | **Hide all ref'd by stash** | Close all tool windows referenced in the stash |
 | **Drop** | Delete the stash permanently |
+
+**Bulk Operations:**
+- **Drop All** — Delete all stashes (confirmation required)
 
 ---
 
@@ -106,7 +139,7 @@ The window gives you full control over your stash stack:
 | Save a snapshot instantly without naming it | ✗ | ✓ |
 | Affects tool windows only, not code editor layout | ✗ | ✓ |
 | Context menu operations per saved configuration | ✗ | ✓ |
-| Apply directly from the menu bar | ✗ | ✓ |
+| Apply stash directly from the menu bar | ✗ | ✓ |
 | Multiple saved configurations | ✓ | ✓ |
 | Persistent across sessions | ✓ | ✓ |
 

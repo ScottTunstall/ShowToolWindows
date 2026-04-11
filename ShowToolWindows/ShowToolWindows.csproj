@@ -73,12 +73,12 @@
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="stylecop.json" />
+    <None Include="marketplace-readme.md" />
     <None Include="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
     <None Include="readme.md" />
-    <None Include="marketplace-readme.md" />
     <None Include="Readme\readme.md" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
