@@ -1,3 +1,8 @@
+
+## Documentation
+
+- Whenever `readme.md` in the repository root is updated, also update `marketplace-markdown.md` in the repository root to reflect the same changes. The marketplace version must be tailored for the Visual Studio Marketplace: lead with a developer-focused value proposition, use benefit-led language, include a tick/cross feature comparison table vs Visual Studio built-in layouts, and present commands, modes, keyboard shortcuts, and use cases in a format that attracts developers browsing the Marketplace.
+
 ## Visual Studio Extension Development
 
 - OBEY Visual Studio UX patterns (menus, commands, window behaviour): https://learn.microsoft.com/en-us/visualstudio/extensibility/ux-guidelines/application-patterns-for-visual-studio
@@ -9,7 +14,6 @@
 - Use IVsWindowFrame for visibility control.
 - Avoid blocking the UI thread.
 - Keep long‑running work off the main thread.
-
 
 ## General Coding Practices
 
