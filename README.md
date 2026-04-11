@@ -46,17 +46,20 @@ Unlike **Window -> Apply Window Layout**, the Stash/Restore system provides:
 
 After installation, find new commands and submenus on the **Tools** menu:
 
-<img width="442" height="634" alt="Tools menu with Show Tool Windows commands" src="https://github.com/user-attachments/assets/b9f0f04b-ecdc-434e-8d9f-776b39fc17bd" />
+<img width="443" height="668" alt="image" src="https://github.com/user-attachments/assets/d58a8458-c5ca-479b-9896-d813defd2995" />
 
 ### 2. Using the Stash/Restore Tool Window
 
 Click **Tools -> Stash/Restore Tool Windows** to open the management window:
 
-<img width="535" height="395" alt="Stash/Restore Tool Windows interface" src="https://github.com/user-attachments/assets/df26b936-c891-4eac-88e5-4347a391b091" />
+<img width="435" height="340" alt="image" src="https://github.com/user-attachments/assets/e277dd79-1c63-412c-80c8-1b8747025db0" />
 
 ### 3. Quick Apply via the Apply Stash Submenu
 
 The **Tools → Apply Stash** submenu lists up to 10 of your most recent stashes by name. Clicking any entry applies it immediately in absolute mode — ideal for fast task-switching without leaving your current code file and without needing to open the Stash/Restore window.
+
+<img width="659" height="663" alt="image" src="https://github.com/user-attachments/assets/01823a18-fb61-4427-a8e1-fa10d022c278" />
+
 
 ## How Stashing Works
 
