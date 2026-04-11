@@ -22,6 +22,7 @@ This extension provides **flexible, stack-based tool window management**:
 - **Show Solution Explorer** - Instantly bring Solution Explorer fully into view, even if it's offscreen
 - **Close All Tool Windows (except Solution Explorer)** - Clean your workspace while preserving navigation
 - **Close All Tool Windows** - Nuclear option for complete decluttering (code windows remain untouched)
+- **Apply Stash (Tools menu)** - Apply any of your 10 most recent stashes in absolute mode directly from the Tools menu, without opening the Stash/Restore window
 
 ### Stash/Restore System (The Power Feature)
 
@@ -35,6 +36,7 @@ Unlike **Window -> Apply Window Layout**, the Stash/Restore system provides:
 | **Context menu operations** | No | Yes - apply, hide, drop |
 | **Persistent across sessions** | Yes | Yes |
 | **Affects code editor layout** | Yes - overwrites everything | No - tool windows only |
+| **Apply stash from the menu bar** | No | Yes - via the Tools → Apply Stash submenu |
 
 
 
@@ -42,7 +44,7 @@ Unlike **Window -> Apply Window Layout**, the Stash/Restore system provides:
 
 ### 1. Access the Commands
 
-After installation, find four new commands on the **Tools** menu:
+After installation, find new commands and submenus on the **Tools** menu:
 
 <img width="442" height="634" alt="Tools menu with Show Tool Windows commands" src="https://github.com/user-attachments/assets/b9f0f04b-ecdc-434e-8d9f-776b39fc17bd" />
 
@@ -51,6 +53,10 @@ After installation, find four new commands on the **Tools** menu:
 Click **Tools -> Stash/Restore Tool Windows** to open the management window:
 
 <img width="535" height="395" alt="Stash/Restore Tool Windows interface" src="https://github.com/user-attachments/assets/df26b936-c891-4eac-88e5-4347a391b091" />
+
+### 3. Quick Apply via the Apply Stash Submenu
+
+The **Tools → Apply Stash** submenu lists up to 10 of your most recent stashes by name. Clicking any entry applies it immediately in absolute mode — ideal for fast task-switching without leaving your current code file and without needing to open the Stash/Restore window.
 
 ## How Stashing Works
 
@@ -61,7 +67,7 @@ Click **Tools -> Stash/Restore Tool Windows** to open the management window:
 3. **Check the tool windows** you want to include
 4. Click **Stash Checked** - your configuration is saved to the top of the stack
 
-**Note:** Stashes persist between Visual Studio sessions until you delete them.
+**Note:** Stashes persist between Visual Studio sessions until you delete them. If a stash with the same tool window combination already exists, you will be prompted for confirmation before a duplicate is created.
 
 ### Applying Stashes - Two Modes
 
@@ -70,13 +76,15 @@ The key advantage over Visual Studio's built-in layouts:
 #### Merge Mode (Additive)
 - **Double-click** a stash, or
 - Right-click a stash, select **Apply (Merge)** from the context menu, or  
-- Use **Pop (Merge)** for the top stash
+- Use **Pop (Merge)** for the top stash, or
+- Press a **digit key (0–9)** to select and apply the stash at that index
 
 **Result:** Tool windows from the stash are **added** to your current workspace. Existing tool windows remain open.
 
 #### Absolute Mode (Replacement)
 - Right-click a stash, select **Apply (Absolute)** from the context menu, or
-- Use **Pop (Abs)** for the top stash
+- Use **Pop (Abs)** for the top stash, or
+- Select **Tools → Apply Stash** and choose a stash from the submenu
 
 **Result:** Current tool windows are **closed**, then the stashed tool windows are opened. Similar to built-in layouts, but tool-windows-only.
 
@@ -92,7 +100,7 @@ The key advantage over Visual Studio's built-in layouts:
 
 - **Apply (Merge)** - Add tool windows without deleting stash
 - **Apply (Absolute)** - Replace tool windows without deleting stash
-- **Hide All ref'd by Stash** - Close all tool windows referenced in the stash
+- **Hide all ref'd by stash** - Close all tool windows referenced in the stash
 - **Drop** - Delete the stash permanently
 
 **Bulk Operations:**
@@ -104,6 +112,7 @@ The Stash/Restore window includes built-in shortcuts:
 - **F5** - Refresh tool window list
 - **Ctrl+A** - Check all tool windows
 - **Delete** - Drop selected stash
+- **0–9 / NumPad 0–9** - Select the stash at that index and apply it in merge mode
 
 ## Recommended: Assign Shortcuts to Menu Commands
 
@@ -142,7 +151,7 @@ For maximum productivity, assign keyboard shortcuts to the main commands:
 - **Persistence:** Stashes are stored in Visual Studio's settings and persist across sessions
 - **Scope:** Operations affect tool windows only; code editor tabs and layouts are never modified
 - **Architecture:** Uses Visual Studio's DTE automation layer for tool window management
-- **Compatibility:** Tested with Visual Studio 2019, 2022, and 2026 (x86 and amd64 architectures)
+- **Compatibility:** Tested with Visual Studio 2019, 2022, and 2026 (x86, amd64, and arm64 architectures)
 
 ## Why Not Use Built-in Window Layouts?
 

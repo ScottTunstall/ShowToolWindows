@@ -68,7 +68,7 @@ The window gives you full control over your stash stack:
 |------|-------------|
 | **Apply (Merge)** | Open stash windows without deleting the stash or closing existing windows |
 | **Apply (Absolute)** | Replace the current workspace with the stash windows |
-| **Hide All ref'd by Stash** | Close all tool windows referenced in the stash |
+| **Hide all ref'd by stash** | Close all tool windows referenced in the stash |
 | **Drop** | Delete the stash permanently |
 
 ---
