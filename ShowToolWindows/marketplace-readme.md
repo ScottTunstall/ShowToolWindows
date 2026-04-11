@@ -99,7 +99,7 @@ Apply operations open the stash windows but keep the stash in the list. Pop oper
 | **Apply (Merge)** | Open stash windows without deleting the stash or closing existing windows |
 | **Apply (Absolute)** | Replace the current workspace with the stash windows |
 | **Hide all ref'd by stash** | Close all tool windows referenced in the stash |
-| **Drop** | Delete the stash permanently |
+| **Drop** | Delete the stash permanently (confirmation required) |
 
 **Bulk Operations:**
 - **Drop All** — Delete all stashes (confirmation required)
@@ -169,6 +169,7 @@ Run **Tools → Close All Tool Windows** to reset your workspace without touchin
 - **Architecture:** Uses Visual Studio's DTE automation layer for tool window management
 - **Persistence:** Stashes are stored in Visual Studio's settings and survive session restarts
 - **Scope:** Tool windows only — code editor tabs and arrangements are never modified
+- **Status bar feedback:** Every operation posts a result message to the Visual Studio status bar (e.g. number of windows closed, stash applied or dropped)
 
 ---
 

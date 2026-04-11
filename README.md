@@ -104,7 +104,7 @@ The key advantage over Visual Studio's built-in layouts:
 - **Apply (Merge)** - Add tool windows without deleting stash
 - **Apply (Absolute)** - Replace tool windows without deleting stash
 - **Hide all ref'd by stash** - Close all tool windows referenced in the stash
-- **Drop** - Delete the stash permanently
+- **Drop** - Delete the stash permanently (confirmation required)
 
 **Bulk Operations:**
 - **Drop All** - Delete all stashes (confirmation required)
@@ -155,6 +155,7 @@ For maximum productivity, assign keyboard shortcuts to the main commands:
 - **Scope:** Operations affect tool windows only; code editor tabs and layouts are never modified
 - **Architecture:** Uses Visual Studio's DTE automation layer for tool window management
 - **Compatibility:** Tested with Visual Studio 2019, 2022, and 2026 (x86, amd64, and arm64 architectures)
+- **Status bar feedback:** Every operation posts a result message to the Visual Studio status bar (e.g. number of windows closed, stash applied or dropped)
 
 ## Why Not Use Built-in Window Layouts?
 
